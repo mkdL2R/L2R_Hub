@@ -14,7 +14,344 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ecosystem_profiles: {
+        Row: {
+          challenges: string[] | null
+          created_at: string
+          cultural_background: string | null
+          daily_routine: Json | null
+          family_id: string
+          goals: string[] | null
+          id: string
+          notes: string | null
+          parenting_style: string | null
+          support_network: string | null
+          tech_usage: string | null
+          updated_at: string
+          values_summary: string | null
+        }
+        Insert: {
+          challenges?: string[] | null
+          created_at?: string
+          cultural_background?: string | null
+          daily_routine?: Json | null
+          family_id: string
+          goals?: string[] | null
+          id?: string
+          notes?: string | null
+          parenting_style?: string | null
+          support_network?: string | null
+          tech_usage?: string | null
+          updated_at?: string
+          values_summary?: string | null
+        }
+        Update: {
+          challenges?: string[] | null
+          created_at?: string
+          cultural_background?: string | null
+          daily_routine?: Json | null
+          family_id?: string
+          goals?: string[] | null
+          id?: string
+          notes?: string | null
+          parenting_style?: string | null
+          support_network?: string | null
+          tech_usage?: string | null
+          updated_at?: string
+          values_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ecosystem_profiles_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: true
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      families: {
+        Row: {
+          address: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          family_name: string | null
+          household_languages: string[] | null
+          household_size: number | null
+          id: string
+          postal_code: string | null
+          primary_email: string | null
+          primary_phone: string | null
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          family_name?: string | null
+          household_languages?: string[] | null
+          household_size?: number | null
+          id?: string
+          postal_code?: string | null
+          primary_email?: string | null
+          primary_phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          family_name?: string | null
+          household_languages?: string[] | null
+          household_size?: number | null
+          id?: string
+          postal_code?: string | null
+          primary_email?: string | null
+          primary_phone?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      onboarding_status: {
+        Row: {
+          completed_at: string | null
+          completed_steps: string[]
+          current_step: number
+          family_id: string | null
+          id: string
+          journey: string
+          started_at: string
+          status: string
+          student_id: string | null
+          total_steps: number
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: string[]
+          current_step?: number
+          family_id?: string | null
+          id?: string
+          journey: string
+          started_at?: string
+          status?: string
+          student_id?: string | null
+          total_steps: number
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: string[]
+          current_step?: number
+          family_id?: string | null
+          id?: string
+          journey?: string
+          started_at?: string
+          status?: string
+          student_id?: string | null
+          total_steps?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_status_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "onboarding_status_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parent_responses: {
+        Row: {
+          answer: Json
+          created_at: string
+          family_id: string
+          id: string
+          parent_id: string | null
+          question_key: string
+          step_key: string
+        }
+        Insert: {
+          answer: Json
+          created_at?: string
+          family_id: string
+          id?: string
+          parent_id?: string | null
+          question_key: string
+          step_key: string
+        }
+        Update: {
+          answer?: Json
+          created_at?: string
+          family_id?: string
+          id?: string
+          parent_id?: string | null
+          question_key?: string
+          step_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parent_responses_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parent_responses_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "parents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parents: {
+        Row: {
+          created_at: string
+          education_level: string | null
+          email: string | null
+          family_id: string
+          full_name: string
+          id: string
+          is_primary: boolean
+          occupation: string | null
+          phone: string | null
+          relationship: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          education_level?: string | null
+          email?: string | null
+          family_id: string
+          full_name: string
+          id?: string
+          is_primary?: boolean
+          occupation?: string | null
+          phone?: string | null
+          relationship?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          education_level?: string | null
+          email?: string | null
+          family_id?: string
+          full_name?: string
+          id?: string
+          is_primary?: boolean
+          occupation?: string | null
+          phone?: string | null
+          relationship?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parents_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_responses: {
+        Row: {
+          answer: Json
+          created_at: string
+          id: string
+          question_key: string
+          step_key: string
+          student_id: string
+        }
+        Insert: {
+          answer: Json
+          created_at?: string
+          id?: string
+          question_key: string
+          step_key: string
+          student_id: string
+        }
+        Update: {
+          answer?: Json
+          created_at?: string
+          id?: string
+          question_key?: string
+          step_key?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_responses_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          date_of_birth: string | null
+          family_id: string | null
+          full_name: string
+          grade_level: string | null
+          id: string
+          learning_style: string | null
+          preferred_subjects: string[] | null
+          school_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_of_birth?: string | null
+          family_id?: string | null
+          full_name: string
+          grade_level?: string | null
+          id?: string
+          learning_style?: string | null
+          preferred_subjects?: string[] | null
+          school_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_of_birth?: string | null
+          family_id?: string | null
+          full_name?: string
+          grade_level?: string | null
+          id?: string
+          learning_style?: string | null
+          preferred_subjects?: string[] | null
+          school_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "students_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
