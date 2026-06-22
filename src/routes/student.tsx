@@ -142,21 +142,24 @@ function StudentJourney() {
         studentId = row!.id;
         onboardingStore.set("student", studentId);
       }
-    } else if (studentId) {
-      const partial: Record<string, unknown> = {};
-      if (currentStep === 1) {
-        partial.grade_level = data.grade_level || null;
-        partial.school_name = data.school_name || null;
-      }
-      if (currentStep === 2) {
-        partial.preferred_subjects = data.preferred_subjects.length
-          ? data.preferred_subjects
-          : null;
-        partial.learning_style = data.learning_style || null;
-      }
-      if (Object.keys(partial).length) {
-        await supabase.from("students").update(partial).eq("id", studentId).throwOnError();
-      }
+    } else if (studentId && currentStep === 1) {
+      await supabase
+        .from("students")
+        .update({
+          grade_level: data.grade_level || null,
+          school_name: data.school_name || null,
+        })
+        .eq("id", studentId)
+        .throwOnError();
+    } else if (studentId && currentStep === 2) {
+      await supabase
+        .from("students")
+        .update({
+          preferred_subjects: data.preferred_subjects.length ? data.preferred_subjects : null,
+          learning_style: data.learning_style || null,
+        })
+        .eq("id", studentId)
+        .throwOnError();
     }
 
     if (studentId) {
