@@ -12,7 +12,11 @@ import {
   Home,
   MessagesSquare,
   Target,
+  Lightbulb,
+  Sparkles,
+  Navigation,
 } from "lucide-react";
+import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/compass")({
   head: () => ({
@@ -58,6 +62,10 @@ type GoalsInsights = {
   studentAspirations: string;
   narrative: string;
 };
+
+type StrengthsInsights = { items: string[] };
+type GrowthInsights = { items: string[] };
+type PathwayInsights = { name: string; explanation: string };
 
 function pickAnswer(rows: AnswerRow[], key: string): string {
   const row = rows.find((r) => r.question_key === key);
@@ -228,6 +236,125 @@ function deriveGoals(parentRows: AnswerRow[], studentRows: AnswerRow[]): GoalsIn
   return { parentGoals, studentAspirations, narrative };
 }
 
+function deriveStrengths(
+  parentRows: AnswerRow[],
+  studentRows: AnswerRow[],
+): StrengthsInsights {
+  const text = [
+    pickAnswer(studentRows, "strengths"),
+    pickAnswer(studentRows, "motivation"),
+    pickAnswer(studentRows, "goals"),
+    pickArray(studentRows, "preferred_subjects").join(" "),
+    pickAnswer(parentRows, "values_summary"),
+    pickAnswer(parentRows, "notes"),
+    pickArray(parentRows, "goals").join(" "),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const catalog: Array<[string, RegExp]> = [
+    ["Curiosity", /curious|explore|wonder|question|discover|interest/],
+    ["Creativity", /creative|art|imagine|design|music|story|draw|build/],
+    ["Responsibility", /responsib|reliable|trust|duty|care/],
+    ["Perseverance", /persever|persist|effort|try again|determined|resilien/],
+    ["Emotional awareness", /emotion|feeling|empath|aware|sensitive|kind/],
+    ["Adaptability", /adapt|flexible|change|new situation|open/],
+    ["Collaboration", /team|friend|group|together|peer|collaborat|share/],
+    ["Independence", /independ|alone|self|autonom|own/],
+    ["Focus", /focus|concentrate|attention|dedicated/],
+    ["Curiosity for learning", /learn|study|read|practice/],
+  ];
+
+  const matched = catalog
+    .filter(([, re]) => re.test(text))
+    .map(([name]) => name);
+
+  const unique = Array.from(new Set(matched));
+  const items = unique.length
+    ? unique.slice(0, 5)
+    : ["Curiosity", "Emotional awareness", "Adaptability"];
+
+  return { items };
+}
+
+function deriveGrowth(
+  parentRows: AnswerRow[],
+  studentRows: AnswerRow[],
+): GrowthInsights {
+  const text = [
+    pickAnswer(studentRows, "struggles"),
+    pickArray(parentRows, "challenges").join(" "),
+    pickAnswer(parentRows, "notes"),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  const catalog: Array<[string, RegExp]> = [
+    ["Building consistency", /routine|consisten|habit|schedule|follow through/],
+    ["Strengthening focus", /focus|distract|attention|concentrate/],
+    ["Developing self-confidence", /confidence|shy|nervous|doubt|self-esteem|quiet/],
+    ["Improving emotional regulation", /anger|frustrat|emotion|melt|overwhelm|anxiet|stress/],
+    ["Nurturing social connection", /social|friend|peer|lonely|isolat/],
+    ["Expanding curiosity", /bored|uninterested|motivat/],
+    ["Strengthening organisation", /organi[sz]|messy|forget|plan/],
+  ];
+
+  const matched = catalog
+    .filter(([, re]) => re.test(text))
+    .map(([name]) => name);
+
+  const unique = Array.from(new Set(matched));
+  const items = unique.length
+    ? unique.slice(0, 4)
+    : ["Building consistency", "Developing self-confidence"];
+
+  return { items };
+}
+
+function derivePathway(
+  strengths: StrengthsInsights,
+  growth: GrowthInsights,
+  insights: LearningInsights,
+): PathwayInsights {
+  const s = strengths.items.join(" ").toLowerCase();
+  const g = growth.items.join(" ").toLowerCase();
+  const env = insights.environment.toLowerCase();
+
+  if (/confidence/.test(g)) {
+    return {
+      name: "Confidence Building Pathway",
+      explanation:
+        "This pathway centres on gentle, encouraging experiences that help the learner trust their own voice. Activities are paced to build small, repeated wins, with mentors who notice progress out loud. Over time, the learner is invited into slightly bolder challenges, always with a safety net of support.",
+    };
+  }
+  if (/focus|consistency|organi/.test(g)) {
+    return {
+      name: "Structured Guidance Pathway",
+      explanation:
+        "This pathway offers a clear rhythm and steady scaffolding so the learner can develop focus and follow-through. Sessions are predictable, expectations are transparent, and mentors check in often. Structure here is a form of care, not control — a framework that frees the learner to take ownership step by step.",
+    };
+  }
+  if (/curiosity|creativity/.test(s) && /flexible|stimulating/.test(env)) {
+    return {
+      name: "Exploratory Learning Pathway",
+      explanation:
+        "This pathway leans into the learner's natural curiosity, offering rich, open-ended experiences and time to follow interests deeply. Mentors act as guides, not gatekeepers, and projects are shaped around real questions the learner cares about. The goal is to keep wonder alive while building lasting skills.",
+    };
+  }
+  if (/independ/.test(s)) {
+    return {
+      name: "Independent Growth Pathway",
+      explanation:
+        "This pathway gives the learner room to drive their own progress, with mentors available as thinking partners rather than directors. Goals are co-designed, reflection is built in, and the learner gradually takes on more authorship of their journey. It honours autonomy while keeping connection close.",
+    };
+  }
+  return {
+    name: "Balanced Development Pathway",
+    explanation:
+      "This pathway weaves together structure and freedom, individual and collaborative work, challenge and rest. It is designed for learners who flourish when their days hold a healthy mix — enough rhythm to feel grounded, enough openness to feel alive. Mentors adjust the balance as the learner grows.",
+  };
+}
+
 function CompassPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -294,6 +421,27 @@ function CompassPage() {
         : null,
     [parentResponses, responses],
   );
+  const strengths = useMemo(
+    () =>
+      parentResponses.length || responses.length
+        ? deriveStrengths(parentResponses, responses)
+        : null,
+    [parentResponses, responses],
+  );
+  const growth = useMemo(
+    () =>
+      parentResponses.length || responses.length
+        ? deriveGrowth(parentResponses, responses)
+        : null,
+    [parentResponses, responses],
+  );
+  const pathway = useMemo(
+    () =>
+      insights && strengths && growth
+        ? derivePathway(strengths, growth, insights)
+        : null,
+    [insights, strengths, growth],
+  );
 
   // Persist generated learning summary into ecosystem_profiles
   useEffect(() => {
@@ -319,6 +467,9 @@ function CompassPage() {
               ecosystem,
               communication,
               goals,
+              strengths,
+              growth,
+              pathway,
             },
           },
         };
@@ -330,14 +481,19 @@ function CompassPage() {
         console.warn("Could not persist Compass output", e);
       }
     })();
-  }, [insights, ecosystem, communication, goals, familyId, saved]);
+  }, [insights, ecosystem, communication, goals, strengths, growth, pathway, familyId, saved]);
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-          <Link to="/" className="text-sm font-semibold tracking-tight">
-            ← Home
+          <Link to="/" className="flex items-center gap-3 text-sm font-semibold tracking-tight">
+            <img
+              src={logoAsset.url}
+              alt="Left2Right Education Hub"
+              className="h-9 w-9 rounded-lg object-cover"
+            />
+            <span className="hidden sm:inline">Left2Right Education Hub</span>
           </Link>
           <span className="text-xs uppercase tracking-widest text-muted-foreground">
             L2R Compass
@@ -484,6 +640,80 @@ function CompassPage() {
                 </div>
               </SectionCard>
             )}
+
+            {strengths && (
+              <SectionCard
+                icon={<Lightbulb className="h-5 w-5" />}
+                title="Strengths 💡"
+                subtitle="Qualities that already shine through"
+                summary="These are the qualities most present in the learner's story right now — strengths to lean on as the journey continues."
+              >
+                <div className="flex flex-wrap gap-2">
+                  {strengths.items.map((s) => (
+                    <Badge
+                      key={s}
+                      variant="secondary"
+                      className="rounded-full px-4 py-1.5 text-sm"
+                    >
+                      {s}
+                    </Badge>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
+
+            {growth && (
+              <SectionCard
+                icon={<Sparkles className="h-5 w-5" />}
+                title="Growth Opportunities 🌟"
+                subtitle="Gentle next steps to nurture together"
+                summary="These are not weaknesses — they are invitations. Areas where attention, care, and the right support can open new chapters of growth."
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {growth.items.map((g) => (
+                    <div
+                      key={g}
+                      className="rounded-xl border border-border/60 bg-card/50 p-4 text-sm text-foreground"
+                    >
+                      {g}
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            )}
+
+            {pathway && (
+              <SectionCard
+                icon={<Navigation className="h-5 w-5" />}
+                title="Recommended L2R Accompaniment 🧭"
+                subtitle="A pathway shaped around this learner"
+                summary={pathway.explanation}
+              >
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+                  <p className="text-xs font-medium uppercase tracking-widest text-primary">
+                    Suggested pathway
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                    {pathway.name}
+                  </p>
+                </div>
+              </SectionCard>
+            )}
+
+            <div className="mt-4 rounded-2xl border border-border/60 bg-gradient-to-br from-primary/5 via-card/50 to-transparent p-8 text-center">
+              <img
+                src={logoAsset.url}
+                alt="Left2Right Education Hub"
+                className="mx-auto mb-5 h-14 w-14 rounded-xl object-cover shadow-sm"
+              />
+              <p className="mx-auto max-w-2xl text-lg italic leading-relaxed text-foreground">
+                "This Compass is not a destination. It is a living guide that evolves as the
+                learner and family continue their journey together."
+              </p>
+              <p className="mt-4 text-xs uppercase tracking-widest text-muted-foreground">
+                Structure without rigidity · Autonomy without isolation · Education as a lifelong journey
+              </p>
+            </div>
           </div>
         ) : null}
       </main>
