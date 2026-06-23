@@ -4,7 +4,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { onboardingStore } from "@/lib/onboarding-storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sprout, Compass, Loader2, AlertCircle } from "lucide-react";
+import {
+  Sprout,
+  Compass,
+  Loader2,
+  AlertCircle,
+  Home,
+  MessagesSquare,
+  Target,
+} from "lucide-react";
 
 export const Route = createFileRoute("/compass")({
   head: () => ({
@@ -29,6 +37,26 @@ type LearningInsights = {
   environment: string;
   subjects: string[];
   summary: string;
+};
+
+type EcosystemInsights = {
+  rhythm: string;
+  values: string;
+  environment: string;
+  summary: string;
+};
+
+type CommunicationInsights = {
+  style: string;
+  conflict: string;
+  safety: string;
+  summary: string;
+};
+
+type GoalsInsights = {
+  parentGoals: string[];
+  studentAspirations: string;
+  narrative: string;
 };
 
 function pickAnswer(rows: AnswerRow[], key: string): string {
@@ -104,11 +132,108 @@ function deriveInsights(rows: AnswerRow[]): LearningInsights {
   return { approach, collaboration, energy, environment, subjects, summary };
 }
 
+function deriveEcosystem(rows: AnswerRow[]): EcosystemInsights {
+  const parentingStyle = pickAnswer(rows, "parenting_style");
+  const values = pickAnswer(rows, "values_summary");
+  const support = pickAnswer(rows, "support_network");
+  const tech = pickAnswer(rows, "tech_usage");
+  const languages = pickArray(rows, "household_languages");
+  const culture = pickAnswer(rows, "cultural_background");
+
+  const rhythm = [
+    parentingStyle && `A ${parentingStyle.toLowerCase()} parenting rhythm`,
+    support && `supported by ${support.toLowerCase()}`,
+    tech && `with a ${tech.toLowerCase()} approach to technology`,
+  ]
+    .filter(Boolean)
+    .join(", ") || "A balanced daily rhythm shaped by shared routines";
+
+  const valuesText =
+    values ||
+    (culture
+      ? `Rooted in ${culture} traditions and shared family values`
+      : "Guided by shared family values and lived experience");
+
+  const environment =
+    languages.length > 1
+      ? `A multilingual home (${languages.join(", ")}) that nurtures curiosity across cultures`
+      : languages.length === 1
+        ? `A ${languages[0]}-speaking home that encourages learning through everyday life`
+        : "A home environment that encourages learning through everyday life";
+
+  const summary =
+    "This family ecosystem is rooted in " +
+    (values ? `${values.toLowerCase().replace(/\.$/, "")}` : "shared care and intention") +
+    ". The home environment encourages both autonomy and support, with daily rhythms that make space for growth.";
+
+  return { rhythm, values: valuesText, environment, summary };
+}
+
+function deriveCommunication(
+  parentRows: AnswerRow[],
+  studentRows: AnswerRow[],
+): CommunicationInsights {
+  const parentingStyle = pickAnswer(parentRows, "parenting_style").toLowerCase();
+  const support = pickAnswer(parentRows, "support_network").toLowerCase();
+  const notes = pickAnswer(parentRows, "notes").toLowerCase();
+  const challenges = pickArray(parentRows, "challenges").map((c) => c.toLowerCase());
+  const struggles = pickAnswer(studentRows, "struggles").toLowerCase();
+  const motivation = pickAnswer(studentRows, "motivation").toLowerCase();
+
+  const style = /authoritative|collaborative|democratic|gentle/.test(parentingStyle)
+    ? "Warm and collaborative — conversations tend to be two-way and respectful"
+    : /strict|structured|firm/.test(parentingStyle)
+      ? "Clear and structured — communication leans on consistency and direction"
+      : /relax|permissive|free/.test(parentingStyle)
+        ? "Open and flexible — conversation flows freely with room for self-expression"
+        : "Caring and adaptive — communication shifts to meet the moment";
+
+  const conflict = challenges.some((c) => /anxiety|stress|peer|focus/.test(c))
+    ? "Approaches tension with patience, leaning on connection before correction"
+    : /talk|listen|together|family/.test(support + " " + notes)
+      ? "Resolves friction through dialogue, with space for everyone to be heard"
+      : "Works through disagreements steadily, prioritising understanding over winning";
+
+  const safety =
+    /quiet|shy|afraid|nervous|anxious/.test(struggles)
+      ? "Expression is gentle; the learner may need extra reassurance to share openly"
+      : /share|talk|express|open|confident/.test(motivation + " " + struggles)
+        ? "Expression feels safe — the learner is comfortable sharing thoughts and feelings"
+        : "Expression is steady, with growing confidence to share when invited";
+
+  const summary =
+    "Communication here is grounded in care. " +
+    "Conversations honor each person's voice, and emotional safety is treated as part of learning, not separate from it.";
+
+  return { style, conflict, safety, summary };
+}
+
+function deriveGoals(parentRows: AnswerRow[], studentRows: AnswerRow[]): GoalsInsights {
+  const parentGoals = pickArray(parentRows, "goals");
+  const studentGoals = pickAnswer(studentRows, "goals");
+  const studentStrengths = pickAnswer(studentRows, "strengths");
+  const studentMotivation = pickAnswer(studentRows, "motivation");
+
+  const aspirationParts = [studentGoals, studentMotivation, studentStrengths]
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const studentAspirations =
+    aspirationParts[0] || "A growing sense of curiosity and self-direction";
+
+  const narrative = parentGoals.length
+    ? "There is a strong alignment between family aspirations and the learner's interests, creating a healthy foundation for future growth. " +
+      `The family hopes to nurture ${parentGoals.slice(0, 3).join(", ").toLowerCase()}, while the learner is drawn toward ${studentAspirations.toLowerCase().slice(0, 140)}.`
+    : "Family hopes and the learner's own aspirations are beginning to take shape together, creating space for shared goals over time.";
+
+  return { parentGoals, studentAspirations, narrative };
+}
+
 function CompassPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [studentName, setStudentName] = useState<string>("");
   const [responses, setResponses] = useState<AnswerRow[]>([]);
+  const [parentResponses, setParentResponses] = useState<AnswerRow[]>([]);
   const [familyId, setFamilyId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -123,15 +248,22 @@ function CompassPage() {
     }
     (async () => {
       try {
-        const [{ data: stu }, { data: resp }] = await Promise.all([
+        const [{ data: stu }, { data: resp }, { data: presp }] = await Promise.all([
           supabase.from("students").select("full_name").eq("id", sid).maybeSingle(),
           supabase
             .from("student_responses")
             .select("question_key,step_key,answer")
             .eq("student_id", sid),
+          fid
+            ? supabase
+                .from("parent_responses")
+                .select("question_key,step_key,answer")
+                .eq("family_id", fid)
+            : Promise.resolve({ data: [] as AnswerRow[] }),
         ]);
         setStudentName(stu?.full_name ?? "");
         setResponses((resp ?? []) as AnswerRow[]);
+        setParentResponses((presp ?? []) as AnswerRow[]);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not load your Compass");
       } finally {
@@ -143,6 +275,24 @@ function CompassPage() {
   const insights = useMemo(
     () => (responses.length ? deriveInsights(responses) : null),
     [responses],
+  );
+  const ecosystem = useMemo(
+    () => (parentResponses.length ? deriveEcosystem(parentResponses) : null),
+    [parentResponses],
+  );
+  const communication = useMemo(
+    () =>
+      parentResponses.length || responses.length
+        ? deriveCommunication(parentResponses, responses)
+        : null,
+    [parentResponses, responses],
+  );
+  const goals = useMemo(
+    () =>
+      parentResponses.length || responses.length
+        ? deriveGoals(parentResponses, responses)
+        : null,
+    [parentResponses, responses],
   );
 
   // Persist generated learning summary into ecosystem_profiles
@@ -166,6 +316,9 @@ function CompassPage() {
             compass: {
               generated_at: new Date().toISOString(),
               learning_profile: insights,
+              ecosystem,
+              communication,
+              goals,
             },
           },
         };
@@ -177,7 +330,7 @@ function CompassPage() {
         console.warn("Could not persist Compass output", e);
       }
     })();
-  }, [insights, familyId, saved]);
+  }, [insights, ecosystem, communication, goals, familyId, saved]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -224,7 +377,7 @@ function CompassPage() {
             </CardContent>
           </Card>
         ) : insights ? (
-          <section aria-labelledby="learning-profile">
+          <div className="space-y-8">
             <Card className="overflow-hidden border-border/60">
               <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/5 to-transparent">
                 <div className="flex items-center gap-3">
@@ -267,10 +420,108 @@ function CompassPage() {
                 )}
               </CardContent>
             </Card>
-          </section>
+
+            {ecosystem && (
+              <SectionCard
+                icon={<Home className="h-5 w-5" />}
+                title="Family Ecosystem 🏡"
+                subtitle="The shape of daily life at home"
+                summary={ecosystem.summary}
+              >
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <Trait label="Household rhythm" value={ecosystem.rhythm} />
+                  <Trait label="Family values" value={ecosystem.values} />
+                  <Trait label="Home learning environment" value={ecosystem.environment} />
+                </div>
+              </SectionCard>
+            )}
+
+            {communication && (
+              <SectionCard
+                icon={<MessagesSquare className="h-5 w-5" />}
+                title="Communication Dynamics 🤝"
+                subtitle="How connection and conversation flow"
+                summary={communication.summary}
+              >
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <Trait label="Communication style" value={communication.style} />
+                  <Trait label="Conflict resolution style" value={communication.conflict} />
+                  <Trait label="Expression safety level" value={communication.safety} />
+                </div>
+              </SectionCard>
+            )}
+
+            {goals && (
+              <SectionCard
+                icon={<Target className="h-5 w-5" />}
+                title="Goals & Aspirations 🎯"
+                subtitle="Where the family and learner are heading"
+                summary={goals.narrative}
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/60 bg-card/50 p-4">
+                    <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                      Parent goals for the child
+                    </p>
+                    {goals.parentGoals.length ? (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {goals.parentGoals.map((g) => (
+                          <Badge key={g} variant="secondary" className="rounded-full px-3 py-1">
+                            {g}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        Goals will appear here once the parent journey is completed.
+                      </p>
+                    )}
+                  </div>
+                  <Trait
+                    label="Student aspirations and dreams"
+                    value={goals.studentAspirations}
+                  />
+                </div>
+              </SectionCard>
+            )}
+          </div>
         ) : null}
       </main>
     </div>
+  );
+}
+
+function SectionCard({
+  icon,
+  title,
+  subtitle,
+  summary,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  summary: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="overflow-hidden border-border/60">
+      <CardHeader className="border-b border-border/60 bg-gradient-to-br from-primary/5 to-transparent">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            {icon}
+          </div>
+          <div>
+            <CardTitle className="text-2xl">{title}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6 pt-8">
+        <p className="text-lg leading-relaxed text-foreground">{summary}</p>
+        {children}
+      </CardContent>
+    </Card>
   );
 }
 
