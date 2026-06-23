@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, GraduationCap, ArrowRight } from "lucide-react";
+import { Users, GraduationCap, ArrowRight, Compass } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -62,6 +62,17 @@ function Index() {
               "Reflective questions",
             ]}
           />
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <Link
+            to="/compass"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+          >
+            <Compass className="h-4 w-4 text-primary" />
+            View your L2R Compass
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </div>
