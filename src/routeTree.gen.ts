@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as ParentRouteImport } from './routes/parent'
+import { Route as CompassRouteImport } from './routes/compass'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StudentRoute = StudentRouteImport.update({
@@ -23,6 +24,11 @@ const ParentRoute = ParentRouteImport.update({
   path: '/parent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompassRoute = CompassRouteImport.update({
+  id: '/compass',
+  path: '/compass',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -31,30 +37,34 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/parent' | '/student'
+  fullPaths: '/' | '/compass' | '/parent' | '/student'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/parent' | '/student'
-  id: '__root__' | '/' | '/parent' | '/student'
+  to: '/' | '/compass' | '/parent' | '/student'
+  id: '__root__' | '/' | '/compass' | '/parent' | '/student'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CompassRoute: typeof CompassRoute
   ParentRoute: typeof ParentRoute
   StudentRoute: typeof StudentRoute
 }
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/compass': {
+      id: '/compass'
+      path: '/compass'
+      fullPath: '/compass'
+      preLoaderRoute: typeof CompassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -87,19 +104,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CompassRoute: CompassRoute,
   ParentRoute: ParentRoute,
   StudentRoute: StudentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
