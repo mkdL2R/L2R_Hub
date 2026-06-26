@@ -1,0 +1,155 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Bookmark, Clock, Search, Share2 } from "lucide-react";
+import { ARTICLE_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
+import { fmtDate, listPublishedArticles, type Article } from "@/lib/hub-content";
+import { supabase } from "@/integrations/supabase/client";
+
+export const Route = createFileRoute("/hub/articles")({ component: ArticlesTab });
+
+function ArticlesTab() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [cat, setCat] = useState<string>("All");
+  const { user } = useAuthUser();
+  const [saved, setSaved] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    listPublishedArticles().then((a) => {
+      setArticles(a);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("hub_saved_items")
+      .select("item_id")
+      .eq("user_id", user.id)
+      .eq("item_type", "article")
+      .then(({ data }) => setSaved(new Set((data ?? []).map((r) => r.item_id))));
+  }, [user]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return articles.filter((a) => {
+      const matchCat = cat === "All" || a.category === cat;
+      const matchQ =
+        !q ||
+        a.title.toLowerCase().includes(q) ||
+        (a.excerpt ?? "").toLowerCase().includes(q) ||
+        (a.author ?? "").toLowerCase().includes(q);
+      return matchCat && matchQ;
+    });
+  }, [articles, query, cat]);
+
+  async function toggleSave(id: string) {
+    if (!user) {
+      window.location.href = "/auth";
+      return;
+    }
+    const next = new Set(saved);
+    if (saved.has(id)) {
+      await supabase.from("hub_saved_items").delete().match({ user_id: user.id, item_type: "article", item_id: id });
+      next.delete(id);
+    } else {
+      await supabase.from("hub_saved_items").insert({ user_id: user.id, item_type: "article", item_id: id });
+      next.add(id);
+    }
+    setSaved(next);
+  }
+
+  async function share(a: Article) {
+    const url = `${window.location.origin}/hub/articles/${a.slug}`;
+    try {
+      if (navigator.share) await navigator.share({ title: a.title, url });
+      else {
+        await navigator.clipboard.writeText(url);
+      }
+    } catch {
+      /* noop */
+    }
+  }
+
+  return (
+    <div className="mx-auto max-w-6xl px-6 py-10 space-y-8">
+      <header className="space-y-3">
+        <h1 className="text-4xl font-serif font-medium tracking-tight">Articles</h1>
+        <p className="max-w-2xl text-muted-foreground">
+          Reflections, research and practical guidance — organized by the themes that matter most to family life.
+        </p>
+      </header>
+
+      <div className="flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="relative md:w-80">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search articles…"
+            className="pl-9 rounded-full"
+          />
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {(["All", ...ARTICLE_CATEGORIES] as const).map((c) => (
+            <button
+              key={c}
+              onClick={() => setCat(c)}
+              className={`rounded-full px-3 py-1 text-xs border transition-colors ${
+                cat === c ? "bg-emerald-700 text-white border-emerald-700" : "border-border hover:bg-accent"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {loading ? (
+        <p className="text-muted-foreground">Loading…</p>
+      ) : filtered.length === 0 ? (
+        <Card className="rounded-3xl border-dashed p-12 text-center text-muted-foreground">No articles match.</Card>
+      ) : (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((a) => (
+            <Card key={a.id} className="rounded-2xl border-border/60 overflow-hidden flex flex-col">
+              <Link to="/hub/articles/$slug" params={{ slug: a.slug }} className="block">
+                <div className="aspect-[16/10] bg-muted">
+                  {a.hero_image_url && <img src={a.hero_image_url} alt="" className="h-full w-full object-cover" />}
+                </div>
+              </Link>
+              <div className="p-5 flex-1 flex flex-col gap-3">
+                <Badge variant="outline" className="rounded-full text-[10px] w-fit">{a.category}</Badge>
+                <Link to="/hub/articles/$slug" params={{ slug: a.slug }}>
+                  <h3 className="font-serif text-lg leading-snug">{a.title}</h3>
+                </Link>
+                {a.excerpt && <p className="text-sm text-muted-foreground line-clamp-2">{a.excerpt}</p>}
+                <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> {a.reading_minutes} min · {fmtDate(a.publish_at)}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => toggleSave(a.id)}>
+                      <Bookmark
+                        className={`h-3.5 w-3.5 ${saved.has(a.id) ? "fill-emerald-700 text-emerald-700" : ""}`}
+                      />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => share(a)}>
+                      <Share2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

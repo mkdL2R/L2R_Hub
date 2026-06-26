@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, GraduationCap, ArrowRight, Compass } from "lucide-react";
+import { Users, GraduationCap, ArrowRight, Compass, Sprout } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -64,13 +64,21 @@ function Index() {
           />
         </div>
 
-        <div className="mt-10 flex justify-center">
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
           <Link
             to="/compass"
             className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
           >
             <Compass className="h-4 w-4 text-primary" />
             View your L2R Compass
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/hub"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-5 py-2 text-sm font-medium text-foreground transition-colors hover:border-primary/40 hover:bg-accent"
+          >
+            <Sprout className="h-4 w-4 text-emerald-700" />
+            Family Growth Hub
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
