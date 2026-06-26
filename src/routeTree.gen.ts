@@ -11,8 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as ParentRouteImport } from './routes/parent'
+import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HubIndexRouteImport } from './routes/hub.index'
+import { Route as HubResourcesRouteImport } from './routes/hub.resources'
+import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
+import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
+import { Route as HubArticlesRouteImport } from './routes/hub.articles'
+import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
@@ -24,9 +33,19 @@ const ParentRoute = ParentRouteImport.update({
   path: '/parent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HubRoute = HubRouteImport.update({
+  id: '/hub',
+  path: '/hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CompassRoute = CompassRouteImport.update({
   id: '/compass',
   path: '/compass',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,37 +53,139 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HubIndexRoute = HubIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubResourcesRoute = HubResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubPodcastsRoute = HubPodcastsRouteImport.update({
+  id: '/podcasts',
+  path: '/podcasts',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubFeaturedRoute = HubFeaturedRouteImport.update({
+  id: '/featured',
+  path: '/featured',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubArticlesRoute = HubArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubAdminRoute = HubAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => HubArticlesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
+  '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/hub/admin': typeof HubAdminRoute
+  '/hub/articles': typeof HubArticlesRouteWithChildren
+  '/hub/featured': typeof HubFeaturedRoute
+  '/hub/podcasts': typeof HubPodcastsRoute
+  '/hub/resources': typeof HubResourcesRoute
+  '/hub/': typeof HubIndexRoute
+  '/hub/articles/$slug': typeof HubArticlesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/hub/admin': typeof HubAdminRoute
+  '/hub/articles': typeof HubArticlesRouteWithChildren
+  '/hub/featured': typeof HubFeaturedRoute
+  '/hub/podcasts': typeof HubPodcastsRoute
+  '/hub/resources': typeof HubResourcesRoute
+  '/hub': typeof HubIndexRoute
+  '/hub/articles/$slug': typeof HubArticlesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
+  '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/hub/admin': typeof HubAdminRoute
+  '/hub/articles': typeof HubArticlesRouteWithChildren
+  '/hub/featured': typeof HubFeaturedRoute
+  '/hub/podcasts': typeof HubPodcastsRoute
+  '/hub/resources': typeof HubResourcesRoute
+  '/hub/': typeof HubIndexRoute
+  '/hub/articles/$slug': typeof HubArticlesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/compass' | '/parent' | '/student'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/compass'
+    | '/hub'
+    | '/parent'
+    | '/student'
+    | '/hub/admin'
+    | '/hub/articles'
+    | '/hub/featured'
+    | '/hub/podcasts'
+    | '/hub/resources'
+    | '/hub/'
+    | '/hub/articles/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/compass' | '/parent' | '/student'
-  id: '__root__' | '/' | '/compass' | '/parent' | '/student'
+  to:
+    | '/'
+    | '/auth'
+    | '/compass'
+    | '/parent'
+    | '/student'
+    | '/hub/admin'
+    | '/hub/articles'
+    | '/hub/featured'
+    | '/hub/podcasts'
+    | '/hub/resources'
+    | '/hub'
+    | '/hub/articles/$slug'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/compass'
+    | '/hub'
+    | '/parent'
+    | '/student'
+    | '/hub/admin'
+    | '/hub/articles'
+    | '/hub/featured'
+    | '/hub/podcasts'
+    | '/hub/resources'
+    | '/hub/'
+    | '/hub/articles/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   CompassRoute: typeof CompassRoute
+  HubRoute: typeof HubRouteWithChildren
   ParentRoute: typeof ParentRoute
   StudentRoute: typeof StudentRoute
 }
@@ -85,11 +206,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ParentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hub': {
+      id: '/hub'
+      path: '/hub'
+      fullPath: '/hub'
+      preLoaderRoute: typeof HubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/compass': {
       id: '/compass'
       path: '/compass'
       fullPath: '/compass'
       preLoaderRoute: typeof CompassRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -99,25 +234,98 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hub/': {
+      id: '/hub/'
+      path: '/'
+      fullPath: '/hub/'
+      preLoaderRoute: typeof HubIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/resources': {
+      id: '/hub/resources'
+      path: '/resources'
+      fullPath: '/hub/resources'
+      preLoaderRoute: typeof HubResourcesRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/podcasts': {
+      id: '/hub/podcasts'
+      path: '/podcasts'
+      fullPath: '/hub/podcasts'
+      preLoaderRoute: typeof HubPodcastsRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/featured': {
+      id: '/hub/featured'
+      path: '/featured'
+      fullPath: '/hub/featured'
+      preLoaderRoute: typeof HubFeaturedRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/articles': {
+      id: '/hub/articles'
+      path: '/articles'
+      fullPath: '/hub/articles'
+      preLoaderRoute: typeof HubArticlesRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/admin': {
+      id: '/hub/admin'
+      path: '/admin'
+      fullPath: '/hub/admin'
+      preLoaderRoute: typeof HubAdminRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/articles/$slug': {
+      id: '/hub/articles/$slug'
+      path: '/$slug'
+      fullPath: '/hub/articles/$slug'
+      preLoaderRoute: typeof HubArticlesSlugRouteImport
+      parentRoute: typeof HubArticlesRoute
+    }
   }
 }
 
+interface HubArticlesRouteChildren {
+  HubArticlesSlugRoute: typeof HubArticlesSlugRoute
+}
+
+const HubArticlesRouteChildren: HubArticlesRouteChildren = {
+  HubArticlesSlugRoute: HubArticlesSlugRoute,
+}
+
+const HubArticlesRouteWithChildren = HubArticlesRoute._addFileChildren(
+  HubArticlesRouteChildren,
+)
+
+interface HubRouteChildren {
+  HubAdminRoute: typeof HubAdminRoute
+  HubArticlesRoute: typeof HubArticlesRouteWithChildren
+  HubFeaturedRoute: typeof HubFeaturedRoute
+  HubPodcastsRoute: typeof HubPodcastsRoute
+  HubResourcesRoute: typeof HubResourcesRoute
+  HubIndexRoute: typeof HubIndexRoute
+}
+
+const HubRouteChildren: HubRouteChildren = {
+  HubAdminRoute: HubAdminRoute,
+  HubArticlesRoute: HubArticlesRouteWithChildren,
+  HubFeaturedRoute: HubFeaturedRoute,
+  HubPodcastsRoute: HubPodcastsRoute,
+  HubResourcesRoute: HubResourcesRoute,
+  HubIndexRoute: HubIndexRoute,
+}
+
+const HubRouteWithChildren = HubRoute._addFileChildren(HubRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   CompassRoute: CompassRoute,
+  HubRoute: HubRouteWithChildren,
   ParentRoute: ParentRoute,
   StudentRoute: StudentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
