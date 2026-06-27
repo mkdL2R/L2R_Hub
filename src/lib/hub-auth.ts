@@ -2,7 +2,23 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
-export type Role = "admin" | "editor" | "member";
+export type Role =
+  | "admin"
+  | "editor"
+  | "member"
+  | "parent"
+  | "student"
+  | "instructor"
+  | "administrator"
+  | "mentor"
+  | "wellness_practitioner";
+
+export const PRIMARY_ROLES: { value: Role; label: string; emoji: string; description: string }[] = [
+  { value: "parent", label: "Parent", emoji: "👨‍👩‍👧", description: "I'm raising a learner" },
+  { value: "student", label: "Student", emoji: "👨‍🎓", description: "I am the learner" },
+  { value: "instructor", label: "Instructor", emoji: "👩‍🏫", description: "I teach and guide" },
+  { value: "administrator", label: "Administrator", emoji: "👩‍💼", description: "I run programs at L2R" },
+];
 
 export function useAuthUser() {
   const [user, setUser] = useState<User | null>(null);
