@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, GraduationCap, ArrowRight, Compass, Sprout } from "lucide-react";
+import { Users, GraduationCap, ArrowRight, Compass, Sprout, LogIn, LayoutDashboard } from "lucide-react";
+import { useAuthUser } from "@/lib/hub-auth";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,8 +22,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
+  const { user } = useAuthUser();
   return (
     <div className="min-h-screen bg-background">
+      <div className="absolute right-6 top-6">
+        {user ? (
+          <Link to="/_authenticated/dashboard" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary/40">
+            <LayoutDashboard className="h-4 w-4" /> Open dashboard
+          </Link>
+        ) : (
+          <Link to="/auth" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary/40">
+            <LogIn className="h-4 w-4" /> Sign in
+          </Link>
+        )}
+      </div>
       <div className="mx-auto max-w-5xl px-6 py-20">
         <div className="mb-16 text-center">
           <span className="inline-block rounded-full bg-accent px-4 py-1 text-xs font-medium uppercase tracking-widest text-accent-foreground">
