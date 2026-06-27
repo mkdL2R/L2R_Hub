@@ -22,6 +22,7 @@ import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
 import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
 import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 
@@ -89,6 +90,11 @@ const HubAdminRoute = HubAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => HubRoute,
 } as any)
+const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/onboarding': typeof AuthenticatedOnboardingRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/dashboard'
+    | '/onboarding'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/dashboard'
+    | '/onboarding'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/student'
     | '/_authenticated/dashboard'
+    | '/_authenticated/onboarding'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -303,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubAdminRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_authenticated/onboarding': {
+      id: '/_authenticated/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -322,10 +341,12 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
