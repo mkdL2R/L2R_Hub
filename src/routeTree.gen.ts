@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ParentRouteImport } from './routes/parent'
 import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
@@ -30,6 +31,11 @@ import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
   path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ParentRoute = ParentRouteImport.update({
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -135,6 +142,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/compass'
     | '/hub'
     | '/parent'
+    | '/reset-password'
     | '/student'
     | '/dashboard'
     | '/onboarding'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compass'
     | '/parent'
+    | '/reset-password'
     | '/student'
     | '/dashboard'
     | '/onboarding'
@@ -211,6 +222,7 @@ export interface FileRouteTypes {
     | '/compass'
     | '/hub'
     | '/parent'
+    | '/reset-password'
     | '/student'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
@@ -231,6 +243,7 @@ export interface RootRouteChildren {
   CompassRoute: typeof CompassRoute
   HubRoute: typeof HubRouteWithChildren
   ParentRoute: typeof ParentRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StudentRoute: typeof StudentRoute
 }
 
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/student'
       fullPath: '/student'
       preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/parent': {
@@ -412,6 +432,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompassRoute: CompassRoute,
   HubRoute: HubRouteWithChildren,
   ParentRoute: ParentRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StudentRoute: StudentRoute,
 }
 export const routeTree = rootRouteImport
