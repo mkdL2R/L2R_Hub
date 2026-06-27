@@ -14,6 +14,7 @@ import { Route as ParentRouteImport } from './routes/parent'
 import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HubIndexRouteImport } from './routes/hub.index'
 import { Route as HubResourcesRouteImport } from './routes/hub.resources'
@@ -21,6 +22,7 @@ import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
 import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
 import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 
 const StudentRoute = StudentRouteImport.update({
@@ -46,6 +48,10 @@ const CompassRoute = CompassRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -83,6 +89,11 @@ const HubAdminRoute = HubAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => HubRoute,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -96,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -110,6 +122,7 @@ export interface FileRoutesByTo {
   '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -121,11 +134,13 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
   '/parent': typeof ParentRoute
   '/student': typeof StudentRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -143,6 +158,7 @@ export interface FileRouteTypes {
     | '/hub'
     | '/parent'
     | '/student'
+    | '/dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -157,6 +173,7 @@ export interface FileRouteTypes {
     | '/compass'
     | '/parent'
     | '/student'
+    | '/dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -167,11 +184,13 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/compass'
     | '/hub'
     | '/parent'
     | '/student'
+    | '/_authenticated/dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -183,6 +202,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompassRoute: typeof CompassRoute
   HubRoute: typeof HubRouteWithChildren
@@ -225,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -276,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubAdminRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/hub/articles/$slug': {
       id: '/hub/articles/$slug'
       path: '/$slug'
@@ -285,6 +319,17 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface HubArticlesRouteChildren {
   HubArticlesSlugRoute: typeof HubArticlesSlugRoute
@@ -320,6 +365,7 @@ const HubRouteWithChildren = HubRoute._addFileChildren(HubRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CompassRoute: CompassRoute,
   HubRoute: HubRouteWithChildren,
