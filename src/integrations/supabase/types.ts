@@ -118,6 +118,38 @@ export type Database = {
         }
         Relationships: []
       }
+      family_members: {
+        Row: {
+          created_at: string
+          family_id: string
+          id: string
+          relation: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          family_id: string
+          id?: string
+          relation: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          family_id?: string
+          id?: string
+          relation?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_members_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hub_articles: {
         Row: {
           author: string | null
@@ -280,6 +312,33 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          specialties: string[]
+          updated_at: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          specialties?: string[]
+          updated_at?: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          specialties?: string[]
+          updated_at?: string
+          user_id?: string
+          years_experience?: number | null
+        }
+        Relationships: []
+      }
       onboarding_status: {
         Row: {
           completed_at: string | null
@@ -432,6 +491,42 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          notification_prefs: Json
+          phone: string | null
+          preferred_name: string | null
+          primary_role: Database["public"]["Enums"]["app_role"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          notification_prefs?: Json
+          phone?: string | null
+          preferred_name?: string | null
+          primary_role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          notification_prefs?: Json
+          phone?: string | null
+          preferred_name?: string | null
+          primary_role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_responses: {
         Row: {
           answer: Json
@@ -547,10 +642,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_family_member: {
+        Args: { _family_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "admin" | "editor" | "member"
+      app_role:
+        | "admin"
+        | "editor"
+        | "member"
+        | "parent"
+        | "student"
+        | "instructor"
+        | "administrator"
+        | "mentor"
+        | "wellness_practitioner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -678,7 +786,17 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "editor", "member"],
+      app_role: [
+        "admin",
+        "editor",
+        "member",
+        "parent",
+        "student",
+        "instructor",
+        "administrator",
+        "mentor",
+        "wellness_practitioner",
+      ],
     },
   },
 } as const
