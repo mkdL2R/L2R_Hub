@@ -22,6 +22,7 @@ import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
 import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
 import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
@@ -90,6 +91,11 @@ const HubAdminRoute = HubAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => HubRoute,
 } as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/dashboard'
     | '/onboarding'
+    | '/profile'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/dashboard'
     | '/onboarding'
+    | '/profile'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/_authenticated/profile'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -315,6 +327,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubAdminRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -342,11 +361,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
