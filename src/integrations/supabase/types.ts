@@ -76,7 +76,9 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          family_motto: string | null
           family_name: string | null
+          family_photo_url: string | null
           household_languages: string[] | null
           household_size: number | null
           id: string
@@ -91,7 +93,9 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          family_motto?: string | null
           family_name?: string | null
+          family_photo_url?: string | null
           household_languages?: string[] | null
           household_size?: number | null
           id?: string
@@ -106,7 +110,9 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          family_motto?: string | null
           family_name?: string | null
+          family_photo_url?: string | null
           household_languages?: string[] | null
           household_size?: number | null
           id?: string
@@ -117,6 +123,53 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      family_goals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          family_id: string
+          id: string
+          progress_notes: Json
+          status: string
+          title: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          family_id: string
+          id?: string
+          progress_notes?: Json
+          status?: string
+          title: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          family_id?: string
+          id?: string
+          progress_notes?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_goals_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_members: {
         Row: {
@@ -338,6 +391,66 @@ export type Database = {
           years_experience?: number | null
         }
         Relationships: []
+      }
+      living_tree_entries: {
+        Row: {
+          attachments: Json
+          author_user_id: string | null
+          content: Json
+          created_at: string
+          description: string | null
+          entry_type: string
+          family_id: string
+          id: string
+          occurred_on: string
+          student_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json
+          author_user_id?: string | null
+          content?: Json
+          created_at?: string
+          description?: string | null
+          entry_type: string
+          family_id: string
+          id?: string
+          occurred_on?: string
+          student_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json
+          author_user_id?: string | null
+          content?: Json
+          created_at?: string
+          description?: string | null
+          entry_type?: string
+          family_id?: string
+          id?: string
+          occurred_on?: string
+          student_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "living_tree_entries_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "living_tree_entries_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       onboarding_status: {
         Row: {
