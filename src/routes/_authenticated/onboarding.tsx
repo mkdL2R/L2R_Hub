@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthUser, PRIMARY_ROLES, type Role } from "@/lib/hub-auth";
+import { useAuthUser, PRIMARY_ROLES, dashboardPathForRole, type Role } from "@/lib/hub-auth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -23,12 +23,11 @@ function Onboarding() {
   useEffect(() => {
     if (loading || !user) return;
     (async () => {
-      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
-      const primary = (roles ?? []).map((r) => r.role as Role).find((r) =>
-        ["parent", "student", "instructor", "administrator"].includes(r as string)
-      );
-      if (primary) {
-        navigate({ to: "/_authenticated/dashboard" });
+      const { data: profile } = await supabase
+        .from("profiles").select("primary_role").eq("user_id", user.id).maybeSingle();
+      const existing = profile?.primary_role as Role | null | undefined;
+      if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
+        navigate({ to: dashboardPathForRole(existing) as never });
         return;
       }
       setNeedsRole(true);
@@ -43,8 +42,17 @@ function Onboarding() {
     try {
       const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: user.id, role });
       if (roleErr && !roleErr.message.includes("duplicate")) throw roleErr;
-      await supabase.from("profiles").upsert({ user_id: user.id, email: user.email ?? null, primary_role: role });
-      navigate({ to: "/_authenticated/dashboard" });
+      const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const fullName = (meta.full_name as string) || (meta.name as string) || (meta.preferred_name as string) || null;
+      const avatar = (meta.avatar_url as string) || (meta.picture as string) || null;
+      await supabase.from("profiles").upsert({
+        user_id: user.id,
+        email: user.email ?? null,
+        preferred_name: fullName,
+        avatar_url: avatar,
+        primary_role: role,
+      });
+      navigate({ to: dashboardPathForRole(role) as never });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save role");
     } finally {
@@ -66,21 +74,21 @@ function Onboarding() {
     <div className="min-h-screen bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)] flex items-center justify-center p-6">
       <Card className="w-full max-w-2xl p-10 rounded-3xl border-border/60 shadow-lg">
         <div className="text-center mb-8">
-          <img src={logoAsset.url} alt="L2R" className="h-14 w-14 rounded-2xl object-cover mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold tracking-tight">Tell us who's signing in</h1>
-          <p className="mt-2 text-sm text-muted-foreground">We'll tailor your experience. You can adjust this later.</p>
+          <img src={logoAsset.url} alt="L2R" className="h-16 w-16 rounded-2xl object-cover mx-auto mb-5 shadow-sm" />
+          <h1 className="text-3xl font-semibold tracking-tight">Welcome to Left2Right Education Hub</h1>
+          <p className="mt-3 text-sm text-muted-foreground">Choose your role to personalize your experience.</p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           {PRIMARY_ROLES.map((r) => (
             <button
               key={r.value}
               disabled={busy}
               onClick={() => pickRole(r.value)}
-              className="text-left rounded-2xl border border-border/60 p-5 hover:border-primary/50 hover:bg-accent/40 transition-all disabled:opacity-60"
+              className="text-center rounded-3xl border border-border/60 p-8 hover:border-primary/50 hover:bg-accent/40 hover:shadow-md transition-all disabled:opacity-60"
             >
-              <div className="text-3xl">{r.emoji}</div>
-              <div className="mt-3 font-semibold">{r.label}</div>
-              <div className="text-sm text-muted-foreground">{r.description}</div>
+              <div className="text-5xl">{r.emoji}</div>
+              <div className="mt-4 text-lg font-semibold">{r.label}</div>
+              <div className="text-sm text-muted-foreground mt-1">{r.description}</div>
             </button>
           ))}
         </div>
