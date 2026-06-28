@@ -114,7 +114,7 @@ function LivingTreePage() {
     ]);
     setFamily(fam as Family | null);
     setEntries((ents ?? []) as Entry[]);
-    setGoals((gs ?? []) as Goal[]);
+    setGoals((gs ?? []) as unknown as Goal[]);
     setLoading(false);
   }
 
