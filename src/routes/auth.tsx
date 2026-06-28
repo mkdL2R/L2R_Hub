@@ -32,7 +32,7 @@ function AuthPage() {
   // If already signed in, jump to onboarding/dashboard
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/_authenticated/onboarding" as never });
+      if (data.user) navigate({ to: "/onboarding" as never });
     });
   }, [navigate]);
 
@@ -45,7 +45,7 @@ function AuthPage() {
       });
       if (result.error) throw result.error;
       if (result.redirected) return;
-      navigate({ to: "/_authenticated/onboarding" as never });
+      navigate({ to: "/onboarding" as never });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Google sign-in failed");
     } finally {
@@ -77,7 +77,7 @@ function AuthPage() {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/_authenticated/onboarding" as never });
+        navigate({ to: "/onboarding" as never });
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Authentication failed");

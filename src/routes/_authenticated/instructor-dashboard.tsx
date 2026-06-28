@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Compass, Sprout, Users, BookOpen, Settings, UserCircle } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/DashboardShell";
 
-export const Route = createFileRoute("/_authenticated/instructor-dashboard")({
+export const Route = createFileRoute("/instructor-dashboard")({
   head: () => ({ meta: [{ title: "Instructor Admin — L2R" }] }),
   component: InstructorDashboard,
 });
@@ -13,7 +13,7 @@ const ITEMS: NavItem[] = [
   { to: "/compass", label: "Compass Summaries", icon: Compass, desc: "Family insights" },
   { to: "/hub/articles", label: "Articles", icon: BookOpen, desc: "Teaching library" },
   { to: "/parent", label: "Family intakes", icon: Users, desc: "Review parent flow" },
-  { to: "/_authenticated/profile", label: "Profile", icon: UserCircle, desc: "Account & preferences" },
+  { to: "/profile", label: "Profile", icon: UserCircle, desc: "Account & preferences" },
 ];
 
 function InstructorDashboard() {
