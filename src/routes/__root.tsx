@@ -78,14 +78,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Left2Right Education Hub Compass App" },
+      { name: "description", content: "Welcome Journey is a multi-step onboarding application for families and students, powered by Supabase." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Left2Right Education Hub Compass App" },
+      { property: "og:description", content: "Welcome Journey is a multi-step onboarding application for families and students, powered by Supabase." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Left2Right Education Hub Compass App" },
+      { name: "twitter:description", content: "Welcome Journey is a multi-step onboarding application for families and students, powered by Supabase." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/JlpfkUaRJgg4a8UY4vA803r2Dim1/social-images/social-1782636950942-50ee1613-74cc-442f-9458-47be266103f2.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/JlpfkUaRJgg4a8UY4vA803r2Dim1/social-images/social-1782636950942-50ee1613-74cc-442f-9458-47be266103f2.webp" },
     ],
     links: [
       {
