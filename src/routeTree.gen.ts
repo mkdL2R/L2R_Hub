@@ -26,6 +26,7 @@ import { Route as HubAdminRouteImport } from './routes/hub.admin'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student-dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedLivingTreeRouteImport } from './routes/_authenticated/living-tree'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
 import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_authenticated/family-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -116,6 +117,11 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLivingTreeRoute = AuthenticatedLivingTreeRouteImport.update({
+  id: '/living-tree',
+  path: '/living-tree',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedInstructorDashboardRoute =
   AuthenticatedInstructorDashboardRouteImport.update({
     id: '/instructor-dashboard',
@@ -150,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
+  '/_authenticated/living-tree': typeof AuthenticatedLivingTreeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/family-dashboard'
     | '/instructor-dashboard'
+    | '/living-tree'
     | '/onboarding'
     | '/profile'
     | '/student-dashboard'
@@ -240,6 +250,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/family-dashboard'
     | '/instructor-dashboard'
+    | '/living-tree'
     | '/onboarding'
     | '/profile'
     | '/student-dashboard'
@@ -263,6 +274,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/family-dashboard'
     | '/_authenticated/instructor-dashboard'
+    | '/_authenticated/living-tree'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
     | '/_authenticated/student-dashboard'
@@ -407,6 +419,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/living-tree': {
+      id: '/_authenticated/living-tree'
+      path: '/living-tree'
+      fullPath: '/living-tree'
+      preLoaderRoute: typeof AuthenticatedLivingTreeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/instructor-dashboard': {
       id: '/_authenticated/instructor-dashboard'
       path: '/instructor-dashboard'
@@ -442,6 +461,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFamilyDashboardRoute: typeof AuthenticatedFamilyDashboardRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
+  AuthenticatedLivingTreeRoute: typeof AuthenticatedLivingTreeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
@@ -451,6 +471,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFamilyDashboardRoute: AuthenticatedFamilyDashboardRoute,
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
+  AuthenticatedLivingTreeRoute: AuthenticatedLivingTreeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,

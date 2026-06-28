@@ -58,7 +58,7 @@ export function DashboardShell({
               <img src={avatar} alt="" className="h-8 w-8 rounded-full object-cover border border-border/60" />
             ) : null}
             <Button asChild variant="ghost" size="sm">
-              <Link to="/_authenticated/profile"><UserCircle className="h-4 w-4 mr-1.5" />Profile</Link>
+              <Link to="/profile"><UserCircle className="h-4 w-4 mr-1.5" />Profile</Link>
             </Button>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-1.5" />Sign out

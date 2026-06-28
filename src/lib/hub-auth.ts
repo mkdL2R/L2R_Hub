@@ -21,13 +21,13 @@ export const PRIMARY_ROLES: { value: Role; label: string; emoji: string; descrip
 
 export function dashboardPathForRole(role: Role | string | null | undefined): string {
   switch (role) {
-    case "parent": return "/_authenticated/family-dashboard";
-    case "student": return "/_authenticated/student-dashboard";
+    case "parent": return "/family-dashboard";
+    case "student": return "/student-dashboard";
     case "instructor":
     case "administrator":
     case "admin":
-      return "/_authenticated/instructor-dashboard";
-    default: return "/_authenticated/onboarding";
+      return "/instructor-dashboard";
+    default: return "/onboarding";
   }
 }
 

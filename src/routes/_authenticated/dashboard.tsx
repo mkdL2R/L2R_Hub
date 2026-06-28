@@ -19,7 +19,7 @@ function DashboardRedirect() {
         .from("profiles").select("primary_role").eq("user_id", user.id).maybeSingle();
       const role = data?.primary_role as Role | null | undefined;
       if (!role) {
-        navigate({ to: "/_authenticated/onboarding" as never, replace: true });
+        navigate({ to: "/onboarding" as never, replace: true });
         return;
       }
       navigate({ to: dashboardPathForRole(role) as never, replace: true });

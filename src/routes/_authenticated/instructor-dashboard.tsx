@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Compass, Sprout, Users, BookOpen, Settings, UserCircle } from "lucide-react";
+import { Compass, Sprout, Users, BookOpen, Settings, UserCircle, TreeDeciduous } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/DashboardShell";
 
 export const Route = createFileRoute("/_authenticated/instructor-dashboard")({
@@ -11,9 +11,10 @@ const ITEMS: NavItem[] = [
   { to: "/hub/admin", label: "Content Admin", icon: Settings, desc: "Publish & manage Hub" },
   { to: "/hub", label: "Growth Hub", icon: Sprout, desc: "Library" },
   { to: "/compass", label: "Compass Summaries", icon: Compass, desc: "Family insights" },
+  { to: "/living-tree", label: "Living Trees", icon: TreeDeciduous, desc: "Family timelines & notes" },
   { to: "/hub/articles", label: "Articles", icon: BookOpen, desc: "Teaching library" },
   { to: "/parent", label: "Family intakes", icon: Users, desc: "Review parent flow" },
-  { to: "/_authenticated/profile", label: "Profile", icon: UserCircle, desc: "Account & preferences" },
+  { to: "/profile", label: "Profile", icon: UserCircle, desc: "Account & preferences" },
 ];
 
 function InstructorDashboard() {

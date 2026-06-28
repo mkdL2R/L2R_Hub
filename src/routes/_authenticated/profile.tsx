@@ -71,7 +71,7 @@ function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)] py-12">
       <div className="mx-auto max-w-2xl px-6">
-        <Link to="/_authenticated/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/dashboard" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4 mr-1" /> Back to dashboard
         </Link>
         <Card className="mt-6 rounded-3xl p-8 border-border/60">
