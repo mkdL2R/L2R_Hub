@@ -113,7 +113,7 @@ function LivingTreePage() {
       supabase.from("family_goals").select("*").eq("family_id", mem.family_id).order("year", { ascending: false }),
     ]);
     setFamily(fam as Family | null);
-    setEntries((ents ?? []) as Entry[]);
+    setEntries((ents ?? []) as unknown as Entry[]);
     setGoals((gs ?? []) as unknown as Goal[]);
     setLoading(false);
   }
