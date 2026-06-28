@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Compass, Sprout, BookOpen, GraduationCap, UserCircle } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/DashboardShell";
 
-export const Route = createFileRoute("/student-dashboard")({
+export const Route = createFileRoute("/_authenticated/student-dashboard")({
   head: () => ({ meta: [{ title: "Student Dashboard — L2R" }] }),
   component: StudentDashboard,
 });

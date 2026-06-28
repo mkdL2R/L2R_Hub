@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Compass, Sprout, Users, BookOpen, UserCircle } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/DashboardShell";
 
-export const Route = createFileRoute("/family-dashboard")({
+export const Route = createFileRoute("/_authenticated/family-dashboard")({
   head: () => ({ meta: [{ title: "Family Dashboard — L2R" }] }),
   component: FamilyDashboard,
 });

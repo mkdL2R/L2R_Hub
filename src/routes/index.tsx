@@ -27,7 +27,7 @@ function Index() {
     <div className="min-h-screen bg-background">
       <div className="absolute right-6 top-6">
         {user ? (
-          <Link to="/_authenticated/dashboard" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary/40">
+          <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium hover:border-primary/40">
             <LayoutDashboard className="h-4 w-4" /> Open dashboard
           </Link>
         ) : (
