@@ -23,8 +23,11 @@ import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
 import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
 import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student-dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
+import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_authenticated/family-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 
@@ -97,6 +100,12 @@ const HubAdminRoute = HubAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => HubRoute,
 } as any)
+const AuthenticatedStudentDashboardRoute =
+  AuthenticatedStudentDashboardRouteImport.update({
+    id: '/student-dashboard',
+    path: '/student-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -107,6 +116,18 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedInstructorDashboardRoute =
+  AuthenticatedInstructorDashboardRouteImport.update({
+    id: '/instructor-dashboard',
+    path: '/instructor-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFamilyDashboardRoute =
+  AuthenticatedFamilyDashboardRouteImport.update({
+    id: '/family-dashboard',
+    path: '/family-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -127,8 +148,11 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
+  '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -145,8 +169,11 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
+  '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -166,8 +193,11 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
+  '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/featured': typeof HubFeaturedRoute
@@ -187,8 +217,11 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/student'
     | '/dashboard'
+    | '/family-dashboard'
+    | '/instructor-dashboard'
     | '/onboarding'
     | '/profile'
+    | '/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -205,8 +238,11 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/student'
     | '/dashboard'
+    | '/family-dashboard'
+    | '/instructor-dashboard'
     | '/onboarding'
     | '/profile'
+    | '/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -225,8 +261,11 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/student'
     | '/_authenticated/dashboard'
+    | '/_authenticated/family-dashboard'
+    | '/_authenticated/instructor-dashboard'
     | '/_authenticated/onboarding'
     | '/_authenticated/profile'
+    | '/_authenticated/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/featured'
@@ -347,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubAdminRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_authenticated/student-dashboard': {
+      id: '/_authenticated/student-dashboard'
+      path: '/student-dashboard'
+      fullPath: '/student-dashboard'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -359,6 +405,20 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/instructor-dashboard': {
+      id: '/_authenticated/instructor-dashboard'
+      path: '/instructor-dashboard'
+      fullPath: '/instructor-dashboard'
+      preLoaderRoute: typeof AuthenticatedInstructorDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/family-dashboard': {
+      id: '/_authenticated/family-dashboard'
+      path: '/family-dashboard'
+      fullPath: '/family-dashboard'
+      preLoaderRoute: typeof AuthenticatedFamilyDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -380,14 +440,20 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFamilyDashboardRoute: typeof AuthenticatedFamilyDashboardRoute
+  AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFamilyDashboardRoute: AuthenticatedFamilyDashboardRoute,
+  AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

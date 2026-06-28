@@ -17,8 +17,19 @@ export const PRIMARY_ROLES: { value: Role; label: string; emoji: string; descrip
   { value: "parent", label: "Parent", emoji: "👨‍👩‍👧", description: "I'm raising a learner" },
   { value: "student", label: "Student", emoji: "👨‍🎓", description: "I am the learner" },
   { value: "instructor", label: "Instructor", emoji: "👩‍🏫", description: "I teach and guide" },
-  { value: "administrator", label: "Administrator", emoji: "👩‍💼", description: "I run programs at L2R" },
 ];
+
+export function dashboardPathForRole(role: Role | string | null | undefined): string {
+  switch (role) {
+    case "parent": return "/_authenticated/family-dashboard";
+    case "student": return "/_authenticated/student-dashboard";
+    case "instructor":
+    case "administrator":
+    case "admin":
+      return "/_authenticated/instructor-dashboard";
+    default: return "/_authenticated/onboarding";
+  }
+}
 
 export function useAuthUser() {
   const [user, setUser] = useState<User | null>(null);
