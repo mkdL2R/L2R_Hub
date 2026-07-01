@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useUserRoles, ARTICLE_CATEGORIES, PODCAST_CATEGORIES, RESOURCE_CATEGORIES } from "@/lib/hub-auth";
 import { fmtDate } from "@/lib/hub-content";
 
-export const Route = createFileRoute("/hub/admin")({ component: AdminPage });
+export const Route = createFileRoute("/hub/admin")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data: userData, error } = await supabase.auth.getUser();
+    if (error || !userData.user) {
+      throw redirect({ to: "/auth" });
+    }
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userData.user.id);
+    const staffRoles = new Set(["admin", "editor", "administrator"]);
+    const isStaff = (roles ?? []).some((r) => staffRoles.has(r.role as string));
+    if (!isStaff) {
+      throw redirect({ to: "/hub/featured" });
+    }
+  },
+  component: AdminPage,
+});
 
 function AdminPage() {
   const { user, loading: userLoading } = useAuthUser();
