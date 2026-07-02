@@ -25,6 +25,7 @@ import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student-dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedLivingTreeRouteImport } from './routes/_authenticated/living-tree'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
@@ -112,6 +113,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPeopleRoute = AuthenticatedPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/_authenticated/living-tree': typeof AuthenticatedLivingTreeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/_authenticated/people': typeof AuthenticatedPeopleRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/instructor-dashboard'
     | '/living-tree'
     | '/onboarding'
+    | '/people'
     | '/profile'
     | '/student-dashboard'
     | '/hub/admin'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/instructor-dashboard'
     | '/living-tree'
     | '/onboarding'
+    | '/people'
     | '/profile'
     | '/student-dashboard'
     | '/hub/admin'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/_authenticated/instructor-dashboard'
     | '/_authenticated/living-tree'
     | '/_authenticated/onboarding'
+    | '/_authenticated/people'
     | '/_authenticated/profile'
     | '/_authenticated/student-dashboard'
     | '/hub/admin'
@@ -412,6 +424,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/people': {
+      id: '/_authenticated/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AuthenticatedPeopleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -463,6 +482,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedLivingTreeRoute: typeof AuthenticatedLivingTreeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
+  AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
 }
@@ -473,6 +493,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
   AuthenticatedLivingTreeRoute: AuthenticatedLivingTreeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
+  AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
 }
