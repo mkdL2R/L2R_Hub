@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { Users, GraduationCap, type LucideProps } from "lucide-react";
 
 export type Role =
   | "admin"
@@ -13,10 +14,14 @@ export type Role =
   | "mentor"
   | "wellness_practitioner";
 
-export const PRIMARY_ROLES: { value: Role; label: string; emoji: string; description: string }[] = [
-  { value: "parent", label: "Parent", emoji: "👨‍👩‍👧", description: "I'm raising a learner" },
-  { value: "student", label: "Student", emoji: "👨‍🎓", description: "I am the learner" },
-  { value: "instructor", label: "Instructor", emoji: "👩‍🏫", description: "I teach and guide" },
+export const PRIMARY_ROLES: {
+  value: Role;
+  label: string;
+  icon: ComponentType<LucideProps>;
+  description: string;
+}[] = [
+  { value: "parent", label: "Parent", icon: Users, description: "I'm raising a learner" },
+  { value: "student", label: "Student", icon: GraduationCap, description: "I am the learner" },
 ];
 
 export function dashboardPathForRole(role: Role | string | null | undefined): string {

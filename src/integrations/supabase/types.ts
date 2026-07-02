@@ -365,6 +365,42 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          invited_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       instructor_profiles: {
         Row: {
           bio: string | null
@@ -748,6 +784,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_instructor_invitation: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
