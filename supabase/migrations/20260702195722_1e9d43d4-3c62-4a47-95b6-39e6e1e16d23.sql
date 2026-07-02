@@ -1,0 +1,1 @@
+DROP POLICY "Family members can add others" ON public.family_members;
