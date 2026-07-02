@@ -30,6 +30,11 @@ function Onboarding() {
         navigate({ to: dashboardPathForRole(existing) as never });
         return;
       }
+      const { data: claimed } = await supabase.rpc("claim_instructor_invitation");
+      if (claimed === true) {
+        navigate({ to: dashboardPathForRole("instructor") as never });
+        return;
+      }
       setNeedsRole(true);
       setChecking(false);
     })();
@@ -76,9 +81,11 @@ function Onboarding() {
         <div className="text-center mb-8">
           <img src={logoAsset.url} alt="L2R" className="h-16 w-16 rounded-2xl object-cover mx-auto mb-5 shadow-sm" />
           <h1 className="text-3xl font-semibold tracking-tight">Welcome to Left2Right Education Hub</h1>
-          <p className="mt-3 text-sm text-muted-foreground">Choose your role to personalize your experience.</p>
+          <p className="mt-3 text-sm text-muted-foreground max-w-md mx-auto">
+            We're delighted to have you join our learning community. Let's begin by identifying how you'll be participating.
+          </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           {PRIMARY_ROLES.map((r) => (
             <button
               key={r.value}
@@ -86,7 +93,9 @@ function Onboarding() {
               onClick={() => pickRole(r.value)}
               className="text-center rounded-3xl border border-border/60 p-8 hover:border-primary/50 hover:bg-accent/40 hover:shadow-md transition-all disabled:opacity-60"
             >
-              <div className="text-5xl">{r.emoji}</div>
+              <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <r.icon className="h-7 w-7" />
+              </div>
               <div className="mt-4 text-lg font-semibold">{r.label}</div>
               <div className="text-sm text-muted-foreground mt-1">{r.description}</div>
             </button>
