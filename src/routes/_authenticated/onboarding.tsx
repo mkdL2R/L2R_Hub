@@ -23,16 +23,18 @@ function Onboarding() {
   useEffect(() => {
     if (loading || !user) return;
     (async () => {
+      // Always try to claim a pending instructor invitation first — this promotes
+      // invited users even if they previously self-assigned a different role.
+      const { data: claimed } = await supabase.rpc("claim_instructor_invitation");
+      if (claimed === true) {
+        navigate({ to: dashboardPathForRole("instructor") as never });
+        return;
+      }
       const { data: profile } = await supabase
         .from("profiles").select("primary_role").eq("user_id", user.id).maybeSingle();
       const existing = profile?.primary_role as Role | null | undefined;
       if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
         navigate({ to: dashboardPathForRole(existing) as never });
-        return;
-      }
-      const { data: claimed } = await supabase.rpc("claim_instructor_invitation");
-      if (claimed === true) {
-        navigate({ to: dashboardPathForRole("instructor") as never });
         return;
       }
       setNeedsRole(true);
