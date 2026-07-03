@@ -76,6 +76,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          created_by: string | null
           family_motto: string | null
           family_name: string | null
           family_photo_url: string | null
@@ -93,6 +94,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          created_by?: string | null
           family_motto?: string | null
           family_name?: string | null
           family_photo_url?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          created_by?: string | null
           family_motto?: string | null
           family_name?: string | null
           family_photo_url?: string | null
