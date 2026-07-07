@@ -1,71 +1,79 @@
+# Left2Right — Brand Refresh + Media Uploads
 
-# Family Growth Hub — Implementation Plan
+Two things in one pass: (1) a warm, premium visual identity across the whole app, and (2) drag-and-drop file uploads in the Content Admin so you can publish blog posts and podcast episodes without hosting files elsewhere.
 
-## Scope
+---
 
-Add a new authenticated section "🌱 Family Growth Hub" to the L2R Education Hub, with public reading access for families and an admin interface for L2R staff to manage content.
+## 1. Visual identity system
 
-## Routing & Layout
+**Color tokens** (replaces the current emerald/amber palette everywhere):
 
-- `/hub` — pathless layout route with a left sidebar (using shadcn Sidebar). Sidebar items:
-  - Home (link back to `/`)
-  - Compass (`/compass`)
-  - 🌱 Family Growth Hub (active section, expands to show 4 tabs)
-  - Admin (visible only to admins)
-- Tabs under the Hub:
-  - `/hub/featured` — featured article, featured podcast, recently added, recommended (based on Compass tags).
-  - `/hub/articles` — search + category filter + grid of article cards.
-  - `/hub/articles/$slug` — article detail (hero, content, "Listen to this article" using Web Speech API, related articles, related podcast episodes; comments disabled).
-  - `/hub/podcasts` — featured episode + grid of episodes with play button (HTML5 audio).
-  - `/hub/resources` — searchable, categorized downloadable resources.
-- `/hub/admin` — staff-only CRUD for articles, podcasts, resources (publish, schedule, edit, archive).
-- `/auth` — sign in / sign up (email + password + Google). Required because admin must be authenticated.
+| Token | Hex | Role |
+|---|---|---|
+| `--background` | `#F8F5EF` ivory | Page background (no more pure white) |
+| `--primary` — Forest Green | `#2F6B4F` | Buttons, links, brand |
+| `--accent-red` — Crayon Red | `#D95C5C` | Family / celebration highlights |
+| `--accent-blue` — Sketch Blue | `#3A7CCF` | Guidance / educational tags |
+| `--sage` — Soft Sage | `#A9C3A2` | Growth sections, subtle bg |
+| `--sand` — Warm Sand | `#E9DFC9` | Card & secondary backgrounds |
+| `--ink` | `#1F2A24` | Body text |
 
-## Database (new migration)
+**Typography** — Editorial serif + clean sans, loaded via `<link>` in `__root.tsx`:
+- Headings: **Fraunces** (warm literary serif)
+- Body: **Inter** (crisp, readable)
 
-New tables under `public` schema, all with GRANTs + RLS:
+**Shapes & feel**
+- Rounded cards (`rounded-2xl` / `rounded-3xl`), warm sand backgrounds, subtle organic-paper shadows
+- Gentle blob/paper SVG accents behind hero sections
+- Bento-grid layouts for the Hub landing and dashboards
+- All emoji swapped for Lucide icons (🌱 → `Sprout`, 🌳 → `TreeDeciduous`, etc.)
+- Micro-interactions: hover-lift on cards, subtle fade-in on scroll
 
-- `app_role` enum: `admin`, `editor`, `member`.
-- `user_roles(user_id, role)` — standard separate-table role pattern + `has_role()` security-definer function.
-- `hub_articles` — slug, title, excerpt, content (markdown), hero_image_url, author, category, reading_minutes, status (`draft|scheduled|published|archived`), publish_at, created/updated.
-- `hub_podcast_episodes` — slug, title, description, cover_url, audio_url, duration_seconds, category, status, publish_at, is_featured.
-- `hub_resources` — title, description, file_url, file_type, category, age_group, status, publish_at.
-- `hub_saved_items` — `user_id`, `item_type` (`article|podcast|resource`), `item_id`. Per-user "save for later".
-- Storage bucket `hub-media` (public read) for hero images, cover art, audio files, and resource downloads.
+---
 
-RLS:
-- Anyone (anon + authenticated) can SELECT `status = 'published' AND publish_at <= now()` rows.
-- Only admins/editors (via `has_role`) can INSERT/UPDATE/DELETE.
-- `hub_saved_items`: each user manages their own rows.
+## 2. Pages that get restyled
 
-## Auth
+Applied globally via updated `src/styles.css` tokens + targeted per-page polish:
+- `/` landing (hero, feature bento, CTA)
+- `/hub`, `/hub/featured`, `/hub/articles`, `/hub/podcasts`, `/hub/resources`, `/hub/articles/$slug`
+- `/hub/admin` (new upload UI, see below)
+- `/compass`, `/parent`, `/student`, `/auth`
+- All `_authenticated` dashboards (family, instructor, student, profile, people, onboarding, living-tree)
+- Sidebar + shared shells
 
-Add minimal `/auth` route with email/password + Google OAuth via the Lovable broker. Profile/role auto-seeding: a trigger creates a default `member` role on signup. First admin is bootstrapped by the user manually via a small SQL snippet I'll surface after the migration.
+No layout rewrites — same information architecture, refreshed skin + a bento hero on the landing and Hub featured page.
 
-## Admin Interface
+---
 
-`/hub/admin` (gated by `_authenticated` + `has_role('admin'|'editor')`):
-- Tabs: Articles, Podcasts, Resources.
-- Each tab: table of existing items with status badges + edit/archive actions + "New" button opening a form (title, body, category, hero/cover/audio/file upload to `hub-media` bucket, status, publish_at).
+## 3. Built-in uploads for Blog & Podcast
 
-## Design
+**Storage:** new public `hub-media` bucket in Lovable Cloud with folders `articles/`, `podcasts/`, `resources/`. Public read, staff-only write (RLS on `storage.objects` gated by `has_role('admin'|'instructor')`).
 
-- Soft natural palette layered on the existing warm theme (sage/sand accents added to `src/styles.css`).
-- Rounded `rounded-2xl` cards, generous padding, serif display font for headings paired with the existing body font (loaded via `<link>` in `__root.tsx`).
-- L2R logo in the sidebar header and on hub hero sections.
+**Admin UI changes** in `/hub/admin`:
+- **Articles form:** drag-and-drop **hero image** (JPG/PNG/WebP, ≤5 MB). Replaces the "hero image URL" text field. URL is still editable as a fallback.
+- **Podcasts form:** drag-and-drop **cover art** (image) + **audio file** (MP3/M4A, ≤50 MB). Auto-reads duration from the audio file. Replaces the two URL fields.
+- **Resources form:** drag-and-drop **file** (PDF/DOCX/etc., ≤20 MB). Auto-detects file type.
+- Upload progress bar, thumbnail preview, "Remove" button, and inline error messages.
 
-## Out of scope (not built this turn)
+**How it works technically:** the browser uploads directly to the bucket via the Supabase JS client, receives a public URL, and stores that URL in the existing `hub_articles.hero_image_url` / `hub_podcast_episodes.audio_url` / `hub_resources.file_url` columns. No schema changes to content tables.
 
-- Comments (explicitly disabled).
-- Full-text search infra (uses simple `ilike` filters).
-- Audio transcription for "Listen to this article" beyond Web Speech API TTS fallback.
+---
 
-## Implementation order
+## Technical details
 
-1. Migration (tables, roles, RLS, GRANTs, storage bucket).
-2. `/auth` route + role bootstrap helper.
-3. Hub layout + sidebar + 4 tab routes + article detail route.
-4. Admin route with CRUD forms.
-5. Wire sidebar entry from `/`, `/compass` headers.
+- New migration: create `hub-media` bucket via `storage_create_bucket` tool + RLS policies on `storage.objects`.
+- New component: `src/components/admin/FileDropzone.tsx` (reusable, handles image / audio / doc).
+- Update `src/styles.css` `@theme` block with the new color/font tokens; keep shadcn `@theme inline` mapping intact.
+- Update `__root.tsx` head with Fraunces + Inter `<link>` tags.
+- Replace hardcoded `emerald-*` / `amber-*` Tailwind classes across hub routes with semantic tokens (`bg-primary`, `bg-sand`, `text-ink`, etc.).
+- Swap emoji glyphs in labels/nav for `lucide-react` icons.
 
-Confirm and I'll execute, or tell me what to drop/change (e.g. skip auth/admin and ship public read-only Hub first).
+---
+
+## Out of scope (this pass)
+
+- No changes to auth, roles, RLS on content tables, or onboarding flow.
+- No new content sections or routes.
+- No dark mode (can add after if you want).
+
+Approve and I'll ship it.
