@@ -19,6 +19,7 @@ import { Plus, Archive, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useUserRoles, ARTICLE_CATEGORIES, PODCAST_CATEGORIES, RESOURCE_CATEGORIES } from "@/lib/hub-auth";
 import { fmtDate } from "@/lib/hub-content";
+import { FileDropzone } from "@/components/admin/FileDropzone";
 
 export const Route = createFileRoute("/hub/admin")({
   ssr: false,
@@ -208,7 +209,13 @@ function ArticleForm({
             <Field label="Author"><Input value={form.author ?? ""} onChange={(e) => set("author", e.target.value)} /></Field>
             <Field label="Reading minutes"><Input type="number" value={form.reading_minutes ?? 5} onChange={(e) => set("reading_minutes", Number(e.target.value))} /></Field>
           </div>
-          <Field label="Hero image URL"><Input value={form.hero_image_url ?? ""} onChange={(e) => set("hero_image_url", e.target.value)} /></Field>
+          <FileDropzone
+            label="Hero image"
+            kind="image"
+            folder="articles"
+            value={form.hero_image_url ?? null}
+            onChange={(url) => set("hero_image_url", url)}
+          />
           <Field label="Excerpt"><Textarea value={form.excerpt ?? ""} onChange={(e) => set("excerpt", e.target.value)} /></Field>
           <Field label="Content"><Textarea rows={10} value={form.content ?? ""} onChange={(e) => set("content", e.target.value)} /></Field>
           <div className="grid grid-cols-2 gap-3">
@@ -324,9 +331,24 @@ function EpisodeForm({
           <Field label="Title"><Input value={form.title ?? ""} onChange={(e) => set("title", e.target.value)} /></Field>
           <Field label="Slug (auto if blank)"><Input value={form.slug ?? ""} onChange={(e) => set("slug", e.target.value)} /></Field>
           <Field label="Description"><Textarea value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Cover URL"><Input value={form.cover_url ?? ""} onChange={(e) => set("cover_url", e.target.value)} /></Field>
-            <Field label="Audio URL"><Input value={form.audio_url ?? ""} onChange={(e) => set("audio_url", e.target.value)} /></Field>
+          <div className="grid gap-4 md:grid-cols-2">
+            <FileDropzone
+              label="Cover art"
+              kind="image"
+              folder="podcasts/covers"
+              value={form.cover_url ?? null}
+              onChange={(url) => set("cover_url", url)}
+            />
+            <FileDropzone
+              label="Audio file"
+              kind="audio"
+              folder="podcasts/audio"
+              value={form.audio_url ?? null}
+              onChange={(url, meta) => {
+                set("audio_url", url);
+                if (meta?.durationSeconds) set("duration_seconds", meta.durationSeconds);
+              }}
+            />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Field label="Duration (s)"><Input type="number" value={form.duration_seconds ?? ""} onChange={(e) => set("duration_seconds", Number(e.target.value))} /></Field>
@@ -439,10 +461,17 @@ function ResourceForm({
         <div className="space-y-4">
           <Field label="Title"><Input value={form.title ?? ""} onChange={(e) => set("title", e.target.value)} /></Field>
           <Field label="Description"><Textarea value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="File URL"><Input value={form.file_url ?? ""} onChange={(e) => set("file_url", e.target.value)} /></Field>
-            <Field label="File type"><Input placeholder="PDF, DOCX…" value={form.file_type ?? ""} onChange={(e) => set("file_type", e.target.value)} /></Field>
-          </div>
+          <FileDropzone
+            label="Downloadable file"
+            kind="doc"
+            folder="resources"
+            value={form.file_url ?? null}
+            onChange={(url, meta) => {
+              set("file_url", url);
+              if (meta?.fileType) set("file_type", meta.fileType.toUpperCase());
+            }}
+          />
+          <Field label="File type (auto-detected)"><Input placeholder="PDF, DOCX…" value={form.file_type ?? ""} onChange={(e) => set("file_type", e.target.value)} /></Field>
           <div className="grid grid-cols-3 gap-3">
             <Field label="Category">
               <Select value={form.category} onValueChange={(v) => set("category", v)}>
