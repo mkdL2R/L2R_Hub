@@ -841,6 +841,7 @@ export type Database = {
           phone: string | null
           preferred_name: string | null
           primary_role: Database["public"]["Enums"]["app_role"] | null
+          status: string
           updated_at: string
           user_id: string
         }
@@ -852,6 +853,7 @@ export type Database = {
           phone?: string | null
           preferred_name?: string | null
           primary_role?: Database["public"]["Enums"]["app_role"] | null
+          status?: string
           updated_at?: string
           user_id: string
         }
@@ -863,6 +865,7 @@ export type Database = {
           phone?: string | null
           preferred_name?: string | null
           primary_role?: Database["public"]["Enums"]["app_role"] | null
+          status?: string
           updated_at?: string
           user_id?: string
         }
@@ -976,6 +979,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_profile_data: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
+      admin_list_profiles: {
+        Args: never
+        Returns: {
+          created_at: string
+          current_step: number
+          email: string
+          family_id: string
+          family_name: string
+          journey: string
+          onboarding_status: string
+          preferred_name: string
+          primary_role: Database["public"]["Enums"]["app_role"]
+          status: string
+          total_steps: number
+          user_id: string
+        }[]
+      }
+      admin_set_profile_status: {
+        Args: { _status: string; _user_id: string }
+        Returns: undefined
+      }
       assign_primary_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
@@ -999,6 +1027,8 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      submit_parent_journey: { Args: { _payload: Json }; Returns: string }
+      submit_student_journey: { Args: { _payload: Json }; Returns: string }
       subscribe_to_newsletter: {
         Args: { _email: string; _source?: string }
         Returns: undefined
