@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import DOMPurify from "isomorphic-dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -179,7 +180,7 @@ function ArticlePage() {
 
           <div
             className="prose prose-neutral mt-8 max-w-none font-serif text-[17px] leading-relaxed prose-headings:font-serif prose-img:rounded-xl prose-a:text-primary"
-            dangerouslySetInnerHTML={{ __html: article.content }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.content ?? "", { USE_PROFILES: { html: true } }) }}
           />
 
           <p className="mt-10 text-xs text-muted-foreground italic">
