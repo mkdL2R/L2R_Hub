@@ -506,8 +506,8 @@ function CompassPage() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <Compass className="h-7 w-7" />
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-            🧭 Your L2R Compass
+          <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
+            Your L2R Compass
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
             A reflection of your family's ecosystem, designed to guide growth rather than measure
@@ -541,8 +541,8 @@ function CompassPage() {
                     <Sprout className="h-5 w-5" />
                   </div>
                   <div>
-                    <CardTitle id="learning-profile" className="text-2xl">
-                      Learning Profile 🌱
+                    <CardTitle id="learning-profile" className="font-serif text-2xl font-medium">
+                      Learning Profile
                     </CardTitle>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {studentName ? `${studentName}'s learning tendencies` : "Learning tendencies"}
@@ -580,7 +580,7 @@ function CompassPage() {
             {ecosystem && (
               <SectionCard
                 icon={<Home className="h-5 w-5" />}
-                title="Family Ecosystem 🏡"
+                title="Family Ecosystem"
                 subtitle="The shape of daily life at home"
                 summary={ecosystem.summary}
               >
@@ -595,7 +595,7 @@ function CompassPage() {
             {communication && (
               <SectionCard
                 icon={<MessagesSquare className="h-5 w-5" />}
-                title="Communication Dynamics 🤝"
+                title="Communication Dynamics"
                 subtitle="How connection and conversation flow"
                 summary={communication.summary}
               >
@@ -610,7 +610,7 @@ function CompassPage() {
             {goals && (
               <SectionCard
                 icon={<Target className="h-5 w-5" />}
-                title="Goals & Aspirations 🎯"
+                title="Goals & Aspirations"
                 subtitle="Where the family and learner are heading"
                 summary={goals.narrative}
               >
@@ -644,7 +644,7 @@ function CompassPage() {
             {strengths && (
               <SectionCard
                 icon={<Lightbulb className="h-5 w-5" />}
-                title="Strengths 💡"
+                title="Strengths"
                 subtitle="Qualities that already shine through"
                 summary="These are the qualities most present in the learner's story right now — strengths to lean on as the journey continues."
               >
@@ -665,7 +665,7 @@ function CompassPage() {
             {growth && (
               <SectionCard
                 icon={<Sparkles className="h-5 w-5" />}
-                title="Growth Opportunities 🌟"
+                title="Growth Opportunities"
                 subtitle="Gentle next steps to nurture together"
                 summary="These are not weaknesses — they are invitations. Areas where attention, care, and the right support can open new chapters of growth."
               >
@@ -685,7 +685,7 @@ function CompassPage() {
             {pathway && (
               <SectionCard
                 icon={<Navigation className="h-5 w-5" />}
-                title="Recommended L2R Accompaniment 🧭"
+                title="Recommended L2R Accompaniment"
                 subtitle="A pathway shaped around this learner"
                 summary={pathway.explanation}
               >
