@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Sparkles, BookOpen, Headphones, Download, Sprout, Shield, Home, LogOut, LogIn, Compass } from "lucide-react";
+import { Sparkles, BookOpen, Headphones, Download, Sprout, Shield, Home, LogOut, LogIn, Compass, Video, Tag, Search as SearchIcon, Bookmark } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 import { useAuthUser, useUserRoles } from "@/lib/hub-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,7 +43,11 @@ const tabs = [
   { to: "/hub/featured", title: "Featured", icon: Sparkles },
   { to: "/hub/articles", title: "Articles", icon: BookOpen },
   { to: "/hub/podcasts", title: "Podcasts", icon: Headphones },
-  { to: "/hub/resources", title: "Resources", icon: Download },
+  { to: "/hub/videos", title: "Videos", icon: Video },
+  { to: "/hub/downloads", title: "Downloads", icon: Download },
+  { to: "/hub/categories", title: "Categories", icon: Tag },
+  { to: "/hub/search", title: "Search", icon: SearchIcon },
+  { to: "/hub/bookmarks", title: "Bookmarks", icon: Bookmark },
 ] as const;
 
 function HubLayout() {

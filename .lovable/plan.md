@@ -1,79 +1,96 @@
-# Left2Right — Brand Refresh + Media Uploads
 
-Two things in one pass: (1) a warm, premium visual identity across the whole app, and (2) drag-and-drop file uploads in the Content Admin so you can publish blog posts and podcast episodes without hosting files elsewhere.
+# Growth Hub CMS — Implementation Plan
 
----
+The project already has a partial Hub (`hub_articles`, `hub_podcast_episodes`, `hub_resources`, `hub_saved_items`, `hub-media` bucket, `/hub/*` routes, `/hub/admin`, staff RBAC via `is_staff` + `user_roles`). I'll extend rather than rebuild so existing content and links keep working.
 
-## 1. Visual identity system
+## 1. Database (single migration)
 
-**Color tokens** (replaces the current emerald/amber palette everywhere):
+Extend existing tables and add new ones. All new tables include GRANTs + RLS.
 
-| Token | Hex | Role |
-|---|---|---|
-| `--background` | `#F8F5EF` ivory | Page background (no more pure white) |
-| `--primary` — Forest Green | `#2F6B4F` | Buttons, links, brand |
-| `--accent-red` — Crayon Red | `#D95C5C` | Family / celebration highlights |
-| `--accent-blue` — Sketch Blue | `#3A7CCF` | Guidance / educational tags |
-| `--sage` — Soft Sage | `#A9C3A2` | Growth sections, subtle bg |
-| `--sand` — Warm Sand | `#E9DFC9` | Card & secondary backgrounds |
-| `--ink` | `#1F2A24` | Body text |
+**Extend `hub_articles`** — add: `slug` (already), `featured_image_url`, `seo_title`, `seo_description`, `canonical_url`, `og_image_url`, `scheduled_at`, `is_featured`, `content_json` (jsonb, Tiptap doc), `view_count`. Extend `status` check to include `draft|published|scheduled|archived`.
 
-**Typography** — Editorial serif + clean sans, loaded via `<link>` in `__root.tsx`:
-- Headings: **Fraunces** (warm literary serif)
-- Body: **Inter** (crisp, readable)
+**Extend `hub_podcast_episodes`** — add: `episode_number`, `spotify_url`, `apple_url`, `youtube_url`, `transcript`. Keep `audio_url` optional (unused per spec).
 
-**Shapes & feel**
-- Rounded cards (`rounded-2xl` / `rounded-3xl`), warm sand backgrounds, subtle organic-paper shadows
-- Gentle blob/paper SVG accents behind hero sections
-- Bento-grid layouts for the Hub landing and dashboards
-- All emoji swapped for Lucide icons (🌱 → `Sprout`, 🌳 → `TreeDeciduous`, etc.)
-- Micro-interactions: hover-lift on cards, subtle fade-in on scroll
+**Extend `hub_resources`** — add: `download_count`, `resource_type` (pdf|workbook|checklist|printable|presentation).
 
----
+**New tables:**
+- `hub_categories` (name, slug, description, color, kind: article|podcast|download)
+- `hub_tags` (name, slug)
+- `hub_article_tags` (article_id, tag_id)
+- `hub_reading_history` (user_id, item_type, item_id, progress, completed, last_viewed_at)
+- `hub_newsletter_subscribers` (email unique, source, subscribed_at, confirmed)
 
-## 2. Pages that get restyled
+Reuse existing `hub_saved_items` for bookmarks (already supports article + podcast).
 
-Applied globally via updated `src/styles.css` tokens + targeted per-page polish:
-- `/` landing (hero, feature bento, CTA)
-- `/hub`, `/hub/featured`, `/hub/articles`, `/hub/podcasts`, `/hub/resources`, `/hub/articles/$slug`
-- `/hub/admin` (new upload UI, see below)
-- `/compass`, `/parent`, `/student`, `/auth`
-- All `_authenticated` dashboards (family, instructor, student, profile, people, onboarding, living-tree)
-- Sidebar + shared shells
+**RLS:**
+- Public SELECT on published articles/podcasts/downloads/categories/tags (anon + authenticated).
+- Staff (`is_staff(auth.uid())`) full CRUD on content + categories + tags.
+- Bookmarks/history: owner-only (`auth.uid() = user_id`).
+- Newsletter: anon INSERT allowed; SELECT staff-only.
 
-No layout rewrites — same information architecture, refreshed skin + a bento hero on the landing and Hub featured page.
+## 2. Storage buckets
 
----
+Create via storage tool: `article-images` (public), `downloads` (public read, staff write), `media` (public). Keep existing `hub-media` for backward compat. Storage RLS: staff-only write via `is_staff`, public read.
 
-## 3. Built-in uploads for Blog & Podcast
+## 3. Rich Text Editor
 
-**Storage:** new public `hub-media` bucket in Lovable Cloud with folders `articles/`, `podcasts/`, `resources/`. Public read, staff-only write (RLS on `storage.objects` gated by `has_role('admin'|'instructor')`).
+Install `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-image`, `-link`, `-table`, `-task-list`, `-task-item`, `-highlight`, `-underline`, `-placeholder`, `-youtube`, `-horizontal-rule`, `lowlight` for code.
 
-**Admin UI changes** in `/hub/admin`:
-- **Articles form:** drag-and-drop **hero image** (JPG/PNG/WebP, ≤5 MB). Replaces the "hero image URL" text field. URL is still editable as a fallback.
-- **Podcasts form:** drag-and-drop **cover art** (image) + **audio file** (MP3/M4A, ≤50 MB). Auto-reads duration from the audio file. Replaces the two URL fields.
-- **Resources form:** drag-and-drop **file** (PDF/DOCX/etc., ≤20 MB). Auto-detects file type.
-- Upload progress bar, thumbnail preview, "Remove" button, and inline error messages.
+Build `src/components/editor/TiptapEditor.tsx` with toolbar (headings, bold/italic/underline/highlight, lists, checklists, quote, code block, table, image upload → `article-images`, link, YouTube embed, HR, undo/redo). Autosave draft every 5s via debounced mutation. Preview mode renders read-only.
 
-**How it works technically:** the browser uploads directly to the bucket via the Supabase JS client, receives a public URL, and stores that URL in the existing `hub_articles.hero_image_url` / `hub_podcast_episodes.audio_url` / `hub_resources.file_url` columns. No schema changes to content tables.
+Article renderer: `src/components/editor/ArticleRenderer.tsx` renders `content_json` via `generateHTML` for the public article page.
 
----
+## 4. Routes
 
-## Technical details
+Keep existing route files; add new ones.
 
-- New migration: create `hub-media` bucket via `storage_create_bucket` tool + RLS policies on `storage.objects`.
-- New component: `src/components/admin/FileDropzone.tsx` (reusable, handles image / audio / doc).
-- Update `src/styles.css` `@theme` block with the new color/font tokens; keep shadcn `@theme inline` mapping intact.
-- Update `__root.tsx` head with Fraunces + Inter `<link>` tags.
-- Replace hardcoded `emerald-*` / `amber-*` Tailwind classes across hub routes with semantic tokens (`bg-primary`, `bg-sand`, `text-ink`, etc.).
-- Swap emoji glyphs in labels/nav for `lucide-react` icons.
+**Public / reader:**
+- `/hub` (index — already, refresh to show featured article + featured podcast + latest)
+- `/hub/articles` (extend existing: keyword + category + tag + sort)
+- `/hub/articles/$slug` (extend: cover, tags, share buttons, related, prev/next, view tracking)
+- `/hub/podcasts` (episodes list with external Listen buttons — remove inline audio player)
+- `/hub/podcasts/$slug` (episode detail: artwork, description, Spotify/Apple/YouTube buttons, transcript)
+- `/hub/videos` (empty state "Coming soon" — route scaffold only, per "future ready")
+- `/hub/downloads` (rename/replace `hub.resources.tsx`; downloads with counter increment RPC)
+- `/hub/categories` (browse by category)
+- `/hub/search` (unified search across articles + podcasts + downloads)
+- `/hub/bookmarks` (authenticated: saved items)
 
----
+**Admin (`is_staff` gate in `hub.admin.tsx` already exists):**
+- `/hub/admin` (dashboard: content counts, quick links)
+- `/hub/admin/articles` (list + create/edit/delete/publish/feature)
+- `/hub/admin/articles/$id` (Tiptap editor + metadata + SEO panel + status controls + preview)
+- `/hub/admin/podcasts` + `/hub/admin/podcasts/$id`
+- `/hub/admin/downloads` + upload via `FileDropzone`
+- `/hub/admin/categories` (CRUD)
+- `/hub/admin/tags` (CRUD)
+- `/hub/admin/newsletter` (subscriber list)
 
-## Out of scope (this pass)
+## 5. Navigation
 
-- No changes to auth, roles, RLS on content tables, or onboarding flow.
-- No new content sections or routes.
-- No dark mode (can add after if you want).
+Update `DashboardShell` items and dashboards to expose a single "Growth Hub" entry that lands on `/hub` with a sub-nav (Articles | Podcasts | Videos | Downloads | Categories | Search | Bookmarks). Sub-nav lives in `src/routes/hub.tsx` as a sticky tab bar. Instructor dashboard gets "Growth Hub Admin" → `/hub/admin`.
 
-Approve and I'll ship it.
+## 6. Dashboards
+
+Add "Continue Learning" (recent `hub_reading_history`) and "Featured this week" (featured article + podcast) blocks to `family-dashboard.tsx` and `student-dashboard.tsx`.
+
+## 7. Newsletter
+
+Footer/hero subscribe form → inserts into `hub_newsletter_subscribers` (anon INSERT policy, unique email, silent on duplicate).
+
+## 8. Design
+
+Keep existing warm-ivory + forest + sketch palette; new admin uses cards, rounded-2xl, Lucide icons only. No emojis. Paper-texture backgrounds via existing tokens.
+
+## Technical Notes
+
+- Scheduled publishing: `status='scheduled' + scheduled_at`; existing public filters use `status='published' AND publish_at <= now()` — add scheduler view as `status IN ('published','scheduled') AND publish_at <= now()` or a lightweight cron via pg_cron flipping scheduled → published (defer to pg_cron in a follow-up; MVP treats scheduled = published-when-time-passes at query time).
+- View + download counters: `increment_article_view(id)` and `increment_download(id)` SECURITY DEFINER functions, granted to anon+authenticated.
+- Related articles: same category, exclude self, limit 3.
+- Prev/next: order by `publish_at`.
+- All server data via existing browser `supabase` client (RLS covers it); no server functions required.
+- Do not touch auto-generated files.
+
+## Deliverable per turn
+
+Single migration → then install Tiptap + implement editor + all routes + nav + dashboards + newsletter in one pass. I'll skip video ingestion (route stub only) and pg_cron (query-time scheduling).
