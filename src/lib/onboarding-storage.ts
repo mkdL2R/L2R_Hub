@@ -4,6 +4,8 @@ const KEYS = {
   student: "onboarding_student_id",
   parentStatus: "onboarding_parent_status_id",
   studentStatus: "onboarding_student_status_id",
+  parentDraft: "onboarding_parent_draft",
+  studentDraft: "onboarding_student_draft",
 } as const;
 
 function safe(): Storage | null {
@@ -27,3 +29,15 @@ export const onboardingStore = {
     Object.values(KEYS).forEach((k) => s.removeItem(k));
   },
 };
+
+export function saveDraft<T>(key: "parentDraft" | "studentDraft", value: T) {
+  safe()?.setItem(KEYS[key], JSON.stringify(value));
+}
+export function loadDraft<T>(key: "parentDraft" | "studentDraft"): T | null {
+  const raw = safe()?.getItem(KEYS[key]);
+  if (!raw) return null;
+  try { return JSON.parse(raw) as T; } catch { return null; }
+}
+export function clearDraft(key: "parentDraft" | "studentDraft") {
+  safe()?.removeItem(KEYS[key]);
+}
