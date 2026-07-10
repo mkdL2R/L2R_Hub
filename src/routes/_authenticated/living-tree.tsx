@@ -11,7 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Plus, Search, ArrowLeft, TreeDeciduous } from "lucide-react";
+import {
+  Loader2, Plus, Search, ArrowLeft, TreeDeciduous,
+  Sprout, Compass as CompassIcon, Handshake, BookOpen, Backpack, Tent,
+  Target, Trophy, Book, Headphones, Heart, Leaf, Palette, ScrollText,
+  PartyPopper, Puzzle, Image as ImageIcon, Microscope, Mountain, Sparkles,
+  Lightbulb, Brain, Globe, GraduationCap,
+  type LucideIcon,
+} from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated/living-tree")({
@@ -51,42 +58,42 @@ type Family = {
   created_at: string;
 };
 
-const ENTRY_TYPES: { value: string; label: string; emoji: string; group: "timeline" | "portfolio" | "memory" | "instructor" }[] = [
-  { value: "admission", label: "Admission Completed", emoji: "🌱", group: "timeline" },
-  { value: "compass", label: "Compass Generated", emoji: "🧭", group: "timeline" },
-  { value: "alignment", label: "Family Alignment Meeting", emoji: "🤝", group: "timeline" },
-  { value: "enrolled", label: "Student Enrolled", emoji: "📚", group: "timeline" },
-  { value: "new_year", label: "New Academic Year", emoji: "🎒", group: "timeline" },
-  { value: "core_life", label: "Core Life Studies Experience", emoji: "🏕", group: "timeline" },
-  { value: "goal_created", label: "Personal Goal Created", emoji: "🎯", group: "timeline" },
-  { value: "goal_achieved", label: "Goal Achieved", emoji: "🏆", group: "timeline" },
-  { value: "article_read", label: "Article Read", emoji: "📖", group: "timeline" },
-  { value: "podcast_done", label: "Podcast Completed", emoji: "🎧", group: "timeline" },
-  { value: "wellness", label: "Wellness Session", emoji: "❤️", group: "timeline" },
-  { value: "community", label: "Community Project", emoji: "🌿", group: "timeline" },
-  { value: "creative", label: "Creative Portfolio", emoji: "🎨", group: "portfolio" },
-  { value: "certificate", label: "Certificate Earned", emoji: "📜", group: "timeline" },
-  { value: "celebration", label: "Celebration", emoji: "🎉", group: "timeline" },
-  { value: "portfolio_project", label: "Project", emoji: "🧩", group: "portfolio" },
-  { value: "portfolio_photo", label: "Photo / Artwork", emoji: "🖼", group: "portfolio" },
-  { value: "portfolio_research", label: "Research", emoji: "🔬", group: "portfolio" },
-  { value: "memory", label: "Memory / Field Trip", emoji: "🌄", group: "memory" },
-  { value: "instructor_note", label: "Instructor Note", emoji: "✨", group: "instructor" },
+const ENTRY_TYPES: { value: string; label: string; icon: LucideIcon; group: "timeline" | "portfolio" | "memory" | "instructor" }[] = [
+  { value: "admission", label: "Admission Completed", icon: Sprout, group: "timeline" },
+  { value: "compass", label: "Compass Generated", icon: CompassIcon, group: "timeline" },
+  { value: "alignment", label: "Family Alignment Meeting", icon: Handshake, group: "timeline" },
+  { value: "enrolled", label: "Student Enrolled", icon: BookOpen, group: "timeline" },
+  { value: "new_year", label: "New Academic Year", icon: Backpack, group: "timeline" },
+  { value: "core_life", label: "Core Life Studies Experience", icon: Tent, group: "timeline" },
+  { value: "goal_created", label: "Personal Goal Created", icon: Target, group: "timeline" },
+  { value: "goal_achieved", label: "Goal Achieved", icon: Trophy, group: "timeline" },
+  { value: "article_read", label: "Article Read", icon: Book, group: "timeline" },
+  { value: "podcast_done", label: "Podcast Completed", icon: Headphones, group: "timeline" },
+  { value: "wellness", label: "Wellness Session", icon: Heart, group: "timeline" },
+  { value: "community", label: "Community Project", icon: Leaf, group: "timeline" },
+  { value: "creative", label: "Creative Portfolio", icon: Palette, group: "portfolio" },
+  { value: "certificate", label: "Certificate Earned", icon: ScrollText, group: "timeline" },
+  { value: "celebration", label: "Celebration", icon: PartyPopper, group: "timeline" },
+  { value: "portfolio_project", label: "Project", icon: Puzzle, group: "portfolio" },
+  { value: "portfolio_photo", label: "Photo / Artwork", icon: ImageIcon, group: "portfolio" },
+  { value: "portfolio_research", label: "Research", icon: Microscope, group: "portfolio" },
+  { value: "memory", label: "Memory / Field Trip", icon: Mountain, group: "memory" },
+  { value: "instructor_note", label: "Instructor Note", icon: Sparkles, group: "instructor" },
 ];
 
-const GROWTH_AREAS = [
-  { key: "curiosity", label: "Curiosity", emoji: "🌱" },
-  { key: "communication", label: "Communication", emoji: "🤝" },
-  { key: "creativity", label: "Creativity", emoji: "💡" },
-  { key: "critical_thinking", label: "Critical Thinking", emoji: "🧠" },
-  { key: "emotional_intelligence", label: "Emotional Intelligence", emoji: "❤️" },
-  { key: "responsibility", label: "Responsibility", emoji: "🎯" },
-  { key: "citizenship", label: "Citizenship", emoji: "🌍" },
-  { key: "learning_habits", label: "Learning Habits", emoji: "📚" },
+const GROWTH_AREAS: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "curiosity", label: "Curiosity", icon: Sprout },
+  { key: "communication", label: "Communication", icon: Handshake },
+  { key: "creativity", label: "Creativity", icon: Lightbulb },
+  { key: "critical_thinking", label: "Critical Thinking", icon: Brain },
+  { key: "emotional_intelligence", label: "Emotional Intelligence", icon: Heart },
+  { key: "responsibility", label: "Responsibility", icon: Target },
+  { key: "citizenship", label: "Citizenship", icon: Globe },
+  { key: "learning_habits", label: "Learning Habits", icon: GraduationCap },
 ];
 
 function typeMeta(t: string) {
-  return ENTRY_TYPES.find((e) => e.value === t) ?? { value: t, label: t, emoji: "🌿", group: "timeline" as const };
+  return ENTRY_TYPES.find((e) => e.value === t) ?? { value: t, label: t, icon: Leaf, group: "timeline" as const };
 }
 
 function monthKey(d: string) {
