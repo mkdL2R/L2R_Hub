@@ -183,18 +183,13 @@ function ParentJourney() {
         primary_phone: data.primary_phone || null,
         household_size: data.household_size ? parseInt(data.household_size, 10) : null,
       };
-      if (familyId) {
-        await supabase.from("families").update(payload).eq("id", familyId).throwOnError();
-      } else {
-        const { data: row } = await supabase
-          .from("families")
-          .insert(payload)
-          .select("id")
-          .single()
-          .throwOnError();
-        familyId = row!.id;
+      if (!familyId) {
+        const { data: fid, error: rpcErr } = await supabase.rpc("ensure_user_family");
+        if (rpcErr) throw rpcErr;
+        familyId = fid as unknown as string;
         onboardingStore.set("family", familyId);
       }
+      await supabase.from("families").update(payload).eq("id", familyId).throwOnError();
     }
 
     // step 2: address & languages on family
