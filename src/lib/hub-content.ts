@@ -83,3 +83,18 @@ export async function listPublishedResources() {
   if (error) throw error;
   return (data ?? []) as Resource[];
 }
+
+const CATEGORY_TONES = [
+  "bg-crayon/10 text-crayon border-crayon/25",
+  "bg-sketch/10 text-sketch border-sketch/25",
+  "bg-mustard/20 text-mustard-foreground border-mustard/40",
+  "bg-sage/25 text-sage-foreground border-sage/40",
+  "bg-primary/10 text-primary border-primary/25",
+] as const;
+
+export function categoryTone(category: string | null | undefined): string {
+  if (!category) return CATEGORY_TONES[0];
+  let h = 0;
+  for (let i = 0; i < category.length; i++) h = (h * 31 + category.charCodeAt(i)) >>> 0;
+  return CATEGORY_TONES[h % CATEGORY_TONES.length];
+}
