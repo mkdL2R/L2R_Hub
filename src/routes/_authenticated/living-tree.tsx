@@ -197,21 +197,27 @@ function Overview({ family, entries }: { family: Family; entries: Entry[] }) {
   const academicYear = `${startYear}–${startYear + 1}`;
   const compass = entries.find((e) => e.entry_type === "compass");
   return (
-    <Card className="p-8 rounded-3xl border-border/60 bg-gradient-to-br from-background to-[hsl(140_25%_96%)]">
+    <Card className="card-paper p-8 rounded-3xl">
       <div className="flex flex-col sm:flex-row gap-6 items-start">
         {family.family_photo_url ? (
           <img src={family.family_photo_url} alt="" className="h-28 w-28 rounded-2xl object-cover border border-border/60" />
         ) : (
-          <div className="h-28 w-28 rounded-2xl bg-[hsl(140_25%_92%)] flex items-center justify-center text-5xl">🌳</div>
+          <div className="h-28 w-28 rounded-2xl bg-sand flex items-center justify-center text-primary">
+            <TreeDeciduous className="h-12 w-12" />
+          </div>
         )}
         <div className="flex-1">
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Family</div>
-          <h1 className="text-3xl font-semibold tracking-tight">{family.family_name ?? "Your family"}</h1>
+          <h1 className="font-serif text-4xl font-medium tracking-tight">{family.family_name ?? "Your family"}</h1>
           {family.family_motto && <p className="mt-2 italic text-muted-foreground">"{family.family_motto}"</p>}
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <Badge variant="secondary" className="rounded-full">L2R member since {since}</Badge>
             <Badge variant="secondary" className="rounded-full">Academic year {academicYear}</Badge>
-            {compass && <Badge variant="secondary" className="rounded-full">🧭 Compass active</Badge>}
+            {compass && (
+              <Badge variant="secondary" className="rounded-full inline-flex items-center gap-1">
+                <CompassIcon className="h-3 w-3" /> Compass active
+              </Badge>
+            )}
           </div>
           {compass?.description && (
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{compass.description}</p>
@@ -232,9 +238,12 @@ function OverviewBody({ entries, goals }: { entries: Entry[]; goals: Goal[] }) {
           {recent.length === 0 && <li className="text-sm text-muted-foreground">No entries yet — add the first leaf in the Timeline tab.</li>}
           {recent.map((e) => {
             const m = typeMeta(e.entry_type);
+            const Icon = m.icon;
             return (
               <li key={e.id} className="flex gap-3 text-sm">
-                <span className="text-xl">{m.emoji}</span>
+                <span className="mt-0.5 grid h-7 w-7 place-items-center rounded-full bg-sand text-primary shrink-0">
+                  <Icon className="h-4 w-4" />
+                </span>
                 <div>
                   <div className="font-medium">{e.title}</div>
                   <div className="text-xs text-muted-foreground">{new Date(e.occurred_on).toLocaleDateString()}</div>
@@ -256,7 +265,7 @@ function OverviewBody({ entries, goals }: { entries: Entry[]; goals: Goal[] }) {
           ))}
         </ul>
       </Card>
-      <Card className="p-6 rounded-2xl md:col-span-2 bg-[hsl(40_30%_98%)] border-dashed">
+      <Card className="p-6 rounded-2xl md:col-span-2 bg-sand/40 border-dashed">
         <p className="text-sm text-center text-muted-foreground italic leading-relaxed">
           Education is not measured by grades alone. It is the lifelong story of how a learner, a family, and a community grow together.
         </p>
@@ -274,13 +283,16 @@ function TimelineTab({ entries, family, user, onChange }: { entries: Entry[]; fa
         <h2 className="text-xl font-semibold">Timeline</h2>
         <EntryDialog family={family} user={user} onChange={onChange} defaultGroup="timeline" />
       </div>
-      <div className="relative pl-8 border-l-2 border-[hsl(140_30%_80%)]">
+      <div className="relative pl-8 border-l-2 border-sage">
         {timeline.length === 0 && <p className="text-sm text-muted-foreground">No milestones yet. Plant the first one.</p>}
         {timeline.map((e) => {
           const m = typeMeta(e.entry_type);
+          const Icon = m.icon;
           return (
             <div key={e.id} className="relative mb-6">
-              <div className="absolute -left-[42px] top-1 h-8 w-8 rounded-full bg-background border-2 border-[hsl(140_40%_60%)] flex items-center justify-center text-base">{m.emoji}</div>
+              <div className="absolute -left-[42px] top-1 h-8 w-8 rounded-full bg-background border-2 border-primary/50 flex items-center justify-center text-primary">
+                <Icon className="h-4 w-4" />
+              </div>
               <Card className="p-5 rounded-2xl">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="outline" className="rounded-full text-xs">{m.label}</Badge>
@@ -368,7 +380,14 @@ function EntryDialog({
               <Select value={entryType} onValueChange={setEntryType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {types.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
+                  {types.map((t) => {
+                    const Ti = t.icon;
+                    return (
+                      <SelectItem key={t.value} value={t.value}>
+                        <span className="inline-flex items-center gap-2"><Ti className="h-3.5 w-3.5" /> {t.label}</span>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -495,9 +514,12 @@ function GrowthTab({ entries }: { entries: Entry[] }) {
           : mentions < 3 ? "Beginning to take root."
           : mentions < 6 ? "Growing steadily, branch by branch."
           : "A flourishing branch on the tree.";
+        const Icon = g.icon;
         return (
           <Card key={g.key} className="p-5 rounded-2xl text-center">
-            <div className="text-3xl">{g.emoji}</div>
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-sand text-primary">
+              <Icon className="h-6 w-6" />
+            </div>
             <div className="mt-3 font-semibold">{g.label}</div>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{narrative}</p>
           </Card>
@@ -531,9 +553,12 @@ function PortfolioTab({ entries, family, user, onChange }: { entries: Entry[]; f
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((i) => {
               const m = typeMeta(i.entry_type);
+              const Icon = m.icon;
               return (
                 <Card key={i.id} className="p-5 rounded-2xl">
-                  <div className="text-2xl">{m.emoji}</div>
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-sand text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
                   <div className="mt-2 font-semibold text-sm">{i.title}</div>
                   <div className="text-xs text-muted-foreground">{new Date(i.occurred_on).toLocaleDateString()}</div>
                   {i.description && <p className="mt-2 text-xs whitespace-pre-wrap text-muted-foreground">{i.description}</p>}
@@ -560,9 +585,12 @@ function MemoryTab({ entries, family, user, onChange }: { entries: Entry[]; fami
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((i) => {
           const m = typeMeta(i.entry_type);
+          const Icon = m.icon;
           return (
             <Card key={i.id} className="overflow-hidden rounded-2xl">
-              <div className="h-32 bg-gradient-to-br from-[hsl(140_25%_88%)] to-[hsl(40_30%_92%)] flex items-center justify-center text-5xl">{m.emoji}</div>
+              <div className="h-32 bg-gradient-to-br from-sage/40 to-sand flex items-center justify-center text-primary">
+                <Icon className="h-12 w-12" />
+              </div>
               <div className="p-4">
                 <div className="font-semibold text-sm">{i.title}</div>
                 <div className="text-xs text-muted-foreground">{new Date(i.occurred_on).toLocaleDateString()}</div>
@@ -664,7 +692,14 @@ function SearchTab({ entries }: { entries: Entry[] }) {
           <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All types</SelectItem>
-            {ENTRY_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
+            {ENTRY_TYPES.map((t) => {
+              const Ti = t.icon;
+              return (
+                <SelectItem key={t.value} value={t.value}>
+                  <span className="inline-flex items-center gap-2"><Ti className="h-3.5 w-3.5" /> {t.label}</span>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select value={year} onValueChange={setYear}>
@@ -679,9 +714,12 @@ function SearchTab({ entries }: { entries: Entry[] }) {
         {filtered.length === 0 && <p className="text-sm text-muted-foreground">No matching entries.</p>}
         {filtered.map((e) => {
           const m = typeMeta(e.entry_type);
+          const Icon = m.icon;
           return (
             <Card key={e.id} className="p-4 rounded-xl flex gap-3">
-              <span className="text-2xl">{m.emoji}</span>
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-sand text-primary shrink-0">
+                <Icon className="h-4 w-4" />
+              </span>
               <div className="flex-1">
                 <div className="text-sm font-semibold">{e.title}</div>
                 <div className="text-xs text-muted-foreground">{m.label} · {new Date(e.occurred_on).toLocaleDateString()}</div>
