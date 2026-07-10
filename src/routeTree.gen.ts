@@ -38,6 +38,7 @@ import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
+import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
@@ -186,6 +187,12 @@ const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => HubArticlesRoute,
 } as any)
+const AuthenticatedAdminProfilesRoute =
+  AuthenticatedAdminProfilesRouteImport.update({
+    id: '/admin/profiles',
+    path: '/admin/profiles',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -214,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/hub/search': typeof HubSearchRoute
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
+  '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
 }
@@ -243,6 +251,7 @@ export interface FileRoutesByTo {
   '/hub/search': typeof HubSearchRoute
   '/hub/videos': typeof HubVideosRoute
   '/hub': typeof HubIndexRoute
+  '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
 }
@@ -275,6 +284,7 @@ export interface FileRoutesById {
   '/hub/search': typeof HubSearchRoute
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
+  '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
 }
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/hub/search'
     | '/hub/videos'
     | '/hub/'
+    | '/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/hub/search'
     | '/hub/videos'
     | '/hub'
+    | '/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
   id:
@@ -367,6 +379,7 @@ export interface FileRouteTypes {
     | '/hub/search'
     | '/hub/videos'
     | '/hub/'
+    | '/_authenticated/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
   fileRoutesById: FileRoutesById
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubArticlesSlugRouteImport
       parentRoute: typeof HubArticlesRoute
     }
+    '/_authenticated/admin/profiles': {
+      id: '/_authenticated/admin/profiles'
+      path: '/admin/profiles'
+      fullPath: '/admin/profiles'
+      preLoaderRoute: typeof AuthenticatedAdminProfilesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -599,6 +619,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedAdminProfilesRoute: typeof AuthenticatedAdminProfilesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -610,6 +631,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedAdminProfilesRoute: AuthenticatedAdminProfilesRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
