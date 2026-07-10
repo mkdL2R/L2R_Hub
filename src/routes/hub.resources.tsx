@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Download, FileText, Search } from "lucide-react";
 import { RESOURCE_CATEGORIES } from "@/lib/hub-auth";
-import { fmtDate, listPublishedResources, type Resource } from "@/lib/hub-content";
+import { fmtDate, listPublishedResources, categoryTone, type Resource } from "@/lib/hub-content";
 
 export const Route = createFileRoute("/hub/resources")({ component: ResourcesTab });
 
@@ -36,7 +36,10 @@ function ResourcesTab() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-8">
       <header className="space-y-3">
-        <h1 className="text-4xl font-serif font-medium tracking-tight">Resources</h1>
+        <div className="inline-flex items-center gap-2 rounded-full border border-mustard/40 bg-mustard/20 px-3 py-1 text-[11px] uppercase tracking-widest text-mustard-foreground">
+          <Download className="h-3 w-3" /> Resources
+        </div>
+        <h1 className="text-4xl font-serif font-medium tracking-tight">Print, plan, reflect.</h1>
         <p className="max-w-2xl text-muted-foreground">
           Downloadable guides, worksheets, planners and reflection journals to use at home or in the classroom.
         </p>
@@ -71,14 +74,14 @@ function ResourcesTab() {
           {filtered.map((r) => (
             <Card key={r.id} className="rounded-2xl border-border/60 p-6 flex flex-col gap-3">
               <div className="flex items-start justify-between gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-100 text-primary flex items-center justify-center">
+                <div className="h-10 w-10 rounded-xl bg-sage/25 text-forest flex items-center justify-center">
                   <FileText className="h-5 w-5" />
                 </div>
                 {r.file_type && (
-                  <Badge variant="outline" className="rounded-full text-[10px] uppercase">{r.file_type}</Badge>
+                  <Badge variant="outline" className="rounded-full text-[10px] uppercase border-crayon/30 text-crayon">{r.file_type}</Badge>
                 )}
               </div>
-              <Badge variant="secondary" className="rounded-full text-[10px] w-fit">{r.category}</Badge>
+              <Badge variant="outline" className={`rounded-full text-[10px] w-fit ${categoryTone(r.category)}`}>{r.category}</Badge>
               <h3 className="font-serif text-lg leading-snug">{r.title}</h3>
               {r.description && <p className="text-sm text-muted-foreground line-clamp-3">{r.description}</p>}
               <div className="text-xs text-muted-foreground">

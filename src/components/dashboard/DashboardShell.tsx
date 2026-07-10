@@ -43,7 +43,7 @@ export function DashboardShell({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)]">
+    <div className="min-h-screen bg-gradient-to-br from-sand/40 via-background to-sage/25">
       <header className="border-b border-border/60 bg-background/70 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">

@@ -12,6 +12,7 @@ import {
   type Resource,
   fmtDate,
   fmtDuration,
+  categoryTone,
 } from "@/lib/hub-content";
 
 export const Route = createFileRoute("/hub/featured")({ component: FeaturedTab });
@@ -89,7 +90,7 @@ function FeaturedTab() {
                     )}
                   </div>
                   <div className="p-7 space-y-3">
-                    <Badge variant="secondary" className="rounded-full">
+                     <Badge variant="outline" className={`rounded-full ${categoryTone(featuredArticle.category)}`}>
                       <BookOpen className="h-3 w-3 mr-1" /> {featuredArticle.category}
                     </Badge>
                     <h2 className="text-2xl font-serif font-medium leading-snug">{featuredArticle.title}</h2>
@@ -108,14 +109,15 @@ function FeaturedTab() {
               </Link>
             )}
             {featuredEpisode && (
-              <Card className="lg:col-span-2 overflow-hidden rounded-3xl border-border/60">
+               <Card className="lg:col-span-2 overflow-hidden rounded-3xl border-border/60 relative">
+                 <span aria-hidden className="absolute inset-y-0 left-0 w-1 bg-crayon" />
                 <div className="aspect-square bg-gradient-to-br from-sand to-mustard/30">
                   {featuredEpisode.cover_url && (
                     <img src={featuredEpisode.cover_url} alt="" className="h-full w-full object-cover" />
                   )}
                 </div>
                 <div className="p-6 space-y-3">
-                  <Badge variant="secondary" className="rounded-full">
+                  <Badge variant="outline" className="rounded-full bg-crayon/10 text-crayon border-crayon/25">
                     <Headphones className="h-3 w-3 mr-1" /> Featured episode
                   </Badge>
                   <h3 className="text-xl font-serif font-medium">{featuredEpisode.title}</h3>
@@ -170,7 +172,7 @@ function ArticleMini({ article }: { article: Article }) {
           {article.hero_image_url && <img src={article.hero_image_url} alt="" className="h-full w-full object-cover" />}
         </div>
         <div className="p-4 space-y-2">
-          <Badge variant="outline" className="rounded-full text-[10px]">{article.category}</Badge>
+          <Badge variant="outline" className={`rounded-full text-[10px] ${categoryTone(article.category)}`}>{article.category}</Badge>
           <h3 className="font-medium leading-snug line-clamp-2">{article.title}</h3>
           <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
             <Clock className="h-3 w-3" /> {article.reading_minutes} min · {fmtDate(article.publish_at)}
@@ -184,7 +186,7 @@ function ArticleMini({ article }: { article: Article }) {
 function ResourceMini({ resource }: { resource: Resource }) {
   return (
     <Card className="h-full rounded-2xl border-border/60 p-5 space-y-2">
-      <Badge variant="outline" className="rounded-full text-[10px]">
+      <Badge variant="outline" className={`rounded-full text-[10px] ${categoryTone(resource.category)}`}>
         <Download className="h-3 w-3 mr-1" /> {resource.category}
       </Badge>
       <h3 className="font-medium leading-snug">{resource.title}</h3>

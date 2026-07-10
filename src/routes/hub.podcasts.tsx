@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Headphones, Search } from "lucide-react";
 import { PODCAST_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
-import { fmtDate, fmtDuration, listPublishedEpisodes, type Episode } from "@/lib/hub-content";
+import { fmtDate, fmtDuration, listPublishedEpisodes, categoryTone, type Episode } from "@/lib/hub-content";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/hub/podcasts")({ component: PodcastsTab });
@@ -65,7 +65,10 @@ function PodcastsTab() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-10">
       <header className="space-y-3">
-        <h1 className="text-4xl font-serif font-medium tracking-tight">Podcast library</h1>
+        <div className="inline-flex items-center gap-2 rounded-full border border-crayon/25 bg-crayon/10 px-3 py-1 text-[11px] uppercase tracking-widest text-crayon">
+          <Headphones className="h-3 w-3" /> Podcasts
+        </div>
+        <h1 className="text-4xl font-serif font-medium tracking-tight">Conversations for the drive home.</h1>
         <p className="max-w-2xl text-muted-foreground">
           Conversations with educators, parents and students — listen while you walk, cook, or unwind.
         </p>
@@ -122,7 +125,7 @@ function PodcastsTab() {
                 {e.cover_url && <img src={e.cover_url} alt="" className="h-full w-full object-cover" />}
               </div>
               <div className="p-5 space-y-3 flex-1 flex flex-col">
-                <Badge variant="outline" className="rounded-full text-[10px] w-fit">{e.category}</Badge>
+                <Badge variant="outline" className={`rounded-full text-[10px] w-fit ${categoryTone(e.category)}`}>{e.category}</Badge>
                 <h3 className="font-serif text-lg leading-snug">{e.title}</h3>
                 {e.description && <p className="text-sm text-muted-foreground line-clamp-2">{e.description}</p>}
                 {e.audio_url && <audio controls src={e.audio_url} className="w-full" />}
