@@ -76,7 +76,15 @@ export function useUserRoles(userId: string | undefined) {
         setLoading(false);
       });
   }, [userId]);
-  return { roles, isStaff: roles.includes("admin") || roles.includes("editor"), loading };
+  return {
+    roles,
+    isStaff:
+      roles.includes("admin") ||
+      roles.includes("editor") ||
+      roles.includes("instructor") ||
+      roles.includes("administrator"),
+    loading,
+  };
 }
 
 export const ARTICLE_CATEGORIES = [

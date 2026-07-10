@@ -33,7 +33,7 @@ export const Route = createFileRoute("/hub/admin")({
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id);
-    const staffRoles = new Set(["admin", "editor", "administrator"]);
+    const staffRoles = new Set(["admin", "editor", "administrator", "instructor"]);
     const isStaff = (roles ?? []).some((r) => staffRoles.has(r.role as string));
     if (!isStaff) {
       throw redirect({ to: "/hub/featured" });
