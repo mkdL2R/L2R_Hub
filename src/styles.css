@@ -64,6 +64,10 @@
   --color-crayon-foreground: var(--crayon-foreground);
   --color-sketch: var(--sketch);
   --color-sketch-foreground: var(--sketch-foreground);
+  --color-forest: var(--forest);
+  --color-forest-foreground: var(--forest-foreground);
+  --color-mustard: var(--mustard);
+  --color-mustard-foreground: var(--mustard-foreground);
 
   --font-serif: "Cormorant Garamond", "EB Garamond", "Garamond", ui-serif, Georgia, serif;
   --font-sans: "EB Garamond", "Garamond", ui-serif, Georgia, serif;
