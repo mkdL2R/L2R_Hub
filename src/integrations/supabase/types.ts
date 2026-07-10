@@ -206,99 +206,258 @@ export type Database = {
           },
         ]
       }
+      hub_article_tags: {
+        Row: {
+          article_id: string
+          tag_id: string
+        }
+        Insert: {
+          article_id: string
+          tag_id: string
+        }
+        Update: {
+          article_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hub_article_tags_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "hub_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hub_article_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "hub_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hub_articles: {
         Row: {
           author: string | null
+          canonical_url: string | null
           category: string
           content: string
+          content_json: Json | null
           created_at: string
           excerpt: string | null
+          featured_image_url: string | null
           hero_image_url: string | null
           id: string
+          is_featured: boolean
+          og_image_url: string | null
           publish_at: string
           reading_minutes: number
+          scheduled_at: string | null
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           status: string
           title: string
           updated_at: string
+          view_count: number
         }
         Insert: {
           author?: string | null
+          canonical_url?: string | null
           category: string
           content?: string
+          content_json?: Json | null
           created_at?: string
           excerpt?: string | null
+          featured_image_url?: string | null
           hero_image_url?: string | null
           id?: string
+          is_featured?: boolean
+          og_image_url?: string | null
           publish_at?: string
           reading_minutes?: number
+          scheduled_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           status?: string
           title: string
           updated_at?: string
+          view_count?: number
         }
         Update: {
           author?: string | null
+          canonical_url?: string | null
           category?: string
           content?: string
+          content_json?: Json | null
           created_at?: string
           excerpt?: string | null
+          featured_image_url?: string | null
           hero_image_url?: string | null
           id?: string
+          is_featured?: boolean
+          og_image_url?: string | null
           publish_at?: string
           reading_minutes?: number
+          scheduled_at?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           status?: string
           title?: string
           updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
+      hub_categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          name: string
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          name: string
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      hub_newsletter_subscribers: {
+        Row: {
+          confirmed: boolean
+          email: string
+          id: string
+          source: string | null
+          subscribed_at: string
+        }
+        Insert: {
+          confirmed?: boolean
+          email: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
+        }
+        Update: {
+          confirmed?: boolean
+          email?: string
+          id?: string
+          source?: string | null
+          subscribed_at?: string
         }
         Relationships: []
       }
       hub_podcast_episodes: {
         Row: {
+          apple_url: string | null
           audio_url: string | null
           category: string
           cover_url: string | null
           created_at: string
           description: string | null
           duration_seconds: number | null
+          episode_number: number | null
           id: string
           is_featured: boolean
           publish_at: string
           slug: string
+          spotify_url: string | null
           status: string
           title: string
+          transcript: string | null
           updated_at: string
+          youtube_url: string | null
         }
         Insert: {
+          apple_url?: string | null
           audio_url?: string | null
           category: string
           cover_url?: string | null
           created_at?: string
           description?: string | null
           duration_seconds?: number | null
+          episode_number?: number | null
           id?: string
           is_featured?: boolean
           publish_at?: string
           slug: string
+          spotify_url?: string | null
           status?: string
           title: string
+          transcript?: string | null
           updated_at?: string
+          youtube_url?: string | null
         }
         Update: {
+          apple_url?: string | null
           audio_url?: string | null
           category?: string
           cover_url?: string | null
           created_at?: string
           description?: string | null
           duration_seconds?: number | null
+          episode_number?: number | null
           id?: string
           is_featured?: boolean
           publish_at?: string
           slug?: string
+          spotify_url?: string | null
           status?: string
           title?: string
+          transcript?: string | null
           updated_at?: string
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      hub_reading_history: {
+        Row: {
+          completed: boolean
+          id: string
+          item_id: string
+          item_type: string
+          last_viewed_at: string
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          id?: string
+          item_id: string
+          item_type: string
+          last_viewed_at?: string
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          id?: string
+          item_id?: string
+          item_type?: string
+          last_viewed_at?: string
+          progress?: number
+          user_id?: string
         }
         Relationships: []
       }
@@ -308,10 +467,12 @@ export type Database = {
           category: string
           created_at: string
           description: string | null
+          download_count: number
           file_type: string | null
           file_url: string | null
           id: string
           publish_at: string
+          resource_type: string | null
           status: string
           title: string
           updated_at: string
@@ -321,10 +482,12 @@ export type Database = {
           category: string
           created_at?: string
           description?: string | null
+          download_count?: number
           file_type?: string | null
           file_url?: string | null
           id?: string
           publish_at?: string
+          resource_type?: string | null
           status?: string
           title: string
           updated_at?: string
@@ -334,10 +497,12 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string | null
+          download_count?: number
           file_type?: string | null
           file_url?: string | null
           id?: string
           publish_at?: string
+          resource_type?: string | null
           status?: string
           title?: string
           updated_at?: string
@@ -365,6 +530,27 @@ export type Database = {
           item_id?: string
           item_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      hub_tags: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
         }
         Relationships: []
       }
@@ -795,6 +981,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_article_view: {
+        Args: { _article_id: string }
+        Returns: undefined
+      }
+      increment_download: { Args: { _resource_id: string }; Returns: undefined }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean

@@ -12,6 +12,15 @@ export type Article = {
   reading_minutes: number;
   status: string;
   publish_at: string;
+  featured_image_url?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  canonical_url?: string | null;
+  og_image_url?: string | null;
+  scheduled_at?: string | null;
+  is_featured?: boolean;
+  content_json?: unknown;
+  view_count?: number;
 };
 
 export type Episode = {
@@ -26,6 +35,11 @@ export type Episode = {
   status: string;
   is_featured: boolean;
   publish_at: string;
+  episode_number?: number | null;
+  spotify_url?: string | null;
+  apple_url?: string | null;
+  youtube_url?: string | null;
+  transcript?: string | null;
 };
 
 export type Resource = {
@@ -38,7 +52,20 @@ export type Resource = {
   age_group: string | null;
   status: string;
   publish_at: string;
+  resource_type?: string | null;
+  download_count?: number;
 };
+
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  color: string | null;
+  kind: string;
+};
+
+export type Tag = { id: string; name: string; slug: string };
 
 export function fmtDuration(seconds: number | null): string {
   if (!seconds) return "—";
