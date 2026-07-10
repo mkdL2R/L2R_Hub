@@ -583,6 +583,7 @@ function CompassPage() {
                 title="Family Ecosystem"
                 subtitle="The shape of daily life at home"
                 summary={ecosystem.summary}
+                tone="sage"
               >
                 <div className="grid gap-4 sm:grid-cols-3">
                   <Trait label="Household rhythm" value={ecosystem.rhythm} />
@@ -598,6 +599,7 @@ function CompassPage() {
                 title="Communication Dynamics"
                 subtitle="How connection and conversation flow"
                 summary={communication.summary}
+                tone="sketch"
               >
                 <div className="grid gap-4 sm:grid-cols-3">
                   <Trait label="Communication style" value={communication.style} />
@@ -613,6 +615,7 @@ function CompassPage() {
                 title="Goals & Aspirations"
                 subtitle="Where the family and learner are heading"
                 summary={goals.narrative}
+                tone="terracotta"
               >
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-xl border border-border/60 bg-card/50 p-4">
@@ -647,6 +650,7 @@ function CompassPage() {
                 title="Strengths"
                 subtitle="Qualities that already shine through"
                 summary="These are the qualities most present in the learner's story right now — strengths to lean on as the journey continues."
+                tone="mustard"
               >
                 <div className="flex flex-wrap gap-2">
                   {strengths.items.map((s) => (
@@ -668,6 +672,7 @@ function CompassPage() {
                 title="Growth Opportunities"
                 subtitle="Gentle next steps to nurture together"
                 summary="These are not weaknesses — they are invitations. Areas where attention, care, and the right support can open new chapters of growth."
+                tone="sage"
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   {growth.items.map((g) => (
@@ -688,6 +693,7 @@ function CompassPage() {
                 title="Recommended L2R Accompaniment"
                 subtitle="A pathway shaped around this learner"
                 summary={pathway.explanation}
+                tone="forest"
               >
                 <div className="rounded-xl border border-primary/30 bg-primary/5 p-5">
                   <p className="text-xs font-medium uppercase tracking-widest text-primary">
