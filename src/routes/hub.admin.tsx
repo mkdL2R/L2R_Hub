@@ -20,6 +20,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser, useUserRoles, ARTICLE_CATEGORIES, PODCAST_CATEGORIES, RESOURCE_CATEGORIES } from "@/lib/hub-auth";
 import { fmtDate } from "@/lib/hub-content";
 import { FileDropzone } from "@/components/admin/FileDropzone";
+import { TiptapEditor } from "@/components/editor/TiptapEditor";
 
 export const Route = createFileRoute("/hub/admin")({
   ssr: false,
@@ -74,11 +75,13 @@ function AdminPage() {
         <TabsList className="rounded-full">
           <TabsTrigger value="articles" className="rounded-full">Articles</TabsTrigger>
           <TabsTrigger value="podcasts" className="rounded-full">Podcasts</TabsTrigger>
-          <TabsTrigger value="resources" className="rounded-full">Resources</TabsTrigger>
+          <TabsTrigger value="resources" className="rounded-full">Downloads</TabsTrigger>
+          <TabsTrigger value="newsletter" className="rounded-full">Newsletter</TabsTrigger>
         </TabsList>
         <TabsContent value="articles" className="mt-6"><ArticlesAdmin /></TabsContent>
         <TabsContent value="podcasts" className="mt-6"><PodcastsAdmin /></TabsContent>
         <TabsContent value="resources" className="mt-6"><ResourcesAdmin /></TabsContent>
+        <TabsContent value="newsletter" className="mt-6"><NewsletterAdmin /></TabsContent>
       </Tabs>
     </div>
   );
@@ -105,6 +108,8 @@ type ArticleRow = {
   id: string; slug: string; title: string; excerpt: string | null; content: string;
   hero_image_url: string | null; author: string | null; category: string;
   reading_minutes: number; status: string; publish_at: string;
+  seo_title?: string | null; seo_description?: string | null;
+  og_image_url?: string | null; is_featured?: boolean;
 };
 
 function ArticlesAdmin() {
@@ -183,6 +188,10 @@ function ArticleForm({
       reading_minutes: Number(form.reading_minutes ?? 5),
       status: form.status ?? "draft",
       publish_at: form.publish_at ?? new Date().toISOString(),
+      seo_title: form.seo_title ?? null,
+      seo_description: form.seo_description ?? null,
+      og_image_url: form.og_image_url ?? form.hero_image_url ?? null,
+      is_featured: !!form.is_featured,
     };
     if (initial) {
       await supabase.from("hub_articles").update(payload).eq("id", initial.id);
@@ -217,7 +226,28 @@ function ArticleForm({
             onChange={(url) => set("hero_image_url", url)}
           />
           <Field label="Excerpt"><Textarea value={form.excerpt ?? ""} onChange={(e) => set("excerpt", e.target.value)} /></Field>
-          <Field label="Content"><Textarea rows={10} value={form.content ?? ""} onChange={(e) => set("content", e.target.value)} /></Field>
+          <Field label="Content">
+            <TiptapEditor
+              value={form.content ?? ""}
+              onChange={(html) => set("content", html)}
+              placeholder="Write your article — drag images in, embed YouTube, add tables…"
+            />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="SEO title (optional)"><Input value={form.seo_title ?? ""} onChange={(e) => set("seo_title", e.target.value)} /></Field>
+            <Field label="SEO description (optional)"><Input value={form.seo_description ?? ""} onChange={(e) => set("seo_description", e.target.value)} /></Field>
+          </div>
+          <FileDropzone
+            label="Social share image (optional — defaults to hero)"
+            kind="image"
+            folder="articles/og"
+            value={form.og_image_url ?? null}
+            onChange={(url) => set("og_image_url", url)}
+          />
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={!!form.is_featured} onChange={(e) => set("is_featured", e.target.checked)} />
+            Feature this article on the Hub homepage
+          </label>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Status">
               <Select value={form.status} onValueChange={(v) => set("status", v)}>
@@ -257,6 +287,9 @@ type EpisodeRow = {
   id: string; slug: string; title: string; description: string | null;
   cover_url: string | null; audio_url: string | null; duration_seconds: number | null;
   category: string; status: string; is_featured: boolean; publish_at: string;
+  episode_number?: number | null;
+  spotify_url?: string | null; apple_url?: string | null; youtube_url?: string | null;
+  transcript?: string | null;
 };
 
 function PodcastsAdmin() {
@@ -318,6 +351,11 @@ function EpisodeForm({
       status: form.status ?? "draft",
       is_featured: !!form.is_featured,
       publish_at: form.publish_at ?? new Date().toISOString(),
+      episode_number: form.episode_number ? Number(form.episode_number) : null,
+      spotify_url: form.spotify_url ?? null,
+      apple_url: form.apple_url ?? null,
+      youtube_url: form.youtube_url ?? null,
+      transcript: form.transcript ?? null,
     };
     if (initial) await supabase.from("hub_podcast_episodes").update(payload).eq("id", initial.id);
     else await supabase.from("hub_podcast_episodes").insert(payload);
@@ -331,6 +369,18 @@ function EpisodeForm({
           <Field label="Title"><Input value={form.title ?? ""} onChange={(e) => set("title", e.target.value)} /></Field>
           <Field label="Slug (auto if blank)"><Input value={form.slug ?? ""} onChange={(e) => set("slug", e.target.value)} /></Field>
           <Field label="Description"><Textarea value={form.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Episode number"><Input type="number" value={form.episode_number ?? ""} onChange={(e) => set("episode_number", Number(e.target.value))} /></Field>
+            <div />
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            <Field label="Spotify URL"><Input value={form.spotify_url ?? ""} onChange={(e) => set("spotify_url", e.target.value)} /></Field>
+            <Field label="Apple Podcasts URL"><Input value={form.apple_url ?? ""} onChange={(e) => set("apple_url", e.target.value)} /></Field>
+            <Field label="YouTube URL"><Input value={form.youtube_url ?? ""} onChange={(e) => set("youtube_url", e.target.value)} /></Field>
+          </div>
+          <Field label="Transcript (optional)">
+            <Textarea rows={6} value={form.transcript ?? ""} onChange={(e) => set("transcript", e.target.value)} />
+          </Field>
           <div className="grid gap-4 md:grid-cols-2">
             <FileDropzone
               label="Cover art"
@@ -340,7 +390,7 @@ function EpisodeForm({
               onChange={(url) => set("cover_url", url)}
             />
             <FileDropzone
-              label="Audio file"
+              label="Audio file (optional — external links preferred)"
               kind="audio"
               folder="podcasts/audio"
               value={form.audio_url ?? null}
@@ -390,6 +440,7 @@ type ResourceRow = {
   id: string; title: string; description: string | null; file_url: string | null;
   file_type: string | null; category: string; age_group: string | null;
   status: string; publish_at: string;
+  resource_type?: string | null;
 };
 
 function ResourcesAdmin() {
@@ -449,6 +500,7 @@ function ResourceForm({
       age_group: form.age_group ?? null,
       status: form.status ?? "draft",
       publish_at: form.publish_at ?? new Date().toISOString(),
+      resource_type: form.resource_type ?? null,
     };
     if (initial) await supabase.from("hub_resources").update(payload).eq("id", initial.id);
     else await supabase.from("hub_resources").insert(payload);
@@ -472,6 +524,16 @@ function ResourceForm({
             }}
           />
           <Field label="File type (auto-detected)"><Input placeholder="PDF, DOCX…" value={form.file_type ?? ""} onChange={(e) => set("file_type", e.target.value)} /></Field>
+          <Field label="Resource type">
+            <Select value={form.resource_type ?? ""} onValueChange={(v) => set("resource_type", v)}>
+              <SelectTrigger><SelectValue placeholder="Choose type" /></SelectTrigger>
+              <SelectContent>
+                {["Workbook", "Guide", "Checklist", "Presentation", "Printable", "Template"].map((s) =>
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </Field>
           <div className="grid grid-cols-3 gap-3">
             <Field label="Category">
               <Select value={form.category} onValueChange={(v) => set("category", v)}>
