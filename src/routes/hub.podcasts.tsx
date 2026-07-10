@@ -72,13 +72,13 @@ function PodcastsTab() {
       </header>
 
       {featured && (
-        <Card className="rounded-3xl border-border/60 overflow-hidden bg-gradient-to-br from-emerald-50 to-amber-50">
+        <Card className="rounded-3xl border-border/60 overflow-hidden bg-gradient-to-br from-sand to-mustard/20">
           <div className="grid md:grid-cols-3 gap-6 p-6">
             <div className="aspect-square rounded-2xl bg-muted overflow-hidden">
               {featured.cover_url && <img src={featured.cover_url} alt="" className="h-full w-full object-cover" />}
             </div>
             <div className="md:col-span-2 space-y-3">
-              <Badge className="rounded-full bg-emerald-700 hover:bg-emerald-700">
+              <Badge className="rounded-full bg-primary hover:bg-primary/90">
                 <Headphones className="h-3 w-3 mr-1" /> Featured episode
               </Badge>
               <h2 className="text-2xl font-serif">{featured.title}</h2>
@@ -103,7 +103,7 @@ function PodcastsTab() {
               key={c}
               onClick={() => setCat(c)}
               className={`rounded-full px-3 py-1 text-xs border transition-colors ${
-                cat === c ? "bg-emerald-700 text-white border-emerald-700" : "border-border hover:bg-accent"
+                cat === c ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"
               }`}
             >
               {c}
@@ -118,7 +118,7 @@ function PodcastsTab() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((e) => (
             <Card key={e.id} className="rounded-2xl border-border/60 overflow-hidden flex flex-col">
-              <div className="aspect-square bg-gradient-to-br from-emerald-100 to-amber-100">
+              <div className="aspect-square bg-gradient-to-br from-sand to-mustard/30">
                 {e.cover_url && <img src={e.cover_url} alt="" className="h-full w-full object-cover" />}
               </div>
               <div className="p-5 space-y-3 flex-1 flex flex-col">
@@ -129,7 +129,7 @@ function PodcastsTab() {
                 <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
                   <span>{fmtDuration(e.duration_seconds)} · {fmtDate(e.publish_at)}</span>
                   <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => toggleSave(e.id)}>
-                    <Bookmark className={`h-3.5 w-3.5 ${saved.has(e.id) ? "fill-emerald-700 text-emerald-700" : ""}`} />
+                    <Bookmark className={`h-3.5 w-3.5 ${saved.has(e.id) ? "fill-primary text-primary" : ""}`} />
                   </Button>
                 </div>
               </div>

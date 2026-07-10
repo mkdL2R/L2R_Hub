@@ -55,7 +55,7 @@ function FeaturedTab() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-12">
       <header className="space-y-3">
-        <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-emerald-700">
+        <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
           <Sparkles className="h-3 w-3" /> Featured
         </div>
         <h1 className="text-4xl font-serif font-medium tracking-tight">A library that grows with your family.</h1>
@@ -109,7 +109,7 @@ function FeaturedTab() {
             )}
             {featuredEpisode && (
               <Card className="lg:col-span-2 overflow-hidden rounded-3xl border-border/60">
-                <div className="aspect-square bg-gradient-to-br from-emerald-100 to-amber-100">
+                <div className="aspect-square bg-gradient-to-br from-sand to-mustard/30">
                   {featuredEpisode.cover_url && (
                     <img src={featuredEpisode.cover_url} alt="" className="h-full w-full object-cover" />
                   )}
@@ -206,7 +206,7 @@ function ResourceMini({ resource }: { resource: Resource }) {
 function EmptyState() {
   return (
     <Card className="rounded-3xl border-dashed border-border/60 p-12 text-center space-y-3">
-      <Sparkles className="h-8 w-8 mx-auto text-emerald-600" />
+      <Sparkles className="h-8 w-8 mx-auto text-primary" />
       <h2 className="text-xl font-serif">Your library is just beginning.</h2>
       <p className="text-sm text-muted-foreground max-w-md mx-auto">
         No content has been published yet. L2R staff can add the first article, podcast episode or resource from the

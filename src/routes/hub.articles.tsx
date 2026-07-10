@@ -102,7 +102,7 @@ function ArticlesTab() {
               key={c}
               onClick={() => setCat(c)}
               className={`rounded-full px-3 py-1 text-xs border transition-colors ${
-                cat === c ? "bg-emerald-700 text-white border-emerald-700" : "border-border hover:bg-accent"
+                cat === c ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"
               }`}
             >
               {c}
@@ -137,7 +137,7 @@ function ArticlesTab() {
                   <div className="flex items-center gap-1">
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => toggleSave(a.id)}>
                       <Bookmark
-                        className={`h-3.5 w-3.5 ${saved.has(a.id) ? "fill-emerald-700 text-emerald-700" : ""}`}
+                        className={`h-3.5 w-3.5 ${saved.has(a.id) ? "fill-primary text-primary" : ""}`}
                       />
                     </Button>
                     <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => share(a)}>

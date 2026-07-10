@@ -53,7 +53,7 @@ function ResourcesTab() {
               key={c}
               onClick={() => setCat(c)}
               className={`rounded-full px-3 py-1 text-xs border transition-colors ${
-                cat === c ? "bg-emerald-700 text-white border-emerald-700" : "border-border hover:bg-accent"
+                cat === c ? "bg-primary text-primary-foreground border-primary" : "border-border hover:bg-accent"
               }`}
             >
               {c}
@@ -71,7 +71,7 @@ function ResourcesTab() {
           {filtered.map((r) => (
             <Card key={r.id} className="rounded-2xl border-border/60 p-6 flex flex-col gap-3">
               <div className="flex items-start justify-between gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-xl bg-emerald-100 text-primary flex items-center justify-center">
                   <FileText className="h-5 w-5" />
                 </div>
                 {r.file_type && (
