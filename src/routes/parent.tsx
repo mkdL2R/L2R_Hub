@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { onboardingStore } from "@/lib/onboarding-storage";
+import { clearDraft, loadDraft, saveDraft } from "@/lib/onboarding-storage";
 import { StepShell } from "@/components/onboarding/StepShell";
+import { AccountGate } from "@/components/onboarding/AccountGate";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -119,42 +120,13 @@ const CHALLENGE_OPTIONS = [
 function ParentJourney() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [data, setData] = useState<FormState>(INITIAL);
+  const [data, setData] = useState<FormState>(() => loadDraft<FormState>("parentDraft") ?? INITIAL);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // Load any in-progress family
-  useEffect(() => {
-    const fid = onboardingStore.get("family");
-    if (!fid) return;
-    (async () => {
-      const { data: fam } = await supabase.from("families").select("*").eq("id", fid).maybeSingle();
-      if (fam) {
-        setData((d) => ({
-          ...d,
-          family_name: fam.family_name ?? "",
-          primary_email: fam.primary_email ?? "",
-          primary_phone: fam.primary_phone ?? "",
-          household_size: fam.household_size?.toString() ?? "",
-          address: fam.address ?? "",
-          city: fam.city ?? "",
-          state: fam.state ?? "",
-          postal_code: fam.postal_code ?? "",
-          country: fam.country ?? "",
-          household_languages: fam.household_languages ?? [],
-        }));
-      }
-      const sid = onboardingStore.get("parentStatus");
-      if (sid) {
-        const { data: st } = await supabase
-          .from("onboarding_status")
-          .select("current_step,status")
-          .eq("id", sid)
-          .maybeSingle();
-        if (st && st.status !== "completed") setStep(Math.min(st.current_step, TOTAL_STEPS - 1));
-      }
-    })();
-  }, []);
+  // Persist draft on every change
+  useEffect(() => { saveDraft("parentDraft", data); }, [data]);
 
   const canProceed = useMemo(() => stepValid(step, data), [step, data]);
 
@@ -171,157 +143,81 @@ function ParentJourney() {
     });
   };
 
-  async function persistStep(currentStep: number): Promise<{ familyId: string; parentId?: string }> {
-    let familyId = onboardingStore.get("family") ?? "";
-    let parentId = onboardingStore.get("parent") ?? "";
-
-    // step 1: create or update family
-    if (currentStep === 0) {
-      const payload = {
-        family_name: data.family_name || null,
-        primary_email: data.primary_email || null,
-        primary_phone: data.primary_phone || null,
-        household_size: data.household_size ? parseInt(data.household_size, 10) : null,
-      };
-      if (!familyId) {
-        const { data: fid, error: rpcErr } = await supabase.rpc("ensure_user_family");
-        if (rpcErr) throw rpcErr;
-        familyId = fid as unknown as string;
-        onboardingStore.set("family", familyId);
+  const buildPayload = useCallback((state: FormState) => {
+    const responses: { step_key: string; question_key: string; answer: unknown }[] = [];
+    STEP_KEYS.forEach((step_key, i) => {
+      for (const a of collectStepAnswers(i, state)) {
+        responses.push({ step_key, question_key: a.key, answer: a.value });
       }
-      await supabase.from("families").update(payload).eq("id", familyId).throwOnError();
-    }
-
-    // step 2: address & languages on family
-    if (currentStep === 1 && familyId) {
-      await supabase
-        .from("families")
-        .update({
-          address: data.address || null,
-          city: data.city || null,
-          state: data.state || null,
-          postal_code: data.postal_code || null,
-          country: data.country || null,
-          household_languages: data.household_languages.length ? data.household_languages : null,
-        })
-        .eq("id", familyId)
-        .throwOnError();
-    }
-
-    // step 3: parent record
-    if (currentStep === 2 && familyId) {
-      const payload = {
-        family_id: familyId,
-        full_name: data.parent_full_name,
-        relationship: data.relationship || null,
-        email: data.parent_email || null,
-        phone: data.parent_phone || null,
-        occupation: data.occupation || null,
-        education_level: data.education_level || null,
-        is_primary: true,
-      };
-      if (parentId) {
-        await supabase.from("parents").update(payload).eq("id", parentId).throwOnError();
-      } else {
-        const { data: row } = await supabase
-          .from("parents")
-          .insert(payload)
-          .select("id")
-          .single()
-          .throwOnError();
-        parentId = row!.id;
-        onboardingStore.set("parent", parentId);
-      }
-    }
-
-    // step 4 & 5: ecosystem_profiles upsert
-    if ((currentStep === 3 || currentStep === 4) && familyId) {
-      const payload = {
-        family_id: familyId,
-        parenting_style: data.parenting_style || null,
-        values_summary: data.values_summary || null,
-        cultural_background: data.cultural_background || null,
-        support_network: data.support_network || null,
-        tech_usage: data.tech_usage || null,
-        goals: data.goals.length ? data.goals : null,
-        challenges: data.challenges.length ? data.challenges : null,
-        notes: data.notes || null,
-      };
-      await supabase
-        .from("ecosystem_profiles")
-        .upsert(payload, { onConflict: "family_id" })
-        .throwOnError();
-    }
-
-    // Save responses for the step
-    if (familyId) {
-      const stepKey = STEP_KEYS[currentStep];
-      const answers = collectStepAnswers(currentStep, data);
-      if (answers.length) {
-        await supabase
-          .from("parent_responses")
-          .insert(
-            answers.map((a) => ({
-              family_id: familyId,
-              parent_id: parentId || null,
-              step_key: stepKey,
-              question_key: a.key,
-              answer: a.value as never,
-            })),
-          )
-          .throwOnError();
-      }
-    }
-
-    return { familyId, parentId: parentId || undefined };
-  }
-
-  async function bumpStatus(familyId: string, currentStep: number, finished: boolean) {
-    const statusId = onboardingStore.get("parentStatus");
-    const completedKey = STEP_KEYS[currentStep];
-    const completed_steps = STEP_KEYS.slice(0, currentStep + 1);
-    const payload = {
-      family_id: familyId,
-      journey: "parent" as const,
-      current_step: finished ? TOTAL_STEPS : currentStep + 1,
+    });
+    return {
       total_steps: TOTAL_STEPS,
-      completed_steps,
-      status: finished ? "completed" : "in_progress",
-      completed_at: finished ? new Date().toISOString() : null,
+      completed_steps: STEP_KEYS,
+      family: {
+        family_name: state.family_name || null,
+        primary_email: state.primary_email || null,
+        primary_phone: state.primary_phone || null,
+        household_size: state.household_size ? parseInt(state.household_size, 10) : null,
+        address: state.address || null,
+        city: state.city || null,
+        state: state.state || null,
+        postal_code: state.postal_code || null,
+        country: state.country || null,
+        household_languages: state.household_languages,
+      },
+      parent: {
+        full_name: state.parent_full_name,
+        relationship: state.relationship || null,
+        email: state.parent_email || null,
+        phone: state.parent_phone || null,
+        occupation: state.occupation || null,
+        education_level: state.education_level || null,
+      },
+      ecosystem: {
+        parenting_style: state.parenting_style || null,
+        values_summary: state.values_summary || null,
+        cultural_background: state.cultural_background || null,
+        support_network: state.support_network || null,
+        tech_usage: state.tech_usage || null,
+        goals: state.goals,
+        challenges: state.challenges,
+        notes: state.notes || null,
+      },
+      responses,
     };
-    void completedKey;
-    if (statusId) {
-      await supabase.from("onboarding_status").update(payload).eq("id", statusId).throwOnError();
-    } else {
-      const { data: row } = await supabase
-        .from("onboarding_status")
-        .insert(payload)
-        .select("id")
-        .single()
-        .throwOnError();
-      onboardingStore.set("parentStatus", row!.id);
-    }
-  }
+  }, []);
 
-  async function handleNext() {
-    if (!canProceed) return;
+  const submitAll = useCallback(async () => {
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      const { familyId } = await persistStep(step);
-      const isLast = step === TOTAL_STEPS - 1;
-      await bumpStatus(familyId, step, isLast);
-      if (isLast) {
-        setDone(true);
-        toast.success("Parent onboarding complete");
-      } else {
-        setStep((s) => s + 1);
-      }
-    } catch (e: unknown) {
-      console.error(e);
-      toast.error(e instanceof Error ? e.message : "Could not save this step");
+      const payload = buildPayload(data);
+      const { error } = await supabase.rpc(
+        "submit_parent_journey" as never,
+        { _payload: payload } as never,
+      );
+      if (error) throw error;
+      clearDraft("parentDraft");
+      toast.success("Your answers are saved");
+      setDone(true);
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : "Could not save. Please try again.");
     } finally {
       setSubmitting(false);
     }
+  }, [buildPayload, data]);
+
+  // If already signed in when landing on the completion step, submit automatically.
+  useEffect(() => {
+    if (step !== TOTAL_STEPS) return;
+    supabase.auth.getUser().then(({ data: u }) => {
+      if (u.user && !submitting && !done) void submitAll();
+    });
+  }, [step, submitAll, submitting, done]);
+
+  function handleNext() {
+    if (!canProceed) return;
+    setStep((s) => s + 1);
   }
 
   function handleBack() {
@@ -357,6 +253,35 @@ function ParentJourney() {
     );
   }
 
+  if (step === TOTAL_STEPS) {
+    return (
+      <div className="min-h-screen bg-background px-6 py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">One last step</h1>
+          <p className="mt-3 text-muted-foreground">
+            Create a free account so we can save your answers and give you access to your L2R Compass.
+          </p>
+          {submitting ? (
+            <p className="mt-8 text-sm text-muted-foreground">Saving your answers…</p>
+          ) : (
+            <div className="mt-8">
+              <AccountGate onAuthenticated={submitAll} />
+              {submitError ? (
+                <p className="mt-4 text-sm text-destructive">{submitError}</p>
+              ) : null}
+              <button
+                onClick={() => setStep(TOTAL_STEPS - 1)}
+                className="mt-4 text-sm text-muted-foreground underline underline-offset-2"
+              >
+                Go back and review answers
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <StepShell
       journey="Parent"
@@ -368,6 +293,7 @@ function ParentJourney() {
       onNext={handleNext}
       canProceed={canProceed}
       isSubmitting={submitting}
+      nextLabel={step === TOTAL_STEPS - 1 ? "Finish" : undefined}
     >
       {step === 0 && (
         <div className="grid gap-4">
