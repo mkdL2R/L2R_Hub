@@ -61,7 +61,7 @@ function HubLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)]">
+      <div className="min-h-screen flex w-full bg-gradient-to-br from-sand/40 via-background to-sage/25">
         <Sidebar collapsible="icon">
           <SidebarHeader>
             <Link to="/" className="flex items-center gap-3 px-2 py-3">
