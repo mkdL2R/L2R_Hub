@@ -47,8 +47,8 @@ function Onboarding() {
     setBusy(true);
     setError(null);
     try {
-      const { error: roleErr } = await supabase.from("user_roles").insert({ user_id: user.id, role });
-      if (roleErr && !roleErr.message.includes("duplicate")) throw roleErr;
+      const { error: roleErr } = await supabase.rpc("assign_primary_role", { _role: role });
+      if (roleErr && !/already_set|duplicate/i.test(roleErr.message)) throw roleErr;
       const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
       const fullName = (meta.full_name as string) || (meta.name as string) || (meta.preferred_name as string) || null;
       const avatar = (meta.avatar_url as string) || (meta.picture as string) || null;

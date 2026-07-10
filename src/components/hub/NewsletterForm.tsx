@@ -17,10 +17,11 @@ export function NewsletterForm({ source = "hub" }: { source?: string }) {
       return;
     }
     setStatus("loading");
-    const { error } = await supabase
-      .from("hub_newsletter_subscribers")
-      .insert({ email: email.trim().toLowerCase(), source });
-    if (error && !/duplicate/i.test(error.message)) {
+    const { error } = await supabase.rpc("subscribe_to_newsletter", {
+      _email: email.trim().toLowerCase(),
+      _source: source,
+    });
+    if (error) {
       setStatus("error");
       setMsg("Could not subscribe. Try again in a moment.");
       return;

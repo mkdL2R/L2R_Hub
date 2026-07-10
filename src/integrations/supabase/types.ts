@@ -976,6 +976,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_primary_role: {
+        Args: { _role: Database["public"]["Enums"]["app_role"] }
+        Returns: undefined
+      }
       claim_instructor_invitation: { Args: never; Returns: boolean }
       has_role: {
         Args: {
@@ -994,6 +998,10 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      subscribe_to_newsletter: {
+        Args: { _email: string; _source?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
