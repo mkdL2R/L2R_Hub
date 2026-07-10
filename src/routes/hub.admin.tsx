@@ -562,3 +562,52 @@ function ResourceForm({
     </Dialog>
   );
 }
+// --------- Newsletter admin ---------
+function NewsletterAdmin() {
+  const [rows, setRows] = useState<{ email: string; created_at: string; source: string | null }[]>([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    supabase
+      .from("hub_newsletter_subscribers")
+      .select("email, created_at, source")
+      .order("created_at", { ascending: false })
+      .then(({ data }) => {
+        setRows((data ?? []) as { email: string; created_at: string; source: string | null }[]);
+        setLoading(false);
+      });
+  }, []);
+  function exportCsv() {
+    const csv = ["email,source,subscribed_at", ...rows.map((r) => `${r.email},${r.source ?? ""},${r.created_at}`)].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `newsletter-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  return (
+    <Card className="rounded-2xl border-border/60 p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="font-medium">Newsletter subscribers ({rows.length})</h2>
+        <Button size="sm" variant="outline" className="rounded-full" onClick={exportCsv} disabled={rows.length === 0}>
+          Export CSV
+        </Button>
+      </div>
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-sm text-muted-foreground py-8 text-center">No subscribers yet.</p>
+      ) : (
+        <div className="divide-y divide-border/60">
+          {rows.map((r) => (
+            <div key={r.email} className="py-2 flex items-center justify-between text-sm">
+              <span>{r.email}</span>
+              <span className="text-xs text-muted-foreground">{r.source ?? "hub"} · {fmtDate(r.created_at)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
