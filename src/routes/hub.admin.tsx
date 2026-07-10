@@ -229,7 +229,7 @@ function ArticleForm({
           <Field label="Content">
             <TiptapEditor
               value={form.content ?? ""}
-              onChange={(html) => set("content", html)}
+              onChange={(_json, html) => set("content", html)}
               placeholder="Write your article — drag images in, embed YouTube, add tables…"
             />
           </Field>
