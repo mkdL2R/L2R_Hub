@@ -981,6 +981,7 @@ export type Database = {
         Returns: undefined
       }
       claim_instructor_invitation: { Args: never; Returns: boolean }
+      ensure_user_family: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
