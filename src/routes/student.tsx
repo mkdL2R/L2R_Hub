@@ -122,7 +122,13 @@ function StudentJourney() {
 
   async function persistStep(currentStep: number): Promise<{ studentId: string }> {
     let studentId = onboardingStore.get("student") ?? "";
-    const familyId = onboardingStore.get("family") ?? null;
+    let familyId = onboardingStore.get("family");
+    if (!familyId) {
+      const { data: fid, error: rpcErr } = await supabase.rpc("ensure_user_family");
+      if (rpcErr) throw rpcErr;
+      familyId = fid as unknown as string;
+      onboardingStore.set("family", familyId);
+    }
 
     if (currentStep === 0) {
       const payload = {
