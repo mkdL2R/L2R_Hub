@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Bookmark, Clock, Search, Share2 } from "lucide-react";
 import { ARTICLE_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
-import { fmtDate, listPublishedArticles, type Article } from "@/lib/hub-content";
+import { fmtDate, listPublishedArticles, categoryTone, type Article } from "@/lib/hub-content";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/hub/articles")({ component: ArticlesTab });
@@ -80,7 +80,10 @@ function ArticlesTab() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-8">
       <header className="space-y-3">
-        <h1 className="text-4xl font-serif font-medium tracking-tight">Articles</h1>
+        <div className="inline-flex items-center gap-2 rounded-full border border-sketch/25 bg-sketch/10 px-3 py-1 text-[11px] uppercase tracking-widest text-sketch">
+          <Bookmark className="h-3 w-3" /> Articles
+        </div>
+        <h1 className="text-4xl font-serif font-medium tracking-tight">A reading room, growing.</h1>
         <p className="max-w-2xl text-muted-foreground">
           Reflections, research and practical guidance — organized by the themes that matter most to family life.
         </p>
@@ -125,7 +128,7 @@ function ArticlesTab() {
                 </div>
               </Link>
               <div className="p-5 flex-1 flex flex-col gap-3">
-                <Badge variant="outline" className="rounded-full text-[10px] w-fit">{a.category}</Badge>
+                <Badge variant="outline" className={`rounded-full text-[10px] w-fit ${categoryTone(a.category)}`}>{a.category}</Badge>
                 <Link to="/hub/articles/$slug" params={{ slug: a.slug }}>
                   <h3 className="font-serif text-lg leading-snug">{a.title}</h3>
                 </Link>
