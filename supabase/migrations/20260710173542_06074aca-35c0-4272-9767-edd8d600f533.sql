@@ -1,0 +1,1 @@
+ALTER TABLE public.hub_newsletter_subscribers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();

@@ -347,6 +347,7 @@ export type Database = {
       hub_newsletter_subscribers: {
         Row: {
           confirmed: boolean
+          created_at: string
           email: string
           id: string
           source: string | null
@@ -354,6 +355,7 @@ export type Database = {
         }
         Insert: {
           confirmed?: boolean
+          created_at?: string
           email: string
           id?: string
           source?: string | null
@@ -361,6 +363,7 @@ export type Database = {
         }
         Update: {
           confirmed?: boolean
+          created_at?: string
           email?: string
           id?: string
           source?: string | null
