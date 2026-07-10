@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { onboardingStore } from "@/lib/onboarding-storage";
+import { clearDraft, loadDraft, saveDraft } from "@/lib/onboarding-storage";
 import { StepShell } from "@/components/onboarding/StepShell";
+import { AccountGate } from "@/components/onboarding/AccountGate";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -75,37 +76,12 @@ const SUBJECTS = [
 function StudentJourney() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-  const [data, setData] = useState<FormState>(INITIAL);
+  const [data, setData] = useState<FormState>(() => loadDraft<FormState>("studentDraft") ?? INITIAL);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const sid = onboardingStore.get("student");
-    if (!sid) return;
-    (async () => {
-      const { data: stu } = await supabase.from("students").select("*").eq("id", sid).maybeSingle();
-      if (stu) {
-        setData((d) => ({
-          ...d,
-          full_name: stu.full_name ?? "",
-          date_of_birth: stu.date_of_birth ?? "",
-          grade_level: stu.grade_level ?? "",
-          school_name: stu.school_name ?? "",
-          preferred_subjects: stu.preferred_subjects ?? [],
-          learning_style: stu.learning_style ?? "",
-        }));
-      }
-      const stid = onboardingStore.get("studentStatus");
-      if (stid) {
-        const { data: st } = await supabase
-          .from("onboarding_status")
-          .select("current_step,status")
-          .eq("id", stid)
-          .maybeSingle();
-        if (st && st.status !== "completed") setStep(Math.min(st.current_step, TOTAL_STEPS - 1));
-      }
-    })();
-  }, []);
+  useEffect(() => { saveDraft("studentDraft", data); }, [data]);
 
   const canProceed = useMemo(() => stepValid(step, data), [step, data]);
 
@@ -120,121 +96,60 @@ function StudentJourney() {
         : [...d.preferred_subjects, v],
     }));
 
-  async function persistStep(currentStep: number): Promise<{ studentId: string }> {
-    let studentId = onboardingStore.get("student") ?? "";
-    let familyId = onboardingStore.get("family");
-    if (!familyId) {
-      const { data: fid, error: rpcErr } = await supabase.rpc("ensure_user_family");
-      if (rpcErr) throw rpcErr;
-      familyId = fid as unknown as string;
-      onboardingStore.set("family", familyId);
-    }
-
-    if (currentStep === 0) {
+  const submitAll = useCallback(async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const responses: { step_key: string; question_key: string; answer: unknown }[] = [];
+      STEP_KEYS.forEach((step_key, i) => {
+        for (const a of collectStepAnswers(i, data)) {
+          responses.push({ step_key, question_key: a.key, answer: a.value });
+        }
+      });
       const payload = {
-        family_id: familyId,
-        full_name: data.full_name,
-        date_of_birth: data.date_of_birth || null,
-      };
-      if (studentId) {
-        await supabase.from("students").update(payload).eq("id", studentId).throwOnError();
-      } else {
-        const { data: row } = await supabase
-          .from("students")
-          .insert(payload)
-          .select("id")
-          .single()
-          .throwOnError();
-        studentId = row!.id;
-        onboardingStore.set("student", studentId);
-      }
-    } else if (studentId && currentStep === 1) {
-      await supabase
-        .from("students")
-        .update({
+        total_steps: TOTAL_STEPS,
+        completed_steps: STEP_KEYS,
+        student: {
+          full_name: data.full_name,
+          date_of_birth: data.date_of_birth || null,
           grade_level: data.grade_level || null,
           school_name: data.school_name || null,
-        })
-        .eq("id", studentId)
-        .throwOnError();
-    } else if (studentId && currentStep === 2) {
-      await supabase
-        .from("students")
-        .update({
-          preferred_subjects: data.preferred_subjects.length ? data.preferred_subjects : null,
+          preferred_subjects: data.preferred_subjects,
           learning_style: data.learning_style || null,
-        })
-        .eq("id", studentId)
-        .throwOnError();
-    }
-
-    if (studentId) {
-      const stepKey = STEP_KEYS[currentStep];
-      const answers = collectStepAnswers(currentStep, data);
-      if (answers.length) {
-        await supabase
-          .from("student_responses")
-          .insert(
-            answers.map((a) => ({
-              student_id: studentId,
-              step_key: stepKey,
-              question_key: a.key,
-              answer: a.value as never,
-            })),
-          )
-          .throwOnError();
-      }
-    }
-
-    return { studentId };
-  }
-
-  async function bumpStatus(studentId: string, currentStep: number, finished: boolean) {
-    const statusId = onboardingStore.get("studentStatus");
-    const familyId = onboardingStore.get("family") ?? null;
-    const completed_steps = STEP_KEYS.slice(0, currentStep + 1);
-    const payload = {
-      family_id: familyId,
-      student_id: studentId,
-      journey: "student" as const,
-      current_step: finished ? TOTAL_STEPS : currentStep + 1,
-      total_steps: TOTAL_STEPS,
-      completed_steps,
-      status: finished ? "completed" : "in_progress",
-      completed_at: finished ? new Date().toISOString() : null,
-    };
-    if (statusId) {
-      await supabase.from("onboarding_status").update(payload).eq("id", statusId).throwOnError();
-    } else {
-      const { data: row } = await supabase
-        .from("onboarding_status")
-        .insert(payload)
-        .select("id")
-        .single()
-        .throwOnError();
-      onboardingStore.set("studentStatus", row!.id);
-    }
-  }
-
-  async function handleNext() {
-    if (!canProceed) return;
-    setSubmitting(true);
-    try {
-      const { studentId } = await persistStep(step);
-      const isLast = step === TOTAL_STEPS - 1;
-      await bumpStatus(studentId, step, isLast);
-      if (isLast) {
-        setDone(true);
-        toast.success("Student onboarding complete");
-      } else {
-        setStep((s) => s + 1);
-      }
-    } catch (e: unknown) {
-      console.error(e);
-      toast.error(e instanceof Error ? e.message : "Could not save this step");
+        },
+        reflection: {
+          motivation: data.motivation || null,
+          strengths: data.strengths || null,
+          struggles: data.struggles || null,
+          goals: data.goals || null,
+        },
+        responses,
+      };
+      const { error } = await supabase.rpc(
+        "submit_student_journey" as never,
+        { _payload: payload } as never,
+      );
+      if (error) throw error;
+      clearDraft("studentDraft");
+      toast.success("Your answers are saved");
+      setDone(true);
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : "Could not save. Please try again.");
     } finally {
       setSubmitting(false);
     }
+  }, [data]);
+
+  useEffect(() => {
+    if (step !== TOTAL_STEPS) return;
+    supabase.auth.getUser().then(({ data: u }) => {
+      if (u.user && !submitting && !done) void submitAll();
+    });
+  }, [step, submitAll, submitting, done]);
+
+  function handleNext() {
+    if (!canProceed) return;
+    setStep((s) => s + 1);
   }
 
   if (done) {
@@ -265,6 +180,33 @@ function StudentJourney() {
     );
   }
 
+  if (step === TOTAL_STEPS) {
+    return (
+      <div className="min-h-screen bg-background px-6 py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">One last step</h1>
+          <p className="mt-3 text-muted-foreground">
+            Create a free account so we can save your answers and unlock your L2R Compass.
+          </p>
+          {submitting ? (
+            <p className="mt-8 text-sm text-muted-foreground">Saving your answers…</p>
+          ) : (
+            <div className="mt-8">
+              <AccountGate onAuthenticated={submitAll} />
+              {submitError ? <p className="mt-4 text-sm text-destructive">{submitError}</p> : null}
+              <button
+                onClick={() => setStep(TOTAL_STEPS - 1)}
+                className="mt-4 text-sm text-muted-foreground underline underline-offset-2"
+              >
+                Go back and review answers
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <StepShell
       journey="Student"
@@ -276,6 +218,7 @@ function StudentJourney() {
       onNext={handleNext}
       canProceed={canProceed}
       isSubmitting={submitting}
+      nextLabel={step === TOTAL_STEPS - 1 ? "Finish" : undefined}
     >
       {step === 0 && (
         <div className="grid gap-4">
