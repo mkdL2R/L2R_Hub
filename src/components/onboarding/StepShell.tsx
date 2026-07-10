@@ -34,13 +34,24 @@ export function StepShell({
   const pct = Math.round(((stepIndex + 1) / totalSteps) * 100);
   const isLast = stepIndex === totalSteps - 1;
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur">
+    <div className="relative min-h-screen overflow-hidden">
+      <svg
+        aria-hidden
+        className="pointer-events-none absolute -right-40 -top-32 h-[420px] w-[420px] text-sand/60"
+        viewBox="0 0 200 200"
+      >
+        <path
+          fill="currentColor"
+          d="M42,-58C54,-49,62,-33,66,-15C70,3,70,22,60,34C51,47,32,54,13,60C-6,66,-25,72,-40,64C-55,55,-67,32,-69,9C-71,-14,-63,-37,-48,-48C-33,-59,-16,-58,1,-60C18,-62,30,-67,42,-58Z"
+          transform="translate(100 100)"
+        />
+      </svg>
+      <header className="relative border-b border-border/60 bg-card/60 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
-          <Link to="/" className="text-sm font-semibold tracking-tight text-foreground">
-            ← Onboarding
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-medium tracking-tight text-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Onboarding
           </Link>
-          <span className="text-xs uppercase tracking-widest text-muted-foreground">
+          <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
             {journey} Journey · Step {stepIndex + 1} of {totalSteps}
           </span>
         </div>
@@ -49,15 +60,15 @@ export function StepShell({
         </div>
       </header>
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
+      <main className="relative mx-auto max-w-3xl px-6 py-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">{title}</h1>
+          <h1 className="font-serif text-4xl font-medium tracking-tight text-foreground">{title}</h1>
           {description ? (
-            <p className="mt-2 text-muted-foreground">{description}</p>
+            <p className="mt-3 text-lg text-muted-foreground">{description}</p>
           ) : null}
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm sm:p-8">
+        <div className="card-paper rounded-3xl p-6 sm:p-9">
           {children}
         </div>
 

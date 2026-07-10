@@ -115,7 +115,7 @@ function ArticlePage() {
           </div>
 
           {article.excerpt && (
-            <p className="mt-8 text-lg italic text-muted-foreground border-l-2 border-emerald-700/40 pl-4">
+            <p className="mt-8 text-lg italic text-muted-foreground border-l-2 border-primary/40 pl-4">
               {article.excerpt}
             </p>
           )}

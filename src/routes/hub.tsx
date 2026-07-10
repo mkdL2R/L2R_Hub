@@ -146,7 +146,7 @@ function HubLayout() {
           <header className="sticky top-0 z-10 h-14 flex items-center gap-2 border-b border-border/60 bg-background/80 backdrop-blur px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-2 text-sm font-medium">
-              <Sprout className="h-4 w-4 text-emerald-700" />
+              <Sprout className="h-4 w-4 text-primary" />
               Family Growth Hub
             </div>
           </header>

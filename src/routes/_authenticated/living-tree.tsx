@@ -11,7 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Loader2, Plus, Search, ArrowLeft, TreeDeciduous } from "lucide-react";
+import {
+  Loader2, Plus, Search, ArrowLeft, TreeDeciduous,
+  Sprout, Compass as CompassIcon, Handshake, BookOpen, Backpack, Tent,
+  Target, Trophy, Book, Headphones, Heart, Leaf, Palette, ScrollText,
+  PartyPopper, Puzzle, Image as ImageIcon, Microscope, Mountain, Sparkles,
+  Lightbulb, Brain, Globe, GraduationCap,
+  type LucideIcon,
+} from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated/living-tree")({
@@ -51,42 +58,42 @@ type Family = {
   created_at: string;
 };
 
-const ENTRY_TYPES: { value: string; label: string; emoji: string; group: "timeline" | "portfolio" | "memory" | "instructor" }[] = [
-  { value: "admission", label: "Admission Completed", emoji: "🌱", group: "timeline" },
-  { value: "compass", label: "Compass Generated", emoji: "🧭", group: "timeline" },
-  { value: "alignment", label: "Family Alignment Meeting", emoji: "🤝", group: "timeline" },
-  { value: "enrolled", label: "Student Enrolled", emoji: "📚", group: "timeline" },
-  { value: "new_year", label: "New Academic Year", emoji: "🎒", group: "timeline" },
-  { value: "core_life", label: "Core Life Studies Experience", emoji: "🏕", group: "timeline" },
-  { value: "goal_created", label: "Personal Goal Created", emoji: "🎯", group: "timeline" },
-  { value: "goal_achieved", label: "Goal Achieved", emoji: "🏆", group: "timeline" },
-  { value: "article_read", label: "Article Read", emoji: "📖", group: "timeline" },
-  { value: "podcast_done", label: "Podcast Completed", emoji: "🎧", group: "timeline" },
-  { value: "wellness", label: "Wellness Session", emoji: "❤️", group: "timeline" },
-  { value: "community", label: "Community Project", emoji: "🌿", group: "timeline" },
-  { value: "creative", label: "Creative Portfolio", emoji: "🎨", group: "portfolio" },
-  { value: "certificate", label: "Certificate Earned", emoji: "📜", group: "timeline" },
-  { value: "celebration", label: "Celebration", emoji: "🎉", group: "timeline" },
-  { value: "portfolio_project", label: "Project", emoji: "🧩", group: "portfolio" },
-  { value: "portfolio_photo", label: "Photo / Artwork", emoji: "🖼", group: "portfolio" },
-  { value: "portfolio_research", label: "Research", emoji: "🔬", group: "portfolio" },
-  { value: "memory", label: "Memory / Field Trip", emoji: "🌄", group: "memory" },
-  { value: "instructor_note", label: "Instructor Note", emoji: "✨", group: "instructor" },
+const ENTRY_TYPES: { value: string; label: string; icon: LucideIcon; group: "timeline" | "portfolio" | "memory" | "instructor" }[] = [
+  { value: "admission", label: "Admission Completed", icon: Sprout, group: "timeline" },
+  { value: "compass", label: "Compass Generated", icon: CompassIcon, group: "timeline" },
+  { value: "alignment", label: "Family Alignment Meeting", icon: Handshake, group: "timeline" },
+  { value: "enrolled", label: "Student Enrolled", icon: BookOpen, group: "timeline" },
+  { value: "new_year", label: "New Academic Year", icon: Backpack, group: "timeline" },
+  { value: "core_life", label: "Core Life Studies Experience", icon: Tent, group: "timeline" },
+  { value: "goal_created", label: "Personal Goal Created", icon: Target, group: "timeline" },
+  { value: "goal_achieved", label: "Goal Achieved", icon: Trophy, group: "timeline" },
+  { value: "article_read", label: "Article Read", icon: Book, group: "timeline" },
+  { value: "podcast_done", label: "Podcast Completed", icon: Headphones, group: "timeline" },
+  { value: "wellness", label: "Wellness Session", icon: Heart, group: "timeline" },
+  { value: "community", label: "Community Project", icon: Leaf, group: "timeline" },
+  { value: "creative", label: "Creative Portfolio", icon: Palette, group: "portfolio" },
+  { value: "certificate", label: "Certificate Earned", icon: ScrollText, group: "timeline" },
+  { value: "celebration", label: "Celebration", icon: PartyPopper, group: "timeline" },
+  { value: "portfolio_project", label: "Project", icon: Puzzle, group: "portfolio" },
+  { value: "portfolio_photo", label: "Photo / Artwork", icon: ImageIcon, group: "portfolio" },
+  { value: "portfolio_research", label: "Research", icon: Microscope, group: "portfolio" },
+  { value: "memory", label: "Memory / Field Trip", icon: Mountain, group: "memory" },
+  { value: "instructor_note", label: "Instructor Note", icon: Sparkles, group: "instructor" },
 ];
 
-const GROWTH_AREAS = [
-  { key: "curiosity", label: "Curiosity", emoji: "🌱" },
-  { key: "communication", label: "Communication", emoji: "🤝" },
-  { key: "creativity", label: "Creativity", emoji: "💡" },
-  { key: "critical_thinking", label: "Critical Thinking", emoji: "🧠" },
-  { key: "emotional_intelligence", label: "Emotional Intelligence", emoji: "❤️" },
-  { key: "responsibility", label: "Responsibility", emoji: "🎯" },
-  { key: "citizenship", label: "Citizenship", emoji: "🌍" },
-  { key: "learning_habits", label: "Learning Habits", emoji: "📚" },
+const GROWTH_AREAS: { key: string; label: string; icon: LucideIcon }[] = [
+  { key: "curiosity", label: "Curiosity", icon: Sprout },
+  { key: "communication", label: "Communication", icon: Handshake },
+  { key: "creativity", label: "Creativity", icon: Lightbulb },
+  { key: "critical_thinking", label: "Critical Thinking", icon: Brain },
+  { key: "emotional_intelligence", label: "Emotional Intelligence", icon: Heart },
+  { key: "responsibility", label: "Responsibility", icon: Target },
+  { key: "citizenship", label: "Citizenship", icon: Globe },
+  { key: "learning_habits", label: "Learning Habits", icon: GraduationCap },
 ];
 
 function typeMeta(t: string) {
-  return ENTRY_TYPES.find((e) => e.value === t) ?? { value: t, label: t, emoji: "🌿", group: "timeline" as const };
+  return ENTRY_TYPES.find((e) => e.value === t) ?? { value: t, label: t, icon: Leaf, group: "timeline" as const };
 }
 
 function monthKey(d: string) {
@@ -140,7 +147,7 @@ function LivingTreePage() {
     <Shell>
       <Overview family={family} entries={entries} />
       <Tabs value={tab} onValueChange={setTab} className="mt-10">
-        <TabsList className="flex flex-wrap h-auto bg-[hsl(40_30%_95%)] p-1 rounded-2xl">
+        <TabsList className="flex flex-wrap h-auto bg-sand/60 p-1 rounded-2xl">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="reflections">Monthly</TabsTrigger>
@@ -165,7 +172,7 @@ function LivingTreePage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)]">
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-background/70 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-3">
@@ -190,21 +197,27 @@ function Overview({ family, entries }: { family: Family; entries: Entry[] }) {
   const academicYear = `${startYear}–${startYear + 1}`;
   const compass = entries.find((e) => e.entry_type === "compass");
   return (
-    <Card className="p-8 rounded-3xl border-border/60 bg-gradient-to-br from-background to-[hsl(140_25%_96%)]">
+    <Card className="card-paper p-8 rounded-3xl">
       <div className="flex flex-col sm:flex-row gap-6 items-start">
         {family.family_photo_url ? (
           <img src={family.family_photo_url} alt="" className="h-28 w-28 rounded-2xl object-cover border border-border/60" />
         ) : (
-          <div className="h-28 w-28 rounded-2xl bg-[hsl(140_25%_92%)] flex items-center justify-center text-5xl">🌳</div>
+          <div className="h-28 w-28 rounded-2xl bg-sand flex items-center justify-center text-primary">
+            <TreeDeciduous className="h-12 w-12" />
+          </div>
         )}
         <div className="flex-1">
           <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Family</div>
-          <h1 className="text-3xl font-semibold tracking-tight">{family.family_name ?? "Your family"}</h1>
+          <h1 className="font-serif text-4xl font-medium tracking-tight">{family.family_name ?? "Your family"}</h1>
           {family.family_motto && <p className="mt-2 italic text-muted-foreground">"{family.family_motto}"</p>}
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
             <Badge variant="secondary" className="rounded-full">L2R member since {since}</Badge>
             <Badge variant="secondary" className="rounded-full">Academic year {academicYear}</Badge>
-            {compass && <Badge variant="secondary" className="rounded-full">🧭 Compass active</Badge>}
+            {compass && (
+              <Badge variant="secondary" className="rounded-full inline-flex items-center gap-1">
+                <CompassIcon className="h-3 w-3" /> Compass active
+              </Badge>
+            )}
           </div>
           {compass?.description && (
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">{compass.description}</p>
@@ -225,9 +238,12 @@ function OverviewBody({ entries, goals }: { entries: Entry[]; goals: Goal[] }) {
           {recent.length === 0 && <li className="text-sm text-muted-foreground">No entries yet — add the first leaf in the Timeline tab.</li>}
           {recent.map((e) => {
             const m = typeMeta(e.entry_type);
+            const Icon = m.icon;
             return (
               <li key={e.id} className="flex gap-3 text-sm">
-                <span className="text-xl">{m.emoji}</span>
+                <span className="mt-0.5 grid h-7 w-7 place-items-center rounded-full bg-sand text-primary shrink-0">
+                  <Icon className="h-4 w-4" />
+                </span>
                 <div>
                   <div className="font-medium">{e.title}</div>
                   <div className="text-xs text-muted-foreground">{new Date(e.occurred_on).toLocaleDateString()}</div>
@@ -249,7 +265,7 @@ function OverviewBody({ entries, goals }: { entries: Entry[]; goals: Goal[] }) {
           ))}
         </ul>
       </Card>
-      <Card className="p-6 rounded-2xl md:col-span-2 bg-[hsl(40_30%_98%)] border-dashed">
+      <Card className="p-6 rounded-2xl md:col-span-2 bg-sand/40 border-dashed">
         <p className="text-sm text-center text-muted-foreground italic leading-relaxed">
           Education is not measured by grades alone. It is the lifelong story of how a learner, a family, and a community grow together.
         </p>
@@ -267,13 +283,16 @@ function TimelineTab({ entries, family, user, onChange }: { entries: Entry[]; fa
         <h2 className="text-xl font-semibold">Timeline</h2>
         <EntryDialog family={family} user={user} onChange={onChange} defaultGroup="timeline" />
       </div>
-      <div className="relative pl-8 border-l-2 border-[hsl(140_30%_80%)]">
+      <div className="relative pl-8 border-l-2 border-sage">
         {timeline.length === 0 && <p className="text-sm text-muted-foreground">No milestones yet. Plant the first one.</p>}
         {timeline.map((e) => {
           const m = typeMeta(e.entry_type);
+          const Icon = m.icon;
           return (
             <div key={e.id} className="relative mb-6">
-              <div className="absolute -left-[42px] top-1 h-8 w-8 rounded-full bg-background border-2 border-[hsl(140_40%_60%)] flex items-center justify-center text-base">{m.emoji}</div>
+              <div className="absolute -left-[42px] top-1 h-8 w-8 rounded-full bg-background border-2 border-primary/50 flex items-center justify-center text-primary">
+                <Icon className="h-4 w-4" />
+              </div>
               <Card className="p-5 rounded-2xl">
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge variant="outline" className="rounded-full text-xs">{m.label}</Badge>
@@ -302,7 +321,7 @@ function ReflectionsBlock({ content }: { content: Record<string, unknown> }) {
   return (
     <div className="mt-3 space-y-2">
       {present.map(([k, label]) => (
-        <div key={k} className="text-xs bg-[hsl(40_30%_96%)] rounded-lg p-3">
+        <div key={k} className="text-xs bg-sand/50 rounded-lg p-3">
           <div className="font-semibold text-muted-foreground uppercase tracking-wider mb-1">{label}</div>
           <div className="whitespace-pre-wrap text-foreground/80">{content[k] as string}</div>
         </div>
@@ -361,7 +380,14 @@ function EntryDialog({
               <Select value={entryType} onValueChange={setEntryType}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {types.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
+                  {types.map((t) => {
+                    const Ti = t.icon;
+                    return (
+                      <SelectItem key={t.value} value={t.value}>
+                        <span className="inline-flex items-center gap-2"><Ti className="h-3.5 w-3.5" /> {t.label}</span>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -412,7 +438,7 @@ function ReflectionsTab({ entries, family, user, onChange }: { entries: Entry[];
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 rounded-2xl bg-[hsl(140_25%_96%)]">
+      <Card className="p-6 rounded-2xl bg-sage/20">
         <h3 className="font-semibold">This month's reflection</h3>
         <p className="text-sm text-muted-foreground mt-1">A small pause each month becomes a chapter of your family's story.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -434,7 +460,7 @@ function ReflectionsTab({ entries, family, user, onChange }: { entries: Entry[];
               {list.map((r) => {
                 const role = r.entry_type.replace("monthly_", "");
                 return (
-                  <div key={r.id} className="text-xs bg-[hsl(40_30%_96%)] rounded-xl p-3">
+                  <div key={r.id} className="text-xs bg-sand/50 rounded-xl p-3">
                     <div className="font-semibold uppercase tracking-wider text-muted-foreground">{role}</div>
                     <div className="mt-1 whitespace-pre-wrap">{r.description}</div>
                   </div>
@@ -488,9 +514,12 @@ function GrowthTab({ entries }: { entries: Entry[] }) {
           : mentions < 3 ? "Beginning to take root."
           : mentions < 6 ? "Growing steadily, branch by branch."
           : "A flourishing branch on the tree.";
+        const Icon = g.icon;
         return (
           <Card key={g.key} className="p-5 rounded-2xl text-center">
-            <div className="text-3xl">{g.emoji}</div>
+            <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-sand text-primary">
+              <Icon className="h-6 w-6" />
+            </div>
             <div className="mt-3 font-semibold">{g.label}</div>
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{narrative}</p>
           </Card>
@@ -524,9 +553,12 @@ function PortfolioTab({ entries, family, user, onChange }: { entries: Entry[]; f
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((i) => {
               const m = typeMeta(i.entry_type);
+              const Icon = m.icon;
               return (
                 <Card key={i.id} className="p-5 rounded-2xl">
-                  <div className="text-2xl">{m.emoji}</div>
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-sand text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
                   <div className="mt-2 font-semibold text-sm">{i.title}</div>
                   <div className="text-xs text-muted-foreground">{new Date(i.occurred_on).toLocaleDateString()}</div>
                   {i.description && <p className="mt-2 text-xs whitespace-pre-wrap text-muted-foreground">{i.description}</p>}
@@ -553,9 +585,12 @@ function MemoryTab({ entries, family, user, onChange }: { entries: Entry[]; fami
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((i) => {
           const m = typeMeta(i.entry_type);
+          const Icon = m.icon;
           return (
             <Card key={i.id} className="overflow-hidden rounded-2xl">
-              <div className="h-32 bg-gradient-to-br from-[hsl(140_25%_88%)] to-[hsl(40_30%_92%)] flex items-center justify-center text-5xl">{m.emoji}</div>
+              <div className="h-32 bg-gradient-to-br from-sage/40 to-sand flex items-center justify-center text-primary">
+                <Icon className="h-12 w-12" />
+              </div>
               <div className="p-4">
                 <div className="font-semibold text-sm">{i.title}</div>
                 <div className="text-xs text-muted-foreground">{new Date(i.occurred_on).toLocaleDateString()}</div>
@@ -657,7 +692,14 @@ function SearchTab({ entries }: { entries: Entry[] }) {
           <SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All types</SelectItem>
-            {ENTRY_TYPES.map((t) => <SelectItem key={t.value} value={t.value}>{t.emoji} {t.label}</SelectItem>)}
+            {ENTRY_TYPES.map((t) => {
+              const Ti = t.icon;
+              return (
+                <SelectItem key={t.value} value={t.value}>
+                  <span className="inline-flex items-center gap-2"><Ti className="h-3.5 w-3.5" /> {t.label}</span>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
         <Select value={year} onValueChange={setYear}>
@@ -672,9 +714,12 @@ function SearchTab({ entries }: { entries: Entry[] }) {
         {filtered.length === 0 && <p className="text-sm text-muted-foreground">No matching entries.</p>}
         {filtered.map((e) => {
           const m = typeMeta(e.entry_type);
+          const Icon = m.icon;
           return (
             <Card key={e.id} className="p-4 rounded-xl flex gap-3">
-              <span className="text-2xl">{m.emoji}</span>
+              <span className="grid h-9 w-9 place-items-center rounded-lg bg-sand text-primary shrink-0">
+                <Icon className="h-4 w-4" />
+              </span>
               <div className="flex-1">
                 <div className="text-sm font-semibold">{e.title}</div>
                 <div className="text-xs text-muted-foreground">{m.label} · {new Date(e.occurred_on).toLocaleDateString()}</div>
