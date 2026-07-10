@@ -147,7 +147,7 @@ function LivingTreePage() {
     <Shell>
       <Overview family={family} entries={entries} />
       <Tabs value={tab} onValueChange={setTab} className="mt-10">
-        <TabsList className="flex flex-wrap h-auto bg-[hsl(40_30%_95%)] p-1 rounded-2xl">
+        <TabsList className="flex flex-wrap h-auto bg-sand/60 p-1 rounded-2xl">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="reflections">Monthly</TabsTrigger>
@@ -172,7 +172,7 @@ function LivingTreePage() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[hsl(40_30%_97%)] via-background to-[hsl(140_25%_96%)]">
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-background/70 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link to="/dashboard" className="flex items-center gap-3">
@@ -321,7 +321,7 @@ function ReflectionsBlock({ content }: { content: Record<string, unknown> }) {
   return (
     <div className="mt-3 space-y-2">
       {present.map(([k, label]) => (
-        <div key={k} className="text-xs bg-[hsl(40_30%_96%)] rounded-lg p-3">
+        <div key={k} className="text-xs bg-sand/50 rounded-lg p-3">
           <div className="font-semibold text-muted-foreground uppercase tracking-wider mb-1">{label}</div>
           <div className="whitespace-pre-wrap text-foreground/80">{content[k] as string}</div>
         </div>
@@ -438,7 +438,7 @@ function ReflectionsTab({ entries, family, user, onChange }: { entries: Entry[];
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 rounded-2xl bg-[hsl(140_25%_96%)]">
+      <Card className="p-6 rounded-2xl bg-sage/20">
         <h3 className="font-semibold">This month's reflection</h3>
         <p className="text-sm text-muted-foreground mt-1">A small pause each month becomes a chapter of your family's story.</p>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
@@ -460,7 +460,7 @@ function ReflectionsTab({ entries, family, user, onChange }: { entries: Entry[];
               {list.map((r) => {
                 const role = r.entry_type.replace("monthly_", "");
                 return (
-                  <div key={r.id} className="text-xs bg-[hsl(40_30%_96%)] rounded-xl p-3">
+                  <div key={r.id} className="text-xs bg-sand/50 rounded-xl p-3">
                     <div className="font-semibold uppercase tracking-wider text-muted-foreground">{role}</div>
                     <div className="mt-1 whitespace-pre-wrap">{r.description}</div>
                   </div>
