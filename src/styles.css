@@ -64,58 +64,66 @@
   --color-crayon-foreground: var(--crayon-foreground);
   --color-sketch: var(--sketch);
   --color-sketch-foreground: var(--sketch-foreground);
+  --color-forest: var(--forest);
+  --color-forest-foreground: var(--forest-foreground);
+  --color-mustard: var(--mustard);
+  --color-mustard-foreground: var(--mustard-foreground);
 
-  --font-serif: "Fraunces", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", "EB Garamond", "Garamond", ui-serif, Georgia, serif;
+  --font-sans: "EB Garamond", "Garamond", ui-serif, Georgia, serif;
 }
 
 :root {
   --radius: 0.875rem;
 
-  /* Brand palette */
-  --ivory: oklch(0.965 0.014 85);
-  --ink: oklch(0.24 0.02 155);
-  --sand: oklch(0.905 0.032 82);
-  --sand-foreground: oklch(0.28 0.03 140);
-  --sage: oklch(0.83 0.055 145);
-  --sage-foreground: oklch(0.28 0.05 145);
-  --crayon: oklch(0.66 0.16 22);
+  /* Brand palette — warm ivory, sand, sage, forest, terracotta, mustard, soft navy */
+  --ivory: oklch(0.968 0.012 80);         /* #F8F5F1 */
+  --ink: oklch(0.26 0.02 150);
+  --sand: oklch(0.915 0.028 82);          /* soft sand */
+  --sand-foreground: oklch(0.3 0.03 140);
+  --sage: oklch(0.78 0.06 150);           /* sage green */
+  --sage-foreground: oklch(0.26 0.05 150);
+  --forest: oklch(0.36 0.07 155);         /* deep forest green */
+  --forest-foreground: oklch(0.98 0.01 85);
+  --crayon: oklch(0.62 0.13 40);          /* muted terracotta */
   --crayon-foreground: oklch(0.99 0 0);
-  --sketch: oklch(0.6 0.14 250);
+  --mustard: oklch(0.78 0.13 82);         /* accent mustard/gold */
+  --mustard-foreground: oklch(0.26 0.04 90);
+  --sketch: oklch(0.42 0.08 255);         /* soft navy blue */
   --sketch-foreground: oklch(0.99 0 0);
 
   --background: var(--ivory);
   --foreground: var(--ink);
-  --card: oklch(0.99 0.008 85);
+  --card: oklch(0.985 0.01 82);
   --card-foreground: var(--ink);
-  --popover: oklch(0.99 0.008 85);
+  --popover: oklch(0.985 0.01 82);
   --popover-foreground: var(--ink);
-  --primary: oklch(0.47 0.09 155);
-  --primary-foreground: oklch(0.98 0.01 85);
+  --primary: var(--forest);
+  --primary-foreground: var(--forest-foreground);
   --secondary: var(--sand);
-  --secondary-foreground: oklch(0.28 0.03 140);
-  --muted: oklch(0.93 0.02 85);
-  --muted-foreground: oklch(0.45 0.02 150);
+  --secondary-foreground: var(--sand-foreground);
+  --muted: oklch(0.935 0.018 82);
+  --muted-foreground: oklch(0.46 0.02 150);
   --accent: var(--sage);
-  --accent-foreground: oklch(0.24 0.05 145);
-  --destructive: oklch(0.6 0.2 27);
+  --accent-foreground: var(--sage-foreground);
+  --destructive: oklch(0.58 0.17 30);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.87 0.02 85);
-  --input: oklch(0.9 0.02 85);
-  --ring: oklch(0.47 0.09 155);
-  --chart-1: oklch(0.47 0.09 155);
-  --chart-2: oklch(0.66 0.16 22);
-  --chart-3: oklch(0.6 0.14 250);
-  --chart-4: oklch(0.83 0.055 145);
-  --chart-5: oklch(0.75 0.12 80);
-  --sidebar: oklch(0.955 0.02 85);
+  --border: oklch(0.88 0.018 82);
+  --input: oklch(0.91 0.018 82);
+  --ring: var(--forest);
+  --chart-1: var(--forest);
+  --chart-2: var(--crayon);
+  --chart-3: var(--sketch);
+  --chart-4: var(--sage);
+  --chart-5: var(--mustard);
+  --sidebar: oklch(0.955 0.018 82);
   --sidebar-foreground: var(--ink);
-  --sidebar-primary: oklch(0.47 0.09 155);
-  --sidebar-primary-foreground: oklch(0.98 0.01 85);
+  --sidebar-primary: var(--forest);
+  --sidebar-primary-foreground: var(--forest-foreground);
   --sidebar-accent: var(--sand);
-  --sidebar-accent-foreground: oklch(0.28 0.03 140);
-  --sidebar-border: oklch(0.87 0.02 85);
-  --sidebar-ring: oklch(0.47 0.09 155);
+  --sidebar-accent-foreground: var(--sand-foreground);
+  --sidebar-border: oklch(0.88 0.018 82);
+  --sidebar-ring: var(--forest);
 }
 
 .dark {
