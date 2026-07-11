@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, GraduationCap, ArrowRight, Compass, Sprout, LogIn, LayoutDashboard, Headphones, BookOpen, TreeDeciduous, Sparkles } from "lucide-react";
+import { Users, GraduationCap, ArrowRight, Compass, Sprout, LogIn, LayoutDashboard, Headphones, BookOpen, TreeDeciduous, Sparkles, Lightbulb, Heart, PencilLine } from "lucide-react";
 import { useAuthUser } from "@/lib/hub-auth";
+import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,29 +26,11 @@ function Index() {
   const { user } = useAuthUser();
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* Organic paper-shape accents */}
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute -left-32 -top-32 h-[520px] w-[520px] text-sage/40"
-        viewBox="0 0 200 200"
-      >
-        <path
-          fill="currentColor"
-          d="M45,-63C56,-52,60,-34,64,-16C68,3,71,22,63,36C55,51,35,60,15,66C-5,72,-27,74,-42,64C-57,53,-66,29,-68,5C-70,-19,-64,-42,-49,-55C-34,-68,-11,-70,7,-72C25,-74,34,-74,45,-63Z"
-          transform="translate(100 100)"
-        />
-      </svg>
-      <svg
-        aria-hidden
-        className="pointer-events-none absolute -right-40 top-40 h-[460px] w-[460px] text-sand/70"
-        viewBox="0 0 200 200"
-      >
-        <path
-          fill="currentColor"
-          d="M42,-58C54,-49,62,-33,66,-15C70,3,70,22,60,34C51,47,32,54,13,60C-6,66,-25,72,-40,64C-55,55,-67,32,-69,9C-71,-14,-63,-37,-48,-48C-33,-59,-16,-58,1,-60C18,-62,30,-67,42,-58Z"
-          transform="translate(100 100)"
-        />
-      </svg>
+      {/* Four marker-color blobs echoing the L2R logo */}
+      <div aria-hidden className="pointer-events-none absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--sketch) 22%, transparent)" }} />
+      <div aria-hidden className="pointer-events-none absolute -right-24 top-20 h-[380px] w-[380px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--mustard) 30%, transparent)" }} />
+      <div aria-hidden className="pointer-events-none absolute left-1/3 bottom-0 h-[360px] w-[360px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--forest) 22%, transparent)" }} />
+      <div aria-hidden className="pointer-events-none absolute right-1/4 -bottom-24 h-[320px] w-[320px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--crayon) 22%, transparent)" }} />
 
       <div className="absolute right-6 top-6 z-10">
         {user ? (
@@ -68,146 +51,164 @@ function Index() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 py-20">
-        {/* Hero */}
-        <div className="mb-14 max-w-3xl">
-          <span className="inline-flex items-center gap-2 rounded-full bg-sand px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-sand-foreground">
-            <Sparkles className="h-3.5 w-3.5 text-crayon" />
+        {/* Hero — logo-forward */}
+        <div className="mb-16 flex flex-col items-center text-center">
+          <div className="relative">
+            <div aria-hidden className="absolute inset-0 -m-4 rounded-[2rem] rotate-[-2deg]" style={{ background: "color-mix(in oklab, var(--mustard) 28%, transparent)" }} />
+            <img
+              src={logoAsset.url}
+              alt="Left2Right Education Hub"
+              className="relative h-28 w-28 rounded-3xl object-cover shadow-[0_18px_40px_-18px_rgba(0,0,0,0.35)] ring-4 ring-card"
+            />
+          </div>
+          <span className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5 text-mustard" />
             Left2Right Education Hub
           </span>
-          <h1 className="mt-6 font-serif text-5xl leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-            A warm place for <span className="italic text-primary">families</span> to grow,
-            reflect, and <span className="italic text-crayon">learn together</span>.
+          <h1 className="mt-6 max-w-3xl font-serif text-5xl leading-[1.05] tracking-tight text-foreground sm:text-6xl">
+            Where <span className="italic text-sketch">curious minds</span>,{" "}
+            <span className="italic text-crayon">warm families</span>, and{" "}
+            <span className="italic text-forest">lifelong growth</span> meet.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            Two gentle intake journeys, a growing library of articles and podcasts, and tools
-            that help every parent and child move forward — one thoughtful step at a time.
+            A creative studio for education — thoughtful intake journeys, a growing library of
+            articles and podcasts, and a Living Tree that grows with your family.
           </p>
         </div>
 
-        {/* Bento grid */}
-        <div className="grid gap-5 md:grid-cols-6 md:grid-rows-2">
-          <JourneyCard
+        {/* Four feature cards — one per marker color */}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <FeatureCard
             to="/parent"
-            icon={<Users className="h-6 w-6" />}
+            tone="yellow"
+            icon={<Lightbulb className="h-6 w-6" />}
+            eyebrow="Discover"
+            title="Begin the journey"
+            desc="Admissions & family intake — meet us, tell us your story."
+          />
+          <FeatureCard
+            to="/compass"
+            tone="blue"
+            icon={<Compass className="h-6 w-6" />}
+            eyebrow="Learn"
+            title="L2R Compass"
+            desc="A living guide that turns your answers into insight."
+          />
+          <FeatureCard
+            to="/hub"
+            tone="red"
+            icon={<Heart className="h-6 w-6" />}
+            eyebrow="Connect"
+            title="Family Hub"
+            desc="Articles, podcasts and resources for parents and kids."
+          />
+          <FeatureCard
+            to="/living-tree"
+            tone="green"
+            icon={<TreeDeciduous className="h-6 w-6" />}
+            eyebrow="Grow"
+            title="The Living Tree"
+            desc="Milestones, portfolios and stories that grow over time."
+          />
+        </div>
+
+        {/* Journey CTAs */}
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <JourneyCTA
+            to="/parent"
+            tone="red"
+            icon={<Users className="h-5 w-5" />}
             eyebrow="Parent journey"
             title="Family ecosystem"
             desc="Household basics, values, routines, and goals — captured together."
-            className="md:col-span-3 md:row-span-2 bg-primary text-primary-foreground"
-            variant="primary"
           />
-          <JourneyCard
+          <JourneyCTA
             to="/student"
-            icon={<GraduationCap className="h-6 w-6" />}
+            tone="blue"
+            icon={<GraduationCap className="h-5 w-5" />}
             eyebrow="Student journey"
             title="Learning profile"
             desc="Age, subjects, learning style, reflective questions."
-            className="md:col-span-3 bg-crayon text-crayon-foreground"
-            variant="crayon"
-          />
-          <BentoLink
-            to="/compass"
-            icon={<Compass className="h-5 w-5" />}
-            title="L2R Compass"
-            desc="Your family's insights, one glance."
-            className="md:col-span-2 bg-sketch text-sketch-foreground"
-          />
-          <BentoLink
-            to="/hub"
-            icon={<Sprout className="h-5 w-5" />}
-            title="Growth Hub"
-            desc="Articles, podcasts, resources."
-            className="md:col-span-1 bg-sage text-sage-foreground"
           />
         </div>
 
         {/* Secondary shortcuts */}
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
-          <MiniLink to="/hub/articles" icon={<BookOpen className="h-4 w-4" />} label="Read articles" />
-          <MiniLink to="/hub/podcasts" icon={<Headphones className="h-4 w-4" />} label="Listen to podcasts" />
-          <MiniLink to="/living-tree" icon={<TreeDeciduous className="h-4 w-4" />} label="Explore your Living Tree" />
+          <MiniLink to="/hub/articles" tone="blue" icon={<BookOpen className="h-4 w-4" />} label="Read articles" />
+          <MiniLink to="/hub/podcasts" tone="yellow" icon={<Headphones className="h-4 w-4" />} label="Listen to podcasts" />
+          <MiniLink to="/hub" tone="green" icon={<Sprout className="h-4 w-4" />} label="Explore the Growth Hub" />
         </div>
       </div>
     </div>
   );
 }
 
-function JourneyCard({
-  to,
-  icon,
-  eyebrow,
-  title,
-  desc,
-  className = "",
-  variant = "primary",
-}: {
-  to: string;
-  icon: React.ReactNode;
-  eyebrow: string;
-  title: string;
-  desc: string;
-  className?: string;
-  variant?: "primary" | "crayon";
-}) {
-  return (
-    <Link
-      to={to}
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl p-7 md:p-9 hover-lift ${className}`}
-    >
-      <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
-      <div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-          {icon}
-        </div>
-        <div className="mt-6 text-xs font-semibold uppercase tracking-[0.14em] opacity-80">{eyebrow}</div>
-        <h2 className="mt-2 font-serif text-3xl leading-tight md:text-4xl">{title}</h2>
-        <p className="mt-3 max-w-md text-sm opacity-90 md:text-base">{desc}</p>
-      </div>
-      <div className="mt-8 inline-flex items-center gap-1 text-sm font-medium">
-        {variant === "primary" ? "Begin the family intake" : "Start the student intake"}
-        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-      </div>
-    </Link>
-  );
-}
+type Tone = "blue" | "green" | "red" | "yellow";
 
-function BentoLink({
-  to,
-  icon,
-  title,
-  desc,
-  className = "",
-}: {
-  to: string;
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  className?: string;
-}) {
+const TONE: Record<Tone, { wash: string; ink: string; solid: string; solidFg: string; ring: string; chip: string }> = {
+  blue:   { wash: "bg-sketch-soft",  ink: "text-sketch",  solid: "bg-sketch",  solidFg: "text-sketch-foreground",  ring: "ring-sketch/30",  chip: "bg-sketch/10 text-sketch" },
+  green:  { wash: "bg-sage-soft",    ink: "text-forest",  solid: "bg-forest",  solidFg: "text-forest-foreground",  ring: "ring-forest/25",  chip: "bg-forest/10 text-forest" },
+  red:    { wash: "bg-crayon-soft",  ink: "text-crayon",  solid: "bg-crayon",  solidFg: "text-crayon-foreground",  ring: "ring-crayon/25",  chip: "bg-crayon/10 text-crayon" },
+  yellow: { wash: "bg-mustard-soft", ink: "text-mustard-foreground", solid: "bg-mustard", solidFg: "text-mustard-foreground", ring: "ring-mustard/40", chip: "bg-mustard/25 text-mustard-foreground" },
+};
+
+function FeatureCard({
+  to, tone, icon, eyebrow, title, desc,
+}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string }) {
+  const t = TONE[tone];
   return (
     <Link
       to={to}
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl p-6 hover-lift ${className}`}
+      className={`group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 ${t.wash} p-6 hover-lift ring-1 ${t.ring}`}
     >
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
+      <PencilLine aria-hidden className="absolute -right-3 -top-3 h-16 w-16 rotate-12 text-foreground/[0.04]" />
+      <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.solid} ${t.solidFg} shadow-sm`}>
         {icon}
       </div>
-      <div className="mt-6">
-        <div className="font-serif text-xl leading-tight">{title}</div>
-        <div className="mt-1 text-xs opacity-85">{desc}</div>
+      <div className={`mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] ${t.ink}`}>{eyebrow}</div>
+      <h3 className="mt-1 font-serif text-2xl leading-tight text-foreground">{title}</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+      <div className={`mt-5 inline-flex items-center gap-1 text-sm font-medium ${t.ink}`}>
+        Enter <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
       </div>
-      <ArrowRight className="absolute right-5 top-5 h-4 w-4 opacity-70 transition-transform group-hover:translate-x-1" />
     </Link>
   );
 }
 
-function MiniLink({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) {
+function JourneyCTA({
+  to, tone, icon, eyebrow, title, desc,
+}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string }) {
+  const t = TONE[tone];
+  return (
+    <Link
+      to={to}
+      className={`group relative flex items-start gap-5 overflow-hidden rounded-3xl ${t.solid} ${t.solidFg} p-7 hover-lift`}
+    >
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+        {icon}
+      </div>
+      <div className="relative">
+        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-85">{eyebrow}</div>
+        <div className="mt-1 font-serif text-2xl leading-tight">{title}</div>
+        <p className="mt-1.5 text-sm opacity-90">{desc}</p>
+        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium">
+          Begin <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function MiniLink({ to, tone, icon, label }: { to: string; tone: Tone; icon: React.ReactNode; label: string }) {
+  const t = TONE[tone];
   return (
     <Link
       to={to}
       className="group flex items-center justify-between rounded-2xl border border-border bg-card px-5 py-4 text-sm font-medium hover-lift"
     >
-      <span className="flex items-center gap-2">
-        <span className="grid h-8 w-8 place-items-center rounded-lg bg-sand text-primary">{icon}</span>
+      <span className="flex items-center gap-3">
+        <span className={`grid h-8 w-8 place-items-center rounded-lg ${t.chip}`}>{icon}</span>
         {label}
       </span>
       <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />

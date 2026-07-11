@@ -68,6 +68,10 @@
   --color-forest-foreground: var(--forest-foreground);
   --color-mustard: var(--mustard);
   --color-mustard-foreground: var(--mustard-foreground);
+  --color-mustard-soft: var(--mustard-soft);
+  --color-crayon-soft: var(--crayon-soft);
+  --color-sketch-soft: var(--sketch-soft);
+  --color-sage-soft: var(--sage-soft);
 
   --font-serif: "Cormorant Garamond", "EB Garamond", "Garamond", ui-serif, Georgia, serif;
   --font-sans: "EB Garamond", "Garamond", ui-serif, Georgia, serif;
@@ -76,54 +80,66 @@
 :root {
   --radius: 0.875rem;
 
-  /* Brand palette — warm ivory, sand, sage, forest, terracotta, mustard, soft navy */
-  --ivory: oklch(0.968 0.012 80);         /* #F8F5F1 */
-  --ink: oklch(0.26 0.02 150);
-  --sand: oklch(0.915 0.028 82);          /* soft sand */
-  --sand-foreground: oklch(0.3 0.03 140);
-  --sage: oklch(0.78 0.06 150);           /* sage green */
-  --sage-foreground: oklch(0.26 0.05 150);
-  --forest: oklch(0.36 0.07 155);         /* deep forest green */
-  --forest-foreground: oklch(0.98 0.01 85);
-  --crayon: oklch(0.62 0.13 40);          /* muted terracotta */
-  --crayon-foreground: oklch(0.99 0 0);
-  --mustard: oklch(0.78 0.13 82);         /* accent mustard/gold */
-  --mustard-foreground: oklch(0.26 0.04 90);
-  --sketch: oklch(0.42 0.08 255);         /* soft navy blue */
-  --sketch-foreground: oklch(0.99 0 0);
+  /* Brand palette — the four L2R marker colors on warm ivory paper */
+  --ivory: #F9F6F0;                       /* warm ivory paper */
+  --ink: #2A2E2B;
+  --sand: #F1EBDD;                        /* soft cream card */
+  --sand-foreground: #3B3A32;
+
+  /* Green — Growth, Living Tree, Growth Hub, Dashboard */
+  --sage: #B6D4C0;
+  --sage-foreground: #1F5236;
+  --sage-soft: #DDEBE1;
+  --forest: #2E8B57;                      /* L2R green marker */
+  --forest-foreground: #FFFFFF;
+
+  /* Red — Family, Community, Communication */
+  --crayon: #D94B45;                      /* L2R red marker */
+  --crayon-foreground: #FFFFFF;
+  --crayon-soft: #F7D6D3;
+
+  /* Yellow — Discovery, Admissions, Curiosity */
+  --mustard: #F4C430;                     /* L2R yellow marker */
+  --mustard-foreground: #4A3A05;
+  --mustard-soft: #FBEBB5;
+
+  /* Blue — Learning, Compass, Student Journey */
+  --sketch: #2F6FD8;                      /* L2R blue marker */
+  --sketch-foreground: #FFFFFF;
+  --sketch-soft: #D6E3F8;
 
   --background: var(--ivory);
   --foreground: var(--ink);
-  --card: oklch(0.985 0.01 82);
+  --card: #FDFBF6;
   --card-foreground: var(--ink);
-  --popover: oklch(0.985 0.01 82);
+  --popover: #FDFBF6;
   --popover-foreground: var(--ink);
-  --primary: var(--forest);
-  --primary-foreground: var(--forest-foreground);
+  --primary: var(--sketch);
+  --primary-foreground: var(--sketch-foreground);
   --secondary: var(--sand);
   --secondary-foreground: var(--sand-foreground);
-  --muted: oklch(0.935 0.018 82);
-  --muted-foreground: oklch(0.46 0.02 150);
+  --muted: #EFEADD;
+  --muted-foreground: #6B675C;
   --accent: var(--sage);
   --accent-foreground: var(--sage-foreground);
-  --destructive: oklch(0.58 0.17 30);
-  --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.88 0.018 82);
-  --input: oklch(0.91 0.018 82);
-  --ring: var(--forest);
+  --destructive: var(--crayon);
+  --destructive-foreground: var(--crayon-foreground);
+  --border: #E4DDCB;
+  --input: #EAE3D2;
+  --ring: var(--sketch);
   --chart-1: var(--forest);
   --chart-2: var(--crayon);
   --chart-3: var(--sketch);
   --chart-4: var(--sage);
   --chart-5: var(--mustard);
-  --sidebar: oklch(0.955 0.018 82);
+  --sidebar: #F4EEDE;
   --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--forest);
-  --sidebar-primary-foreground: var(--forest-foreground);
+  --sidebar-primary: var(--sketch);
+  --sidebar-primary-foreground: var(--sketch-foreground);
   --sidebar-accent: var(--sand);
   --sidebar-accent-foreground: var(--sand-foreground);
-  --sidebar-border: oklch(0.88 0.018 82);
-  --sidebar-ring: var(--forest);
+  --sidebar-border: #E4DDCB;
+  --sidebar-ring: var(--sketch);
 }
 
 .dark {
