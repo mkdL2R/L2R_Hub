@@ -31,10 +31,20 @@ function Onboarding() {
         return;
       }
       const { data: profile } = await supabase
-        .from("profiles").select("primary_role").eq("user_id", user.id).maybeSingle();
+        .from("profiles")
+        .select("primary_role, membership_status")
+        .eq("user_id", user.id)
+        .maybeSingle();
       const existing = profile?.primary_role as Role | null | undefined;
+      const membership = (profile as { membership_status?: string } | null)?.membership_status ?? "visitor";
       if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
-        navigate({ to: dashboardPathForRole(existing) as never });
+        // Visitors (signed up directly, no discovery journey yet) go to the Growth Hub.
+        // Applicants and above get their role dashboard.
+        if (existing === "instructor" || existing === "administrator" || membership !== "visitor") {
+          navigate({ to: dashboardPathForRole(existing) as never });
+        } else {
+          navigate({ to: "/hub" as never });
+        }
         return;
       }
       setNeedsRole(true);
@@ -59,7 +69,9 @@ function Onboarding() {
         avatar_url: avatar,
         primary_role: role,
       });
-      navigate({ to: dashboardPathForRole(role) as never });
+      // Newly picked role → Visitor status. Send them into the Growth Hub;
+      // completing the Discovery Journey promotes them to Applicant and unlocks the dashboard.
+      navigate({ to: "/hub" as never });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save role");
     } finally {
