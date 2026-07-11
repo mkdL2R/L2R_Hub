@@ -87,6 +87,44 @@ export function useUserRoles(userId: string | undefined) {
   };
 }
 
+export type MembershipStatus =
+  | "visitor"
+  | "applicant"
+  | "enrolled"
+  | "alumni"
+  | "instructor";
+
+export function useMembership(userId: string | undefined) {
+  const [status, setStatus] = useState<MembershipStatus | null>(null);
+  const [primaryRole, setPrimaryRole] = useState<Role | null>(null);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    if (!userId) {
+      setStatus(null);
+      setPrimaryRole(null);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    supabase
+      .from("profiles")
+      .select("membership_status, primary_role")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        setStatus(((data as { membership_status?: string } | null)?.membership_status as MembershipStatus | undefined) ?? "visitor");
+        setPrimaryRole(((data as { primary_role?: Role | null } | null)?.primary_role as Role | null) ?? null);
+        setLoading(false);
+      });
+  }, [userId]);
+  const canAccessCompass =
+    status === "applicant" ||
+    status === "enrolled" ||
+    status === "alumni" ||
+    status === "instructor";
+  return { status, primaryRole, loading, canAccessCompass };
+}
+
 export const ARTICLE_CATEGORIES = [
   "Parenting",
   "Communication",
