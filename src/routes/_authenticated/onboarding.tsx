@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { alog, aerr, describeError } from "@/lib/auth-log";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({ meta: [{ title: "Welcome — L2R" }] }),
@@ -22,22 +23,55 @@ function Onboarding() {
 
   useEffect(() => {
     if (loading || !user) return;
+    alog("onboarding:mount", { userId: user.id, email: user.email });
     (async () => {
-      // Always try to claim a pending instructor invitation first — this promotes
-      // invited users even if they previously self-assigned a different role.
-      const { data: claimed } = await supabase.rpc("claim_instructor_invitation");
-      if (claimed === true) {
-        navigate({ to: dashboardPathForRole("instructor") as never });
-        return;
-      }
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("primary_role, membership_status")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      const existing = profile?.primary_role as Role | null | undefined;
-      const membership = (profile as { membership_status?: string } | null)?.membership_status ?? "visitor";
-      if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
+      try {
+        // Always try to claim a pending instructor invitation first — this promotes
+        // invited users even if they previously self-assigned a different role.
+        const { data: claimed, error: claimErr } = await supabase.rpc("claim_instructor_invitation");
+        alog("onboarding:claim-instructor", { claimed, error: claimErr?.message });
+        if (claimErr) throw new Error(`claim_instructor_invitation: ${claimErr.message}`);
+        if (claimed === true) {
+          navigate({ to: dashboardPathForRole("instructor") as never });
+          return;
+        }
+
+        let { data: profile, error: profErr } = await supabase
+          .from("profiles")
+          .select("primary_role, membership_status")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        alog("onboarding:profile-lookup", { profile, error: profErr?.message });
+        if (profErr) throw new Error(`profiles select: ${profErr.message}`);
+
+        // If the trigger hasn't created a profile row yet, create it now so we
+        // never redirect to a dashboard while profile creation is still pending.
+        if (!profile) {
+          const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+          const fullName =
+            (meta.full_name as string) || (meta.name as string) || (meta.preferred_name as string) || null;
+          const avatar = (meta.avatar_url as string) || (meta.picture as string) || null;
+          const { error: upErr } = await supabase.from("profiles").upsert(
+            { user_id: user.id, email: user.email ?? null, preferred_name: fullName, avatar_url: avatar },
+            { onConflict: "user_id" },
+          );
+          alog("onboarding:profile-bootstrap", { error: upErr?.message });
+          if (upErr) throw new Error(`profile bootstrap: ${upErr.message}`);
+          const reread = await supabase
+            .from("profiles")
+            .select("primary_role, membership_status")
+            .eq("user_id", user.id)
+            .maybeSingle();
+          profile = reread.data;
+          alog("onboarding:profile-reread", { profile, error: reread.error?.message });
+        }
+
+        const existing = profile?.primary_role as Role | null | undefined;
+        const membership =
+          (profile as { membership_status?: string } | null)?.membership_status ?? "visitor";
+        alog("onboarding:decision", { existing, membership });
+
+        if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
         // Visitors (signed up directly, no discovery journey yet) go to the Growth Hub.
         // Applicants and above get their role dashboard.
         if (existing === "instructor" || existing === "administrator" || membership !== "visitor") {
@@ -46,9 +80,14 @@ function Onboarding() {
           navigate({ to: "/hub" as never });
         }
         return;
+        }
+        setNeedsRole(true);
+        setChecking(false);
+      } catch (err) {
+        aerr("onboarding:init", err);
+        setError(describeError(err));
+        setChecking(false);
       }
-      setNeedsRole(true);
-      setChecking(false);
     })();
   }, [user, loading, navigate]);
 
@@ -57,23 +96,42 @@ function Onboarding() {
     setBusy(true);
     setError(null);
     try {
+      alog("pickRole:start", { role });
       const { error: roleErr } = await supabase.rpc("assign_primary_role", { _role: role });
+      alog("pickRole:assign_primary_role", { error: roleErr?.message });
       if (roleErr && !/already_set|duplicate/i.test(roleErr.message)) throw roleErr;
       const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
       const fullName = (meta.full_name as string) || (meta.name as string) || (meta.preferred_name as string) || null;
       const avatar = (meta.avatar_url as string) || (meta.picture as string) || null;
-      await supabase.from("profiles").upsert({
-        user_id: user.id,
-        email: user.email ?? null,
-        preferred_name: fullName,
-        avatar_url: avatar,
-        primary_role: role,
-      });
+      const { error: upErr } = await supabase.from("profiles").upsert(
+        {
+          user_id: user.id,
+          email: user.email ?? null,
+          preferred_name: fullName,
+          avatar_url: avatar,
+          primary_role: role,
+        },
+        { onConflict: "user_id" },
+      );
+      alog("pickRole:profile-upsert", { error: upErr?.message });
+      if (upErr) throw upErr;
+      // Verify persistence before navigating.
+      const verify = await supabase
+        .from("profiles")
+        .select("primary_role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      alog("pickRole:verify", { primary_role: verify.data?.primary_role, error: verify.error?.message });
+      if (verify.error) throw verify.error;
+      if (verify.data?.primary_role !== role) {
+        throw new Error("Role did not persist. Please try again.");
+      }
       // Newly picked role → Visitor status. Send them into the Growth Hub;
       // completing the Discovery Journey promotes them to Applicant and unlocks the dashboard.
       navigate({ to: "/hub" as never });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save role");
+      aerr("pickRole", err);
+      setError(describeError(err) || "Could not save role");
     } finally {
       setBusy(false);
     }
