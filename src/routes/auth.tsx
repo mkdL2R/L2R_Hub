@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Mail, Loader2 } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { alog, aerr, describeError } from "@/lib/auth-log";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -31,23 +32,38 @@ function AuthPage() {
 
   // If already signed in, jump to onboarding/dashboard
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    alog("auth-page:mount", { href: window.location.href });
+    supabase.auth.getUser().then(({ data, error }) => {
+      alog("auth-page:getUser", { hasUser: !!data.user, error: error?.message });
       if (data.user) navigate({ to: "/onboarding" as never });
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      alog("auth-page:onAuthStateChange", { event, hasSession: !!session });
+      if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
+        navigate({ to: "/onboarding" as never });
+      }
+    });
+    return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
   async function handleGoogle() {
     setBusy(true);
     setError(null);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/auth",
-      });
+      const redirect_uri = window.location.origin + "/auth";
+      alog("google:start", { redirect_uri });
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri });
+      alog("google:result", { redirected: result.redirected, error: result.error?.message });
       if (result.error) throw result.error;
       if (result.redirected) return;
+      // Popup flow: session is set by the wrapper. Confirm before navigating.
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      alog("google:post-getUser", { hasUser: !!userData.user, error: userErr?.message });
+      if (userErr || !userData.user) throw new Error(userErr?.message || "Google returned but no session was created");
       navigate({ to: "/onboarding" as never });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Google sign-in failed");
+      aerr("google", err);
+      setError(describeError(err) || "Google sign-in failed");
     } finally {
       setBusy(false);
     }
@@ -60,27 +76,53 @@ function AuthPage() {
     setInfo(null);
     try {
       if (view === "reset") {
+        alog("reset:send", { email });
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + "/reset-password",
         });
         if (error) throw error;
         setInfo("Check your email for a password reset link.");
       } else if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        alog("signup:start", { email });
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: { emailRedirectTo: window.location.origin + "/auth" },
         });
+        alog("signup:result", {
+          hasUser: !!data?.user,
+          userId: data?.user?.id,
+          hasSession: !!data?.session,
+          error: error?.message,
+        });
         if (error) throw error;
-        setInfo("Account created. Check your email to verify, then sign in.");
-        setMode("signin");
+        if (!data.session) {
+          // Email confirmation is required — do NOT redirect; user must confirm first.
+          setInfo("Account created. Check your email to confirm, then sign in.");
+          setMode("signin");
+        } else {
+          alog("signup:session-created", { userId: data.user?.id });
+          // onAuthStateChange handler will navigate; keep this as a safety net.
+          navigate({ to: "/onboarding" as never });
+        }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        alog("signin:start", { email });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        alog("signin:result", {
+          hasUser: !!data?.user,
+          userId: data?.user?.id,
+          hasSession: !!data?.session,
+          error: error?.message,
+        });
         if (error) throw error;
+        if (!data.session || !data.user) {
+          throw new Error("Signed in but no session was returned. Please try again.");
+        }
         navigate({ to: "/onboarding" as never });
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Authentication failed");
+      aerr(view === "reset" ? "reset" : mode, err);
+      setError(describeError(err));
     } finally {
       setBusy(false);
     }
