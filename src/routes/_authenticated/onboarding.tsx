@@ -26,35 +26,11 @@ function Onboarding() {
     alog("onboarding:mount", { userId: user.id, email: user.email });
     (async () => {
       try {
-        // Only attempt to claim an instructor invitation when there's an explicit
-        // signal that the user is arriving via an invitation link. Parent/Student
-        // sign-ups must never call this RPC (it 400s for non-invited users and
-        // pollutes the auth flow with irrelevant errors).
-        const url = new URL(window.location.href);
-        const inviteToken =
-          url.searchParams.get("invite") ||
-          url.searchParams.get("invitation") ||
-          url.searchParams.get("invitation_token") ||
-          (typeof sessionStorage !== "undefined" ? sessionStorage.getItem("l2r:instructor_invite") : null);
-        if (inviteToken) {
-          try {
-            const { data: claimed, error: claimErr } = await supabase.rpc("claim_instructor_invitation");
-            alog("onboarding:claim-instructor", { claimed, error: claimErr?.message, details: claimErr });
-            if (claimErr) {
-              // Log full response but do NOT block the auth flow — user may have
-              // arrived with a stale/invalid token; fall through to normal flow.
-              aerr("onboarding:claim-instructor", claimErr);
-            } else if (claimed === true) {
-              try { sessionStorage.removeItem("l2r:instructor_invite"); } catch { /* noop */ }
-              navigate({ to: dashboardPathForRole("instructor") as never });
-              return;
-            }
-          } catch (e) {
-            aerr("onboarding:claim-instructor:throw", e);
-          }
-        } else {
-          alog("onboarding:claim-instructor:skip", { reason: "no invitation token" });
-        }
+        // NOTE: instructor-invitation claiming is intentionally NOT performed
+        // here. Standard Parent/Student Google & Email logins land on this
+        // route and must never call claim_instructor_invitation. Invited
+        // instructors are handled by the dedicated /invite route, which only
+        // runs when a verified invitation token is present in the URL.
 
         let { data: profile, error: profErr } = await supabase
           .from("profiles")
