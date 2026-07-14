@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogOut, UserCircle, type LucideIcon } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { MascotScene, Mascot } from "@/components/mascots/MascotScene";
 
 export type NavItem = { to: string; label: string; icon: LucideIcon; desc: string };
 
@@ -43,7 +44,8 @@ export function DashboardShell({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sand/40 via-background to-sage/25">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-sand/40 via-background to-sage/25">
+      <MascotScene variant="dashboard" />
       <header className="border-b border-border/60 bg-background/70 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
@@ -66,20 +68,33 @@ export function DashboardShell({
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-6 py-12">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {title}{name ? `, ${name}` : ""}.
-        </h1>
+      <main className="relative mx-auto max-w-6xl px-6 py-12">
+        <div className="flex items-center gap-3">
+          <Mascot shape="star" tone="yellow" mood="smile" size={44} animate="sway" />
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {title}{name ? `, ${name}` : ""}.
+          </h1>
+        </div>
         <p className="mt-2 text-muted-foreground">{subtitle}</p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((it) => (
+          {items.map((it, i) => (
             <Link key={it.to} to={it.to} className="group">
-              <Card className="p-6 rounded-2xl border-border/60 hover:border-primary/40 hover:shadow-md transition-all">
+              <Card className="relative overflow-hidden p-6 rounded-2xl border-border/60 hover:border-primary/40 hover:shadow-md transition-all">
                 <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                   <it.icon className="h-5 w-5" />
                 </div>
                 <div className="mt-4 font-semibold">{it.label}</div>
                 <div className="text-sm text-muted-foreground mt-1">{it.desc}</div>
+                <div className="pointer-events-none absolute -bottom-2 -right-2 opacity-90 transition-transform group-hover:-translate-y-1 group-hover:rotate-3">
+                  <Mascot
+                    shape={(["blob","triangle","drop","squircle","star","circle","cloud"] as const)[i % 7]}
+                    tone={(["yellow","red","green","blue"] as const)[i % 4]}
+                    mood={(["happy","smile","peek","wink"] as const)[i % 4]}
+                    size={40}
+                    animate="float"
+                    delay={i * 200}
+                  />
+                </div>
               </Card>
             </Link>
           ))}
