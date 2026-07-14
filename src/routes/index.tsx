@@ -1,21 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Users, GraduationCap, ArrowRight, Compass, Sprout, LogIn, LayoutDashboard, Headphones, BookOpen, TreeDeciduous, Sparkles, Lightbulb, Heart, PencilLine } from "lucide-react";
+import {
+  ArrowRight,
+  Compass,
+  Sprout,
+  LogIn,
+  LayoutDashboard,
+  Headphones,
+  BookOpen,
+  TreeDeciduous,
+  Sparkles,
+  Lightbulb,
+  PencilLine,
+} from "lucide-react";
 import { useAuthUser } from "@/lib/hub-auth";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Family & Student Onboarding" },
+      { title: "Left2Right Education Hub — Apply, Sign In, or Explore" },
       {
         name: "description",
         content:
-          "Two-track onboarding for families and students: capture ecosystem profiles and learning profiles step by step.",
+          "One account for the whole L2R journey. Apply through the Discovery & Admission Journey, sign in, or explore the Growth Hub without an account.",
       },
-      { property: "og:title", content: "Family & Student Onboarding" },
+      { property: "og:title", content: "Left2Right Education Hub" },
       {
         property: "og:description",
-        content: "Choose your journey: Parent (family ecosystem) or Student (learning profile).",
+        content: "Apply to L2R, sign in, or explore the Growth Hub library — all under one account.",
       },
     ],
   }),
@@ -52,7 +64,7 @@ function Index() {
 
       <div className="relative mx-auto max-w-6xl px-6 py-20">
         {/* Hero — logo-forward */}
-        <div className="mb-16 flex flex-col items-center text-center">
+        <div className="mb-14 flex flex-col items-center text-center">
           <div className="relative">
             <div aria-hidden className="absolute inset-0 -m-4 rounded-[2rem] rotate-[-2deg]" style={{ background: "color-mix(in oklab, var(--mustard) 28%, transparent)" }} />
             <img
@@ -71,73 +83,54 @@ function Index() {
             <span className="italic text-forest">lifelong growth</span> meet.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-            A creative studio for education — thoughtful intake journeys, a growing library of
-            articles and podcasts, and a Living Tree that grows with your family.
+            One account for everything. Apply to L2R, sign in to your dashboard, or simply
+            explore the Growth Hub — no account needed to read.
           </p>
         </div>
 
-        {/* Four feature cards — one per marker color */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <FeatureCard
+        {/* Three primary actions */}
+        <div className="grid gap-5 md:grid-cols-3">
+          <PrimaryAction
             to="/parent"
             tone="yellow"
             icon={<Lightbulb className="h-6 w-6" />}
-            eyebrow="Discover"
-            title="Begin the journey"
-            desc="Admissions & family intake — meet us, tell us your story."
+            eyebrow="Apply"
+            title="Start the Discovery Journey"
+            desc="Tell us your story. Save your answers with a free account at the very end — one account for parents and students."
+            cta="Begin the journey"
           />
-          <FeatureCard
-            to="/compass"
+          <PrimaryAction
+            to="/auth"
             tone="blue"
-            icon={<Compass className="h-6 w-6" />}
-            eyebrow="Learn"
-            title="L2R Compass"
-            desc="A living guide that turns your answers into insight."
+            icon={<LogIn className="h-6 w-6" />}
+            eyebrow="Sign in"
+            title="Return to your dashboard"
+            desc="Already have an L2R account? Sign in to pick up where you left off, review your Compass, and tend your Living Tree."
+            cta="Sign in"
           />
-          <FeatureCard
-            to="/hub"
-            tone="red"
-            icon={<Heart className="h-6 w-6" />}
-            eyebrow="Connect"
-            title="Family Hub"
-            desc="Articles, podcasts and resources for parents and kids."
-          />
-          <FeatureCard
-            to="/living-tree"
+          <PrimaryAction
+            to="/hub/featured"
             tone="green"
-            icon={<TreeDeciduous className="h-6 w-6" />}
-            eyebrow="Grow"
-            title="The Living Tree"
-            desc="Milestones, portfolios and stories that grow over time."
+            icon={<Sprout className="h-6 w-6" />}
+            eyebrow="Explore"
+            title="Open the Growth Hub"
+            desc="Browse articles, podcasts and public resources freely — no login required. Create an account later for bookmarks and personalized features."
+            cta="Explore the Hub"
           />
         </div>
 
-        {/* Journey CTAs */}
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <JourneyCTA
-            to="/parent"
-            tone="red"
-            icon={<Users className="h-5 w-5" />}
-            eyebrow="Parent journey"
-            title="Family ecosystem"
-            desc="Household basics, values, routines, and goals — captured together."
-          />
-          <JourneyCTA
-            to="/student"
-            tone="blue"
-            icon={<GraduationCap className="h-5 w-5" />}
-            eyebrow="Student journey"
-            title="Learning profile"
-            desc="Age, subjects, learning style, reflective questions."
-          />
-        </div>
-
-        {/* Secondary shortcuts */}
+        {/* Secondary shortcuts — read-only entry points into the public library */}
         <div className="mt-10 grid gap-4 sm:grid-cols-3">
           <MiniLink to="/hub/articles" tone="blue" icon={<BookOpen className="h-4 w-4" />} label="Read articles" />
           <MiniLink to="/hub/podcasts" tone="yellow" icon={<Headphones className="h-4 w-4" />} label="Listen to podcasts" />
-          <MiniLink to="/hub" tone="green" icon={<Sprout className="h-4 w-4" />} label="Explore the Growth Hub" />
+          <MiniLink to="/compass" tone="red" icon={<Compass className="h-4 w-4" />} label="About the L2R Compass" />
         </div>
+
+        {/* Notes */}
+        <p className="mt-10 text-center text-xs text-muted-foreground">
+          Instructors join by invitation only. If you received an invite, open it from your email.{" "}
+          <TreeDeciduous aria-hidden className="ml-1 inline h-3.5 w-3.5 text-forest" />
+        </p>
       </div>
     </div>
   );
@@ -152,14 +145,14 @@ const TONE: Record<Tone, { wash: string; ink: string; solid: string; solidFg: st
   yellow: { wash: "bg-mustard-soft", ink: "text-mustard-foreground", solid: "bg-mustard", solidFg: "text-mustard-foreground", ring: "ring-mustard/40", chip: "bg-mustard/25 text-mustard-foreground" },
 };
 
-function FeatureCard({
-  to, tone, icon, eyebrow, title, desc,
-}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string }) {
+function PrimaryAction({
+  to, tone, icon, eyebrow, title, desc, cta,
+}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string; cta: string }) {
   const t = TONE[tone];
   return (
     <Link
       to={to}
-      className={`group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 ${t.wash} p-6 hover-lift ring-1 ${t.ring}`}
+      className={`group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 ${t.wash} p-7 hover-lift ring-1 ${t.ring}`}
     >
       <PencilLine aria-hidden className="absolute -right-3 -top-3 h-16 w-16 rotate-12 text-foreground/[0.04]" />
       <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.solid} ${t.solidFg} shadow-sm`}>
@@ -168,33 +161,8 @@ function FeatureCard({
       <div className={`mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] ${t.ink}`}>{eyebrow}</div>
       <h3 className="mt-1 font-serif text-2xl leading-tight text-foreground">{title}</h3>
       <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
-      <div className={`mt-5 inline-flex items-center gap-1 text-sm font-medium ${t.ink}`}>
-        Enter <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-      </div>
-    </Link>
-  );
-}
-
-function JourneyCTA({
-  to, tone, icon, eyebrow, title, desc,
-}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string }) {
-  const t = TONE[tone];
-  return (
-    <Link
-      to={to}
-      className={`group relative flex items-start gap-5 overflow-hidden rounded-3xl ${t.solid} ${t.solidFg} p-7 hover-lift`}
-    >
-      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10 blur-2xl" />
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-        {icon}
-      </div>
-      <div className="relative">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] opacity-85">{eyebrow}</div>
-        <div className="mt-1 font-serif text-2xl leading-tight">{title}</div>
-        <p className="mt-1.5 text-sm opacity-90">{desc}</p>
-        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium">
-          Begin <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </div>
+      <div className={`mt-6 inline-flex items-center gap-1 text-sm font-medium ${t.ink}`}>
+        {cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
       </div>
     </Link>
   );
