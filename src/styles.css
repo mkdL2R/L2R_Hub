@@ -5,9 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Left2Right design system.
- * Warm ivory background, forest-green primary, crayon-red + sketch-blue accents,
- * soft sage growth tone, warm sand cards. Editorial serif (Fraunces) + Inter body.
+ * Left2Right — Artisanal Learning Journal.
+ * Warm terracotta paper background, off-white cards, cobalt + leaf + sun accents,
+ * stamp-red primary. Handwritten headers (Caveat) + Inter body.
  */
 
 @theme inline {
@@ -53,7 +53,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Brand tokens */
+  /* Brand tokens (kept as aliases so existing className references keep working) */
   --color-ivory: var(--ivory);
   --color-ink: var(--ink);
   --color-sand: var(--sand);
@@ -73,93 +73,92 @@
   --color-sketch-soft: var(--sketch-soft);
   --color-sage-soft: var(--sage-soft);
 
-  --font-serif: "Cormorant Garamond", "EB Garamond", "Garamond", ui-serif, Georgia, serif;
-  --font-sans: "EB Garamond", "Garamond", ui-serif, Georgia, serif;
+  /* New sketchbook tokens */
+  --color-paper: var(--paper);
+  --color-cobalt: var(--cobalt);
+  --color-stamp: var(--stamp);
+  --color-leaf: var(--leaf);
+  --color-sun: var(--sun);
+
+  --font-serif: "Caveat", "Kalam", "Bradley Hand", ui-rounded, cursive;
+  --font-hand: "Caveat", "Kalam", "Bradley Hand", ui-rounded, cursive;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 0.75rem;
 
-  /* Brand palette — the four L2R marker colors on warm ivory paper */
-  --ivory: #F9F6F0;                       /* warm ivory paper */
-  --ink: #2A2E2B;
-  --sand: #F1EBDD;                        /* soft cream card */
-  --sand-foreground: #3B3A32;
+  /* Sketchbook palette */
+  --paper: #E2BBA3;               /* warm terracotta paper — page bg */
+  --ivory: #FBF7EE;               /* off-white paper — cards */
+  --ink: #1B1B1B;                 /* charcoal ink */
+  --sand: #FBF7EE;                /* alias -> card paper */
+  --sand-foreground: #1B1B1B;
 
-  /* Green — Growth, Living Tree, Growth Hub, Dashboard */
-  --sage: #B6D4C0;
-  --sage-foreground: #1F5236;
-  --sage-soft: #DDEBE1;
-  --forest: #2E8B57;                      /* L2R green marker */
-  --forest-foreground: #FFFFFF;
+  --cobalt: #1B3E8C;              /* secondary accent */
+  --stamp: #D92121;               /* primary action */
+  --leaf: #3B7559;                /* educational tags */
+  --sun: #EAD03C;                 /* highlights */
 
-  /* Red — Family, Community, Communication */
-  --crayon: #D94B45;                      /* L2R red marker */
-  --crayon-foreground: #FFFFFF;
-  --crayon-soft: #F7D6D3;
+  /* Brand aliases so old classes (bg-forest, text-crayon, bg-sketch, bg-mustard) keep working */
+  --forest: var(--leaf);
+  --forest-foreground: #FBF7EE;
+  --sage: #C7D9CB;
+  --sage-foreground: #1F3F2C;
+  --sage-soft: #E1EBDF;
+  --crayon: var(--stamp);
+  --crayon-foreground: #FBF7EE;
+  --crayon-soft: #F3C8C2;
+  --mustard: var(--sun);
+  --mustard-foreground: #3A2F05;
+  --mustard-soft: #F7E9A3;
+  --sketch: var(--cobalt);
+  --sketch-foreground: #FBF7EE;
+  --sketch-soft: #C9D3EA;
 
-  /* Yellow — Discovery, Admissions, Curiosity */
-  --mustard: #F4C430;                     /* L2R yellow marker */
-  --mustard-foreground: #4A3A05;
-  --mustard-soft: #FBEBB5;
-
-  /* Blue — Learning, Compass, Student Journey */
-  --sketch: #2F6FD8;                      /* L2R blue marker */
-  --sketch-foreground: #FFFFFF;
-  --sketch-soft: #D6E3F8;
-
-  --background: var(--ivory);
+  --background: var(--paper);
   --foreground: var(--ink);
-  --card: #FDFBF6;
+  --card: var(--ivory);
   --card-foreground: var(--ink);
-  --popover: #FDFBF6;
+  --popover: var(--ivory);
   --popover-foreground: var(--ink);
-  --primary: var(--sketch);
-  --primary-foreground: var(--sketch-foreground);
-  --secondary: var(--sand);
-  --secondary-foreground: var(--sand-foreground);
-  --muted: #EFEADD;
-  --muted-foreground: #6B675C;
-  --accent: var(--sage);
-  --accent-foreground: var(--sage-foreground);
-  --destructive: var(--crayon);
-  --destructive-foreground: var(--crayon-foreground);
-  --border: #E4DDCB;
-  --input: #EAE3D2;
-  --ring: var(--sketch);
-  --chart-1: var(--forest);
-  --chart-2: var(--crayon);
-  --chart-3: var(--sketch);
-  --chart-4: var(--sage);
-  --chart-5: var(--mustard);
-  --sidebar: #F4EEDE;
+  --primary: var(--stamp);
+  --primary-foreground: #FBF7EE;
+  --secondary: var(--cobalt);
+  --secondary-foreground: #FBF7EE;
+  --muted: #EFD9C7;               /* soft paper for muted surfaces */
+  --muted-foreground: #5A4A3E;
+  --accent: var(--sun);
+  --accent-foreground: #3A2F05;
+  --destructive: var(--stamp);
+  --destructive-foreground: #FBF7EE;
+  --border: rgba(27, 27, 27, 0.18);
+  --input: rgba(27, 27, 27, 0.22);
+  --ring: var(--cobalt);
+  --chart-1: var(--leaf);
+  --chart-2: var(--stamp);
+  --chart-3: var(--cobalt);
+  --chart-4: var(--sun);
+  --chart-5: #8A5A44;
+  --sidebar: #EFC9A9;
   --sidebar-foreground: var(--ink);
-  --sidebar-primary: var(--sketch);
-  --sidebar-primary-foreground: var(--sketch-foreground);
-  --sidebar-accent: var(--sand);
-  --sidebar-accent-foreground: var(--sand-foreground);
-  --sidebar-border: #E4DDCB;
-  --sidebar-ring: var(--sketch);
+  --sidebar-primary: var(--stamp);
+  --sidebar-primary-foreground: #FBF7EE;
+  --sidebar-accent: var(--ivory);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: rgba(27, 27, 27, 0.16);
+  --sidebar-ring: var(--cobalt);
 }
 
 .dark {
-  --background: oklch(0.2 0.02 155);
-  --foreground: oklch(0.96 0.012 85);
-  --card: oklch(0.24 0.02 155);
-  --card-foreground: oklch(0.96 0.012 85);
-  --popover: oklch(0.24 0.02 155);
-  --popover-foreground: oklch(0.96 0.012 85);
-  --primary: oklch(0.72 0.11 155);
-  --primary-foreground: oklch(0.2 0.02 155);
-  --secondary: oklch(0.3 0.03 140);
-  --secondary-foreground: oklch(0.96 0.012 85);
-  --muted: oklch(0.28 0.02 155);
-  --muted-foreground: oklch(0.75 0.02 85);
-  --accent: oklch(0.4 0.05 145);
-  --accent-foreground: oklch(0.96 0.012 85);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.72 0.11 155);
+  /* Dark mode kept as a subtle candle-lit version of the paper */
+  --background: #241A14;
+  --foreground: #F3E7D7;
+  --card: #2E211A;
+  --card-foreground: #F3E7D7;
+  --border: rgba(243, 231, 215, 0.14);
+  --input: rgba(243, 231, 215, 0.18);
+  --ring: var(--sun);
 }
 
 @layer base {
@@ -175,33 +174,74 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    /* Paper grain — SVG turbulence overlay + warm radial washes */
     background-image:
-      radial-gradient(1200px 700px at 8% -10%, color-mix(in oklab, var(--sage) 30%, transparent) 0%, transparent 60%),
-      radial-gradient(900px 600px at 110% 5%, color-mix(in oklab, var(--sand) 65%, transparent) 0%, transparent 55%),
-      radial-gradient(700px 500px at 50% 110%, color-mix(in oklab, var(--sketch) 12%, transparent) 0%, transparent 60%);
+      radial-gradient(900px 600px at 12% -8%, color-mix(in oklab, var(--sun) 22%, transparent) 0%, transparent 60%),
+      radial-gradient(800px 500px at 108% 6%, color-mix(in oklab, var(--stamp) 12%, transparent) 0%, transparent 55%),
+      radial-gradient(700px 600px at 50% 112%, color-mix(in oklab, var(--cobalt) 12%, transparent) 0%, transparent 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0 0.06  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23p)' opacity='0.55'/></svg>");
     background-attachment: fixed;
+    background-size: auto, auto, auto, 240px 240px;
   }
 
   h1, h2, h3, h4, .font-serif {
-    font-family: var(--font-serif);
-    letter-spacing: -0.015em;
+    font-family: var(--font-hand);
+    letter-spacing: -0.005em;
+    font-weight: 600;
     font-optical-sizing: auto;
   }
 }
 
+/* ————— Sketchbook utilities ————— */
+
 @utility card-paper {
-  background: color-mix(in oklab, var(--card) 90%, var(--sand) 10%);
+  background: var(--card);
+  border: 1.5px solid color-mix(in oklab, var(--ink) 55%, transparent);
+  border-radius: 14px;
   box-shadow:
-    0 1px 0 color-mix(in oklab, var(--ink) 6%, transparent),
-    0 24px 44px -28px color-mix(in oklab, var(--primary) 30%, transparent);
-  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+    0 1px 0 color-mix(in oklab, var(--ink) 12%, transparent),
+    2px 2px 0 color-mix(in oklab, var(--ink) 8%, transparent),
+    0 22px 44px -30px color-mix(in oklab, var(--ink) 40%, transparent);
+  position: relative;
+}
+
+@utility paper-card {
+  background: var(--card);
+  border: 1.5px solid color-mix(in oklab, var(--ink) 55%, transparent);
+  border-radius: 14px;
+  box-shadow:
+    2px 2px 0 color-mix(in oklab, var(--ink) 10%, transparent),
+    0 20px 40px -28px color-mix(in oklab, var(--ink) 35%, transparent);
+  position: relative;
+}
+
+@utility ink-border {
+  border: 1.5px solid color-mix(in oklab, var(--ink) 60%, transparent);
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 color-mix(in oklab, var(--ink) 12%, transparent);
+}
+
+@utility marker-stroke {
+  background: var(--sun);
+  height: 10px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 30%, transparent);
+  transform: rotate(-0.4deg);
+}
+
+@utility handwritten {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  letter-spacing: -0.005em;
 }
 
 @utility hover-lift {
   transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 220ms ease;
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 26px 44px -22px color-mix(in oklab, var(--primary) 32%, transparent);
+    transform: translateY(-3px) rotate(-0.3deg);
+    box-shadow:
+      3px 3px 0 color-mix(in oklab, var(--ink) 14%, transparent),
+      0 24px 44px -22px color-mix(in oklab, var(--ink) 40%, transparent);
   }
 }
 
@@ -212,8 +252,21 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.06;
+    opacity: 0.08;
     mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
   }
+}
+
+@utility mascot-float {
+  animation: mascot-float 5s ease-in-out infinite;
+}
+
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-6px) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-float { animation: none; }
 }
