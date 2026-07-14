@@ -16,7 +16,6 @@ import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as IndexRouteImport } from './routes/index'
 import { Route as HubIndexRouteImport } from './routes/hub.index'
 import { Route as HubVideosRouteImport } from './routes/hub.videos'
 import { Route as HubSearchRouteImport } from './routes/hub.search'
@@ -73,11 +72,6 @@ const AuthRoute = AuthRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HubIndexRoute = HubIndexRouteImport.update({
@@ -201,7 +195,7 @@ const AuthenticatedAdminProfilesRoute =
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
@@ -233,7 +227,7 @@ export interface FileRoutesByFullPath {
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/parent': typeof ParentRoute
@@ -265,7 +259,6 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
@@ -363,7 +356,6 @@ export interface FileRouteTypes {
     | '/hub/podcasts/$slug'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
     | '/auth'
     | '/compass'
@@ -397,7 +389,6 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CompassRoute: typeof CompassRoute
@@ -456,13 +447,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hub/': {
@@ -713,7 +697,6 @@ const HubRouteChildren: HubRouteChildren = {
 const HubRouteWithChildren = HubRoute._addFileChildren(HubRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CompassRoute: CompassRoute,
