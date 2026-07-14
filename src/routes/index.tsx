@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useAuthUser } from "@/lib/hub-auth";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { MascotScene, Mascot } from "@/components/mascots/MascotScene";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,6 +44,7 @@ function Index() {
       <div aria-hidden className="pointer-events-none absolute -right-24 top-20 h-[380px] w-[380px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--mustard) 30%, transparent)" }} />
       <div aria-hidden className="pointer-events-none absolute left-1/3 bottom-0 h-[360px] w-[360px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--forest) 22%, transparent)" }} />
       <div aria-hidden className="pointer-events-none absolute right-1/4 -bottom-24 h-[320px] w-[320px] rounded-full blur-3xl" style={{ background: "color-mix(in oklab, var(--crayon) 22%, transparent)" }} />
+      <MascotScene variant="hero" />
 
       <div className="absolute right-6 top-6 z-10">
         {user ? (
@@ -98,6 +100,7 @@ function Index() {
             title="Start the Discovery Journey"
             desc="Tell us your story. Save your answers with a free account at the very end — one account for parents and students."
             cta="Begin the journey"
+            mascot={{ shape: "blob", tone: "yellow", mood: "happy" }}
           />
           <PrimaryAction
             to="/auth"
@@ -107,6 +110,7 @@ function Index() {
             title="Return to your dashboard"
             desc="Already have an L2R account? Sign in to pick up where you left off, review your Compass, and tend your Living Tree."
             cta="Sign in"
+            mascot={{ shape: "drop", tone: "blue", mood: "wink" }}
           />
           <PrimaryAction
             to="/hub/featured"
@@ -116,6 +120,7 @@ function Index() {
             title="Open the Growth Hub"
             desc="Browse articles, podcasts and public resources freely — no login required. Create an account later for bookmarks and personalized features."
             cta="Explore the Hub"
+            mascot={{ shape: "star", tone: "green", mood: "smile" }}
           />
         </div>
 
@@ -146,8 +151,8 @@ const TONE: Record<Tone, { wash: string; ink: string; solid: string; solidFg: st
 };
 
 function PrimaryAction({
-  to, tone, icon, eyebrow, title, desc, cta,
-}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string; cta: string }) {
+  to, tone, icon, eyebrow, title, desc, cta, mascot,
+}: { to: string; tone: Tone; icon: React.ReactNode; eyebrow: string; title: string; desc: string; cta: string; mascot?: { shape: "blob"|"triangle"|"star"|"drop"|"squircle"|"cloud"|"circle"; tone: "blue"|"green"|"red"|"yellow"; mood?: "happy"|"smile"|"wink"|"peek"|"sleepy" } }) {
   const t = TONE[tone];
   return (
     <Link
@@ -155,6 +160,11 @@ function PrimaryAction({
       className={`group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 ${t.wash} p-7 hover-lift ring-1 ${t.ring}`}
     >
       <PencilLine aria-hidden className="absolute -right-3 -top-3 h-16 w-16 rotate-12 text-foreground/[0.04]" />
+      {mascot ? (
+        <div className="pointer-events-none absolute -bottom-3 -right-3 transition-transform group-hover:-translate-y-1 group-hover:rotate-6">
+          <Mascot shape={mascot.shape} tone={mascot.tone} mood={mascot.mood ?? "happy"} size={64} animate="float" />
+        </div>
+      ) : null}
       <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.solid} ${t.solidFg} shadow-sm`}>
         {icon}
       </div>
