@@ -26,25 +26,29 @@ function StudentDashboard() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [{ count: savedCount }, { data: student }, { data: family }] = await Promise.all([
+      const [{ count: savedCount }, { data: family }] = await Promise.all([
         supabase
           .from("hub_saved_items")
           .select("id", { count: "exact", head: true })
           .eq("user_id", user.id),
-        supabase.from("students").select("id").eq("user_id", user.id).maybeSingle(),
         supabase.from("family_members").select("family_id").eq("user_id", user.id).maybeSingle(),
       ]);
       let compassDone = false;
+      let hasStudent = false;
       if (family?.family_id) {
-        const { data: eco } = await supabase
-          .from("ecosystem_profiles")
-          .select("daily_routine")
-          .eq("family_id", family.family_id)
-          .maybeSingle();
+        const [{ data: eco }, { data: stu }] = await Promise.all([
+          supabase
+            .from("ecosystem_profiles")
+            .select("daily_routine")
+            .eq("family_id", family.family_id)
+            .maybeSingle(),
+          supabase.from("students").select("id").eq("family_id", family.family_id).limit(1).maybeSingle(),
+        ]);
         compassDone = !!(eco?.daily_routine && typeof eco.daily_routine === "object" && "compass" in (eco.daily_routine as object));
+        hasStudent = !!stu;
       }
       setRibbons([
-        { key: "journey", label: "First Reflection", desc: "Started the student journey", earned: !!student, color: "text-mustard-foreground bg-mustard/30" },
+        { key: "journey", label: "First Reflection", desc: "Started the student journey", earned: hasStudent, color: "text-mustard-foreground bg-mustard/30" },
         { key: "compass", label: "Compass Unlocked", desc: "Your Compass has been generated", earned: compassDone, color: "text-sketch bg-sketch/15" },
         { key: "reader", label: "Curious Reader", desc: "Saved 3 items in the Hub", earned: (savedCount ?? 0) >= 3, color: "text-crayon bg-crayon/15" },
         { key: "explorer", label: "Map Explorer", desc: "Opened the Hub map view", earned: typeof window !== "undefined" && !!localStorage.getItem("l2r:hub-map-seen"), color: "text-forest bg-forest/15" },
