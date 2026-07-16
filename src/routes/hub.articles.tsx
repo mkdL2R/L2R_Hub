@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Clock, Search, Share2 } from "lucide-react";
+import { Bookmark, Clock, Search, Share2, LayoutGrid, Map as MapIcon, Route as RouteIcon } from "lucide-react";
 import { ARTICLE_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
 import { fmtDate, listPublishedArticles, categoryTone, type Article } from "@/lib/hub-content";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +18,13 @@ function ArticlesTab() {
   const [cat, setCat] = useState<string>("All");
   const { user } = useAuthUser();
   const [saved, setSaved] = useState<Set<string>>(new Set());
+  const [view, setView] = useState<"shelf" | "map" | "paths">("shelf");
+
+  useEffect(() => {
+    if (view === "map" && typeof window !== "undefined") {
+      localStorage.setItem("l2r:hub-map-seen", "1");
+    }
+  }, [view]);
 
   useEffect(() => {
     listPublishedArticles().then((a) => {
@@ -84,12 +91,14 @@ function ArticlesTab() {
           <Bookmark className="h-3 w-3" /> Articles
         </div>
         <h1 className="text-4xl font-serif font-medium tracking-tight">A reading room, growing.</h1>
+        <div className="margin-note">flip the shelf into a map or a path — same books, new lens</div>
         <p className="max-w-2xl text-muted-foreground">
           Reflections, research and practical guidance — organized by the themes that matter most to family life.
         </p>
       </header>
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="relative md:w-80">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -112,12 +121,34 @@ function ArticlesTab() {
             </button>
           ))}
         </div>
+        </div>
+        <div className="inline-flex items-center gap-1 rounded-full border border-border bg-card/60 p-1 backdrop-blur">
+          {[
+            { k: "shelf", label: "Shelf", icon: LayoutGrid },
+            { k: "map", label: "Map", icon: MapIcon },
+            { k: "paths", label: "Paths", icon: RouteIcon },
+          ].map((v) => (
+            <button
+              key={v.k}
+              onClick={() => setView(v.k as typeof view)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                view === v.k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <v.icon className="h-3.5 w-3.5" /> {v.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {loading ? (
         <p className="text-muted-foreground">Loading…</p>
       ) : filtered.length === 0 ? (
         <Card className="rounded-3xl border-dashed p-12 text-center text-muted-foreground">No articles match.</Card>
+      ) : view === "map" ? (
+        <MapView articles={filtered} />
+      ) : view === "paths" ? (
+        <PathsView articles={filtered} />
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((a) => (
@@ -153,6 +184,101 @@ function ArticlesTab() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function groupByCategory(articles: Article[]): Array<{ category: string; items: Article[] }> {
+  const map = new Map<string, Article[]>();
+  for (const a of articles) {
+    const arr = map.get(a.category) ?? [];
+    arr.push(a);
+    map.set(a.category, arr);
+  }
+  return Array.from(map.entries()).map(([category, items]) => ({ category, items }));
+}
+
+function MapView({ articles }: { articles: Article[] }) {
+  const groups = groupByCategory(articles);
+  return (
+    <div className="relative">
+      <div className="margin-note absolute -top-6 right-2">clusters of curiosity</div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {groups.map((g) => (
+          <div key={g.category} className="card-paper p-5">
+            <div className="flex items-center justify-between">
+              <Badge variant="outline" className={`rounded-full ${categoryTone(g.category)}`}>{g.category}</Badge>
+              <span className="text-xs text-muted-foreground">{g.items.length} article{g.items.length === 1 ? "" : "s"}</span>
+            </div>
+            <div className="relative mt-4 min-h-[180px]">
+              {g.items.slice(0, 6).map((a, i) => {
+                const cols = 3;
+                const row = Math.floor(i / cols);
+                const col = i % cols;
+                const left = `${10 + col * 32 + (row % 2 ? 8 : 0)}%`;
+                const top = `${row * 60}px`;
+                return (
+                  <Link
+                    key={a.id}
+                    to="/hub/articles/$slug"
+                    params={{ slug: a.slug }}
+                    className="group absolute h-12 w-12 -translate-x-1/2 rounded-full border border-border bg-card/80 shadow-sm backdrop-blur transition-transform hover:scale-110"
+                    style={{ left, top }}
+                    title={a.title}
+                  >
+                    <span className="sr-only">{a.title}</span>
+                    <span className="absolute left-1/2 top-14 w-40 -translate-x-1/2 text-center text-[10px] leading-tight text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+                      {a.title}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PathsView({ articles }: { articles: Article[] }) {
+  const groups = groupByCategory(articles);
+  return (
+    <div className="space-y-8">
+      <div className="margin-note">follow a path, one step at a time</div>
+      {groups.map((g) => (
+        <div key={g.category} className="card-paper p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <Badge variant="outline" className={`rounded-full ${categoryTone(g.category)}`}>{g.category}</Badge>
+              <h3 className="mt-2 font-serif text-xl">A path through {g.category.toLowerCase()}</h3>
+            </div>
+            <span className="text-xs text-muted-foreground">{g.items.length} step{g.items.length === 1 ? "" : "s"}</span>
+          </div>
+          <ol className="mt-5 space-y-3">
+            {g.items.map((a, i) => (
+              <li key={a.id}>
+                <Link
+                  to="/hub/articles/$slug"
+                  params={{ slug: a.slug }}
+                  className="flex items-center gap-4 rounded-2xl border border-border/60 bg-card/70 p-4 backdrop-blur hover-lift"
+                >
+                  <div className="icon-badge h-9 w-9 text-primary font-semibold">{i + 1}</div>
+                  <div className="flex-1">
+                    <div className="font-serif text-base leading-tight">{a.title}</div>
+                    {a.excerpt && (
+                      <p className="text-xs text-muted-foreground line-clamp-1">{a.excerpt}</p>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                    <Clock className="h-3 w-3" /> {a.reading_minutes}m
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
     </div>
   );
 }

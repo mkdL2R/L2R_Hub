@@ -65,7 +65,7 @@ function HubLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-sand/40 via-background to-sage/25">
+      <div className="min-h-screen flex w-full">
         <Sidebar collapsible="icon">
           <SidebarHeader>
             <Link to="/" className="flex items-center gap-3 px-2 py-3">
@@ -147,11 +147,12 @@ function HubLayout() {
           </SidebarFooter>
         </Sidebar>
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="sticky top-0 z-10 h-14 flex items-center gap-2 border-b border-border/60 bg-background/80 backdrop-blur px-4">
+          <header className="sticky top-0 z-10 h-14 flex items-center gap-2 border-b border-border/40 bg-card/40 backdrop-blur-xl px-4">
             <SidebarTrigger />
             <div className="flex items-center gap-2 text-sm font-medium">
               <Sprout className="h-4 w-4 text-primary" />
               Family Growth Hub
+              <span className="ml-3 margin-note hidden md:inline">a shelf that grows with you</span>
             </div>
           </header>
           <main className="flex-1">

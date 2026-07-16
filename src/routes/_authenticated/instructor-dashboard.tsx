@@ -25,6 +25,7 @@ function InstructorDashboard() {
       title="Welcome"
       subtitle="Administrative tools and learning library."
       items={ITEMS}
+      variant="calm"
     />
   );
 }

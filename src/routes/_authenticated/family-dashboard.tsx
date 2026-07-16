@@ -23,6 +23,7 @@ function FamilyDashboard() {
       title="Welcome back"
       subtitle="Continue your family's journey, at your pace."
       items={ITEMS}
+      marginNote="tend the shelf, not the score"
     />
   );
 }

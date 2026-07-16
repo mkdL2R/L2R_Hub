@@ -75,6 +75,7 @@
 
   --font-serif: "Cormorant Garamond", "EB Garamond", "Garamond", ui-serif, Georgia, serif;
   --font-sans: "EB Garamond", "Garamond", ui-serif, Georgia, serif;
+  --font-hand: "Caveat", "Segoe Script", "Bradley Hand", cursive;
 }
 
 :root {
@@ -227,4 +228,35 @@
     mix-blend-mode: multiply;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
   }
+}
+
+@utility font-hand {
+  font-family: var(--font-hand);
+  letter-spacing: 0;
+}
+
+@utility icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--card) 60%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid color-mix(in oklab, #ffffff 55%, transparent);
+  box-shadow: 0 6px 18px -10px color-mix(in oklab, var(--primary) 40%, transparent);
+}
+
+@utility margin-note {
+  font-family: var(--font-hand);
+  color: color-mix(in oklab, var(--ink) 55%, transparent);
+  transform: rotate(-3deg);
+  display: inline-block;
+  line-height: 1.05;
+  font-size: 1.15rem;
+}
+
+@utility surface-calm {
+  background: color-mix(in oklab, var(--card) 96%, transparent);
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: calc(var(--radius));
 }
