@@ -10,7 +10,6 @@ import {
   TreeDeciduous,
   Sparkles,
   Lightbulb,
-  PencilLine,
 } from "lucide-react";
 import { useAuthUser } from "@/lib/hub-auth";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
@@ -154,7 +153,6 @@ function PrimaryAction({
       to={to}
       className={`group relative flex flex-col overflow-hidden rounded-3xl border border-border/70 ${t.wash} p-7 hover-lift ring-1 ${t.ring}`}
     >
-      <PencilLine aria-hidden className="absolute -right-3 -top-3 h-16 w-16 rotate-12 text-foreground/[0.04]" />
       <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${t.solid} ${t.solidFg} shadow-sm`}>
         {icon}
       </div>
