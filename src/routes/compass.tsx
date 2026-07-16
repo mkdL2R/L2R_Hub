@@ -484,8 +484,8 @@ function CompassPage() {
   }, [insights, ecosystem, communication, goals, strengths, growth, pathway, familyId, saved]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card/50 backdrop-blur">
+    <div className="min-h-screen">
+      <header className="border-b border-border/40 bg-card/40 backdrop-blur-xl">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <Link to="/" className="flex items-center gap-3 text-sm font-semibold tracking-tight">
             <img
@@ -503,12 +503,13 @@ function CompassPage() {
 
       <main className="mx-auto max-w-4xl px-6 py-12">
         <div className="mb-10 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <div className="icon-badge mx-auto mb-4 h-14 w-14 text-primary">
             <Compass className="h-7 w-7" />
           </div>
           <h1 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
             Your L2R Compass
           </h1>
+          <div className="mt-3 margin-note">a living guide — not a grade</div>
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
             A reflection of your family's ecosystem, designed to guide growth rather than measure
             performance.
