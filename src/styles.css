@@ -78,7 +78,7 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 1.25rem;
 
   /* Brand palette — the four L2R marker colors on warm ivory paper */
   --ivory: #F9F6F0;                       /* warm ivory paper */
@@ -176,9 +176,11 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(1200px 700px at 8% -10%, color-mix(in oklab, var(--sage) 30%, transparent) 0%, transparent 60%),
-      radial-gradient(900px 600px at 110% 5%, color-mix(in oklab, var(--sand) 65%, transparent) 0%, transparent 55%),
-      radial-gradient(700px 500px at 50% 110%, color-mix(in oklab, var(--sketch) 12%, transparent) 0%, transparent 60%);
+      radial-gradient(900px 620px at 6% -8%, color-mix(in oklab, var(--sketch) 32%, transparent) 0%, transparent 60%),
+      radial-gradient(760px 560px at 96% 4%, color-mix(in oklab, var(--crayon) 26%, transparent) 0%, transparent 60%),
+      radial-gradient(820px 620px at 88% 96%, color-mix(in oklab, var(--mustard) 32%, transparent) 0%, transparent 60%),
+      radial-gradient(900px 640px at 8% 104%, color-mix(in oklab, var(--forest) 28%, transparent) 0%, transparent 60%),
+      radial-gradient(700px 500px at 50% 46%, color-mix(in oklab, var(--sage) 22%, transparent) 0%, transparent 65%);
     background-attachment: fixed;
   }
 
@@ -190,11 +192,20 @@
 }
 
 @utility card-paper {
-  background: color-mix(in oklab, var(--card) 90%, var(--sand) 10%);
+  background: color-mix(in oklab, var(--card) 55%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  border-radius: calc(var(--radius) + 6px);
   box-shadow:
     0 1px 0 color-mix(in oklab, var(--ink) 6%, transparent),
-    0 24px 44px -28px color-mix(in oklab, var(--primary) 30%, transparent);
-  border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);
+    0 26px 48px -28px color-mix(in oklab, var(--primary) 32%, transparent);
+  border: 1px solid color-mix(in oklab, #ffffff 55%, transparent);
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--card) 45%, transparent);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid color-mix(in oklab, #ffffff 45%, transparent);
+  border-radius: calc(var(--radius) + 8px);
 }
 
 @utility hover-lift {
