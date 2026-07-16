@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/lib/hub-auth";
 import { Card } from "@/components/ui/card";
@@ -14,11 +14,19 @@ export function DashboardShell({
   title,
   subtitle,
   items,
+  variant = "journal",
+  marginNote,
+  footer,
 }: {
   roleLabel: string;
   title: string;
   subtitle: string;
   items: NavItem[];
+  /** "journal" = warm, frosted, hand-annotated (families & students).
+   *  "calm"    = flat, opaque, dashboard-legible (instructors & admins). */
+  variant?: "journal" | "calm";
+  marginNote?: string;
+  footer?: ReactNode;
 }) {
   const { user } = useAuthUser();
   const [name, setName] = useState<string | null>(null);
@@ -42,9 +50,17 @@ export function DashboardShell({
     window.location.href = "/auth";
   }
 
+  const isCalm = variant === "calm";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sand/40 via-background to-sage/25">
-      <header className="border-b border-border/60 bg-background/70 backdrop-blur sticky top-0 z-10">
+    <div className={`min-h-screen ${isCalm ? "bg-ivory" : ""}`}>
+      <header
+        className={
+          isCalm
+            ? "border-b border-border bg-card sticky top-0 z-10"
+            : "border-b border-border/40 bg-card/40 backdrop-blur-xl sticky top-0 z-10"
+        }
+      >
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
             <img src={logoAsset.url} alt="L2R" className="h-9 w-9 rounded-xl object-cover" />
@@ -67,23 +83,37 @@ export function DashboardShell({
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-6 py-12">
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className={`${isCalm ? "text-3xl font-semibold" : "font-serif text-4xl"} tracking-tight`}>
           {title}{name ? `, ${name}` : ""}.
         </h1>
+        {!isCalm && marginNote ? (
+          <div className="mt-2 margin-note">{marginNote}</div>
+        ) : null}
         <p className="mt-2 text-muted-foreground">{subtitle}</p>
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((it) => (
             <Link key={it.to} to={it.to} className="group">
-              <Card className="p-6 rounded-2xl border-border/60 hover:border-primary/40 hover:shadow-md transition-all">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                  <it.icon className="h-5 w-5" />
+              {isCalm ? (
+                <Card className="p-6 rounded-lg border-border hover:border-primary/40 hover:shadow-sm transition-all">
+                  <div className="h-10 w-10 rounded-md bg-primary/10 text-primary flex items-center justify-center">
+                    <it.icon className="h-5 w-5" />
+                  </div>
+                  <div className="mt-4 font-semibold">{it.label}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{it.desc}</div>
+                </Card>
+              ) : (
+                <div className="card-paper hover-lift p-6">
+                  <div className="icon-badge h-11 w-11 text-primary">
+                    <it.icon className="h-5 w-5" />
+                  </div>
+                  <div className="mt-4 font-serif text-lg">{it.label}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{it.desc}</div>
                 </div>
-                <div className="mt-4 font-semibold">{it.label}</div>
-                <div className="text-sm text-muted-foreground mt-1">{it.desc}</div>
-              </Card>
+              )}
             </Link>
           ))}
         </div>
+        {footer ? <div className="mt-12">{footer}</div> : null}
       </main>
     </div>
   );
