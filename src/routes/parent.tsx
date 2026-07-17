@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2 } from "lucide-react";
+import { useAdmissionsProgress } from "@/lib/admissions";
 
 export const Route = createFileRoute("/parent")({
   head: () => ({
