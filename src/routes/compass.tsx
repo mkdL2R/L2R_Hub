@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { onboardingStore } from "@/lib/onboarding-storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -361,6 +360,8 @@ function derivePathway(
 function CompassPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [nextStepTo, setNextStepTo] = useState<string>("/parent");
+  const [nextStepLabel, setNextStepLabel] = useState<string>("Start the Parent Journey");
   const [studentName, setStudentName] = useState<string>("");
   const [responses, setResponses] = useState<AnswerRow[]>([]);
   const [parentResponses, setParentResponses] = useState<AnswerRow[]>([]);
@@ -368,38 +369,89 @@ function CompassPage() {
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    const sid = onboardingStore.get("student");
-    const fid = onboardingStore.get("family");
-    setFamilyId(fid);
-    if (!sid) {
-      setError("Complete the student journey first to view your Compass.");
-      setLoading(false);
-      return;
-    }
+    let cancelled = false;
     (async () => {
       try {
-        const [{ data: stu }, { data: resp }, { data: presp }] = await Promise.all([
-          supabase.from("students").select("full_name").eq("id", sid).maybeSingle(),
+        // 1. Authenticated user
+        const { data: userRes, error: userErr } = await supabase.auth.getUser();
+        if (userErr) throw userErr;
+        const user = userRes.user;
+        if (!user) {
+          if (cancelled) return;
+          setNextStepTo("/auth");
+          setNextStepLabel("Sign in to view your Compass");
+          setError("Sign in to view your Family Compass.");
+          setLoading(false);
+          return;
+        }
+
+        // 2/3. Family membership (source of truth is family_members;
+        // profiles carries no family_id column in this schema).
+        const { data: member } = await supabase
+          .from("family_members")
+          .select("family_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        const fid: string | null = member?.family_id ?? null;
+
+        if (!fid) {
+          if (cancelled) return;
+          setNextStepTo("/parent");
+          setNextStepLabel("Start the Parent Journey");
+          setError(
+            "Your admissions journey hasn't started yet. Complete the Parent Journey to begin building your Compass.",
+          );
+          setLoading(false);
+          return;
+        }
+        if (!cancelled) setFamilyId(fid);
+
+        // 4. Most recent student for this family
+        const { data: students } = await supabase
+          .from("students")
+          .select("id, full_name, created_at")
+          .eq("family_id", fid)
+          .order("created_at", { ascending: false })
+          .limit(1);
+        const student = students?.[0] ?? null;
+
+        if (!student) {
+          if (cancelled) return;
+          setNextStepTo("/student");
+          setNextStepLabel("Continue to the Student Journey");
+          setError(
+            "Add a student profile through the Student Journey to unlock your Family Compass.",
+          );
+          setLoading(false);
+          return;
+        }
+
+        // 5. Parent + student responses (ecosystem_profiles is upserted below in a separate effect)
+        const [{ data: sResp }, { data: pResp }] = await Promise.all([
           supabase
             .from("student_responses")
             .select("question_key,step_key,answer")
-            .eq("student_id", sid),
-          fid
-            ? supabase
-                .from("parent_responses")
-                .select("question_key,step_key,answer")
-                .eq("family_id", fid)
-            : Promise.resolve({ data: [] as AnswerRow[] }),
+            .eq("student_id", student.id),
+          supabase
+            .from("parent_responses")
+            .select("question_key,step_key,answer")
+            .eq("family_id", fid),
         ]);
-        setStudentName(stu?.full_name ?? "");
-        setResponses((resp ?? []) as AnswerRow[]);
-        setParentResponses((presp ?? []) as AnswerRow[]);
+
+        if (cancelled) return;
+        setStudentName(student.full_name ?? "");
+        setResponses((sResp ?? []) as AnswerRow[]);
+        setParentResponses((pResp ?? []) as AnswerRow[]);
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not load your Compass");
+        if (!cancelled)
+          setError(e instanceof Error ? e.message : "Could not load your Compass");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const insights = useMemo(
@@ -529,10 +581,10 @@ function CompassPage() {
               <AlertCircle className="h-8 w-8 text-muted-foreground" />
               <p className="text-muted-foreground">{error}</p>
               <Link
-                to="/student"
+                to={nextStepTo as string}
                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                Start student journey
+                {nextStepLabel}
               </Link>
             </CardContent>
           </Card>
