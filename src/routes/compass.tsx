@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingStore } from "@/lib/onboarding-storage";
@@ -15,8 +15,11 @@ import {
   Lightbulb,
   Sparkles,
   Navigation,
+  ArrowRight,
 } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { useAdmissionsProgress, markCompassSeen } from "@/lib/admissions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/compass")({
   head: () => ({
