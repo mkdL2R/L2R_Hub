@@ -37,6 +37,7 @@ import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
 import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_authenticated/family-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_authenticated/alignment-meeting'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
@@ -183,6 +184,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAlignmentMeetingRoute =
+  AuthenticatedAlignmentMeetingRouteImport.update({
+    id: '/alignment-meeting',
+    path: '/alignment-meeting',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const HubPodcastsSlugRoute = HubPodcastsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -208,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
@@ -239,6 +247,7 @@ export interface FileRoutesByTo {
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
@@ -273,6 +282,7 @@ export interface FileRoutesById {
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/_authenticated/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/alignment-meeting'
     | '/dashboard'
     | '/family-dashboard'
     | '/instructor-dashboard'
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/alignment-meeting'
     | '/dashboard'
     | '/family-dashboard'
     | '/instructor-dashboard'
@@ -371,6 +383,7 @@ export interface FileRouteTypes {
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/_authenticated/alignment-meeting'
     | '/_authenticated/dashboard'
     | '/_authenticated/family-dashboard'
     | '/_authenticated/instructor-dashboard'
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/alignment-meeting': {
+      id: '/_authenticated/alignment-meeting'
+      path: '/alignment-meeting'
+      fullPath: '/alignment-meeting'
+      preLoaderRoute: typeof AuthenticatedAlignmentMeetingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/hub/podcasts/$slug': {
       id: '/hub/podcasts/$slug'
       path: '/$slug'
@@ -630,6 +650,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlignmentMeetingRoute: typeof AuthenticatedAlignmentMeetingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFamilyDashboardRoute: typeof AuthenticatedFamilyDashboardRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
@@ -643,6 +664,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlignmentMeetingRoute: AuthenticatedAlignmentMeetingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFamilyDashboardRoute: AuthenticatedFamilyDashboardRoute,
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,

@@ -186,7 +186,7 @@ function AlignmentMeetingPage() {
     const instr = instructors.find((i) => i.user_id === m.instructor_id);
     return (
       <div className="min-h-screen mx-auto max-w-2xl px-6 py-12">
-        <Link to="/family-dashboard" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link to={"/family-dashboard" as string} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back to dashboard
         </Link>
         <Card className="card-paper mt-6 p-10 rounded-3xl text-center">
