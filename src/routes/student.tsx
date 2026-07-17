@@ -159,7 +159,7 @@ function StudentJourney() {
           <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">Thanks for sharing</h1>
           <p className="mt-3 text-muted-foreground">
-            Your learning profile is saved. We'll use it to personalize your experience.
+            Your learning profile is saved. Taking you to your Family Compass…
           </p>
           <div className="mt-8 flex justify-center gap-3">
             <button
