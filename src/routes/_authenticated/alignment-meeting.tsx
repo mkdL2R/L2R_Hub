@@ -94,6 +94,13 @@ function AlignmentMeetingPage() {
   const [error, setError] = useState<string | null>(null);
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
 
+  // After a fresh booking, auto-continue to Family Commitment.
+  useEffect(() => {
+    if (!confirmedId) return;
+    const t = setTimeout(() => navigate({ to: "/family-commitment" }), 2200);
+    return () => clearTimeout(t);
+  }, [confirmedId, navigate]);
+
   useEffect(() => {
     if (!user) return;
     (async () => {
