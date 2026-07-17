@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { clearDraft, loadDraft, saveDraft } from "@/lib/onboarding-storage";
@@ -127,6 +127,7 @@ function ParentJourney() {
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const progress = useAdmissionsProgress();
+  const submitAttemptedRef = useRef(false);
 
   // Short-circuit: if the Parent Journey is already saved for this family,
   // don't reopen the wizard — offer the next admissions steps instead.
@@ -216,6 +217,8 @@ function ParentJourney() {
   }, []);
 
   const submitAll = useCallback(async () => {
+    if (submitAttemptedRef.current) return;
+    submitAttemptedRef.current = true;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -224,12 +227,21 @@ function ParentJourney() {
         "submit_parent_journey" as never,
         { _payload: payload } as never,
       );
-      if (error) throw error;
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("[submit_parent_journey] postgres error", error);
+        throw new Error(
+          `${error.message}${error.code ? ` (code ${error.code})` : ""}${error.details ? ` — ${error.details}` : ""}${error.hint ? ` — hint: ${error.hint}` : ""}`,
+        );
+      }
       clearDraft("parentDraft");
       toast.success("Your answers are saved");
       setDone(true);
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : "Could not save. Please try again.");
+      const msg = e instanceof Error ? e.message : "Could not save. Please try again.";
+      setSubmitError(msg);
+      toast.error(msg);
+      // Do NOT auto-retry. User can click "Try again" to reset.
     } finally {
       setSubmitting(false);
     }
@@ -238,10 +250,14 @@ function ParentJourney() {
   // If already signed in when landing on the completion step, submit automatically.
   useEffect(() => {
     if (step !== TOTAL_STEPS) return;
+    if (submitAttemptedRef.current) return;
     supabase.auth.getUser().then(({ data: u }) => {
-      if (u.user && !submitting && !done) void submitAll();
+      if (u.user && !submitAttemptedRef.current) void submitAll();
     });
-  }, [step, submitAll, submitting, done]);
+    // Intentionally only depend on `step`: we must fire at most once when
+    // the user first reaches the completion step.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   function handleNext() {
     if (!canProceed) return;
