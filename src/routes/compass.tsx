@@ -590,10 +590,10 @@ function CompassPage() {
               <AlertCircle className="h-8 w-8 text-muted-foreground" />
               <p className="text-muted-foreground">{error}</p>
               <Link
-                to="/student"
+                to={nextStepTo as string}
                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                Start student journey
+                {nextStepLabel}
               </Link>
             </CardContent>
           </Card>
