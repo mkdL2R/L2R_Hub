@@ -147,6 +147,13 @@ function StudentJourney() {
     });
   }, [step, submitAll, submitting, done]);
 
+  // Auto-continue to Compass once saved.
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => navigate({ to: "/compass" }), 1500);
+    return () => clearTimeout(t);
+  }, [done, navigate]);
+
   function handleNext() {
     if (!canProceed) return;
     setStep((s) => s + 1);
