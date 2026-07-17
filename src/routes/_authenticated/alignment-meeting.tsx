@@ -214,7 +214,12 @@ function AlignmentMeetingPage() {
             details soon.
           </p>
           <div className="mt-8">
-            <Button asChild><Link to="/family-dashboard">Return to dashboard</Link></Button>
+            <Button asChild>
+              <Link to="/family-commitment">Continue to Family Commitment</Link>
+            </Button>
+            <Button asChild variant="ghost" className="ml-2">
+              <Link to="/family-dashboard">Return to dashboard</Link>
+            </Button>
           </div>
         </Card>
       </div>
