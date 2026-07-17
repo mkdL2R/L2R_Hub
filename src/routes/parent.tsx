@@ -282,12 +282,26 @@ function ParentJourney() {
           </p>
           {submitting ? (
             <p className="mt-8 text-sm text-muted-foreground">Saving your answers…</p>
+          ) : submitError ? (
+            <div className="mt-8 space-y-4">
+              <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-left text-sm text-destructive">
+                <p className="font-medium">We couldn't save your answers.</p>
+                <p className="mt-1 whitespace-pre-wrap break-words font-mono text-xs">{submitError}</p>
+              </div>
+              <button
+                onClick={() => {
+                  submitAttemptedRef.current = false;
+                  setSubmitError(null);
+                  void submitAll();
+                }}
+                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Try again
+              </button>
+            </div>
           ) : (
             <div className="mt-8">
               <AccountGate onAuthenticated={submitAll} />
-              {submitError ? (
-                <p className="mt-4 text-sm text-destructive">{submitError}</p>
-              ) : null}
               <button
                 onClick={() => setStep(TOTAL_STEPS - 1)}
                 className="mt-4 text-sm text-muted-foreground underline underline-offset-2"
