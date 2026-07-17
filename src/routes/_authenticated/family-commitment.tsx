@@ -99,7 +99,8 @@ function FamilyCommitmentPage() {
     });
     setSubmitting(false);
     if (error) {
-      setError(error.message);
+      const { friendlyAdmissionsError } = await import("@/lib/admissions");
+      setError(friendlyAdmissionsError(error.message));
       return;
     }
     setCelebrate(true);
