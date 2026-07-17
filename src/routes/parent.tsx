@@ -18,6 +18,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckCircle2 } from "lucide-react";
 import { useAdmissionsProgress } from "@/lib/admissions";
+import { AlreadyCompleted } from "@/components/admissions/AlreadyCompleted";
 
 export const Route = createFileRoute("/parent")({
   head: () => ({
@@ -125,6 +126,32 @@ function ParentJourney() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const progress = useAdmissionsProgress();
+
+  // Short-circuit: if the Parent Journey is already saved for this family,
+  // don't reopen the wizard — offer the next admissions steps instead.
+  if (
+    !progress.loading &&
+    progress.hasFamily &&
+    progress.completed.parent &&
+    !done
+  ) {
+    const actions = [
+      progress.completed.student
+        ? { to: "/compass", label: "Continue to Family Compass" }
+        : { to: "/student", label: "Continue to Student Journey" },
+      progress.completed.student
+        ? { to: "/family-dashboard", label: "Back to Dashboard" }
+        : { to: "/compass", label: "Preview the Family Compass" },
+    ];
+    return (
+      <AlreadyCompleted
+        title="You've already completed the Parent Journey."
+        description="Your answers are saved. Pick up where you left off."
+        actions={actions}
+      />
+    );
+  }
 
   // Persist draft on every change
   useEffect(() => { saveDraft("parentDraft", data); }, [data]);
