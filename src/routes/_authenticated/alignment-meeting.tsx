@@ -159,7 +159,7 @@ function AlignmentMeetingPage() {
       _instructor_id: instructorId,
       _scheduled_at: slot.toISOString(),
       _duration_minutes: 30,
-      _notes: notes || null,
+      _notes: notes || undefined,
     });
     setSaving(false);
     if (rpcErr) {
