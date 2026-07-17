@@ -11,8 +11,17 @@ import { format } from "date-fns";
 
 export const Route = createFileRoute("/_authenticated/family-commitment")({
   head: () => ({ meta: [{ title: "Family Commitment — L2R" }] }),
-  component: FamilyCommitmentPage,
+  component: GatedFamilyCommitmentPage,
 });
+
+import { AdmissionsGate } from "@/components/admissions/AdmissionsGate";
+function GatedFamilyCommitmentPage() {
+  return (
+    <AdmissionsGate require="alignment">
+      <FamilyCommitmentPage />
+    </AdmissionsGate>
+  );
+}
 
 const AGREEMENT_VERSION = "2026.01";
 const AGREEMENT_TEXT = `Left2Right (L2R) Family Commitment Agreement
@@ -90,7 +99,8 @@ function FamilyCommitmentPage() {
     });
     setSubmitting(false);
     if (error) {
-      setError(error.message);
+      const { friendlyAdmissionsError } = await import("@/lib/admissions");
+      setError(friendlyAdmissionsError(error.message));
       return;
     }
     setCelebrate(true);

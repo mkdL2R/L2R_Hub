@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/lib/hub-auth";
@@ -20,8 +20,17 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/alignment-meeting")({
   head: () => ({ meta: [{ title: "Alignment Meeting — L2R" }] }),
-  component: AlignmentMeetingPage,
+  component: GatedAlignmentMeetingPage,
 });
+
+import { AdmissionsGate } from "@/components/admissions/AdmissionsGate";
+function GatedAlignmentMeetingPage() {
+  return (
+    <AdmissionsGate require="compass">
+      <AlignmentMeetingPage />
+    </AdmissionsGate>
+  );
+}
 
 type Instructor = {
   user_id: string;
@@ -69,6 +78,7 @@ function generateSlots(date: Date, avails: Omit<Availability, "instructor_id">[]
 
 function AlignmentMeetingPage() {
   const { user } = useAuthUser();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [availability, setAvailability] = useState<Availability[]>([]);
@@ -83,6 +93,13 @@ function AlignmentMeetingPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmedId, setConfirmedId] = useState<string | null>(null);
+
+  // After a fresh booking, auto-continue to Family Commitment.
+  useEffect(() => {
+    if (!confirmedId) return;
+    const t = setTimeout(() => navigate({ to: "/family-commitment" }), 2200);
+    return () => clearTimeout(t);
+  }, [confirmedId, navigate]);
 
   useEffect(() => {
     if (!user) return;
@@ -205,7 +222,12 @@ function AlignmentMeetingPage() {
             details soon.
           </p>
           <div className="mt-8">
-            <Button asChild><Link to="/family-dashboard">Return to dashboard</Link></Button>
+            <Button asChild>
+              <Link to="/family-commitment">Continue to Family Commitment</Link>
+            </Button>
+            <Button asChild variant="ghost" className="ml-2">
+              <Link to="/family-dashboard">Return to dashboard</Link>
+            </Button>
           </div>
         </Card>
       </div>

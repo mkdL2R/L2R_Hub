@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { onboardingStore } from "@/lib/onboarding-storage";
@@ -15,8 +15,11 @@ import {
   Lightbulb,
   Sparkles,
   Navigation,
+  ArrowRight,
 } from "lucide-react";
 import logoAsset from "@/assets/l2r-logo.jpg.asset.json";
+import { useAdmissionsProgress, markCompassSeen } from "@/lib/admissions";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/compass")({
   head: () => ({
@@ -721,9 +724,38 @@ function CompassPage() {
                 Structure without rigidity · Autonomy without isolation · Education as a lifelong journey
               </p>
             </div>
+            <CompassContinueCTA />
           </div>
         ) : null}
       </main>
+    </div>
+  );
+}
+
+function CompassContinueCTA() {
+  const { hasFamily, familyId, completed } = useAdmissionsProgress();
+  const navigate = useNavigate();
+  if (!hasFamily) return null;
+  if (completed.commitment) return null;
+  const label = completed.alignment
+    ? "Continue to Family Commitment"
+    : "Continue to Alignment Meeting";
+  const to = completed.alignment ? "/family-commitment" : "/alignment-meeting";
+  return (
+    <div className="mt-6 rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
+      <p className="text-sm text-muted-foreground">
+        Ready for the next step in your admissions journey?
+      </p>
+      <Button
+        size="lg"
+        className="mt-4"
+        onClick={() => {
+          markCompassSeen(familyId);
+          navigate({ to });
+        }}
+      >
+        {label} <ArrowRight className="ml-2 h-4 w-4" />
+      </Button>
     </div>
   );
 }
