@@ -181,6 +181,63 @@ export type Database = {
         }
         Relationships: []
       }
+      family_commitments: {
+        Row: {
+          agreement_text: string
+          agreement_version: string
+          created_at: string
+          family_id: string
+          id: string
+          signature_name: string | null
+          signature_type: string
+          signed_at: string | null
+          signed_by: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agreement_text: string
+          agreement_version: string
+          created_at?: string
+          family_id: string
+          id?: string
+          signature_name?: string | null
+          signature_type?: string
+          signed_at?: string | null
+          signed_by: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agreement_text?: string
+          agreement_version?: string
+          created_at?: string
+          family_id?: string
+          id?: string
+          signature_name?: string | null
+          signature_type?: string
+          signed_at?: string | null
+          signed_by?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_commitments_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_commitments_signed_by_fkey"
+            columns: ["signed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       family_goals: {
         Row: {
           created_at: string
@@ -784,6 +841,7 @@ export type Database = {
           completed_steps: string[]
           current_step: number
           family_id: string | null
+          final_enrolled: boolean
           id: string
           journey: string
           started_at: string
@@ -797,6 +855,7 @@ export type Database = {
           completed_steps?: string[]
           current_step?: number
           family_id?: string | null
+          final_enrolled?: boolean
           id?: string
           journey: string
           started_at?: string
@@ -810,6 +869,7 @@ export type Database = {
           completed_steps?: string[]
           current_step?: number
           family_id?: string | null
+          final_enrolled?: boolean
           id?: string
           journey?: string
           started_at?: string
@@ -1137,6 +1197,14 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      sign_family_commitment: {
+        Args: {
+          _agreement_text: string
+          _agreement_version: string
+          _signature_name: string
+        }
+        Returns: string
+      }
       submit_parent_journey: { Args: { _payload: Json }; Returns: string }
       submit_student_journey: { Args: { _payload: Json }; Returns: string }
       subscribe_to_newsletter: {

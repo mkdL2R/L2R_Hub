@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Compass, Sprout, Users, BookOpen, UserCircle, TreeDeciduous, CalendarCheck } from "lucide-react";
+import { Compass, Sprout, Users, BookOpen, UserCircle, TreeDeciduous, CalendarCheck, ShieldCheck } from "lucide-react";
 import { DashboardShell, type NavItem } from "@/components/dashboard/DashboardShell";
 
 export const Route = createFileRoute("/_authenticated/family-dashboard")({
@@ -11,6 +11,7 @@ const ITEMS: NavItem[] = [
   { to: "/parent", label: "Parent Journey", icon: Users, desc: "Family ecosystem intake" },
   { to: "/compass", label: "L2R Compass", icon: Compass, desc: "Your living family guide" },
   { to: "/alignment-meeting", label: "Alignment Meeting", icon: CalendarCheck, desc: "Book a session with an instructor" },
+  { to: "/family-commitment", label: "Family Commitment", icon: ShieldCheck, desc: "Sign the L2R commitment to complete admissions" },
   { to: "/living-tree", label: "The Living Tree", icon: TreeDeciduous, desc: "Your family's lifelong journey" },
   { to: "/hub", label: "Family Growth Hub", icon: Sprout, desc: "Articles, podcasts, resources" },
   { to: "/student", label: "Add a child's profile", icon: BookOpen, desc: "Start a student journey" },

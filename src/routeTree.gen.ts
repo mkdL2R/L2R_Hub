@@ -36,6 +36,7 @@ import { Route as AuthenticatedLivingTreeRouteImport } from './routes/_authentic
 import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
 import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_authenticated/family-dashboard'
+import { Route as AuthenticatedFamilyCommitmentRouteImport } from './routes/_authenticated/family-commitment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_authenticated/alignment-meeting'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
@@ -179,6 +180,12 @@ const AuthenticatedFamilyDashboardRoute =
     path: '/family-dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFamilyCommitmentRoute =
+  AuthenticatedFamilyCommitmentRouteImport.update({
+    id: '/family-commitment',
+    path: '/family-commitment',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -217,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRoute
   '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/invite': typeof AuthenticatedInviteRoute
@@ -249,6 +257,7 @@ export interface FileRoutesByTo {
   '/student': typeof StudentRoute
   '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/invite': typeof AuthenticatedInviteRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRoute
   '/_authenticated/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/_authenticated/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
   '/_authenticated/invite': typeof AuthenticatedInviteRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/alignment-meeting'
     | '/dashboard'
+    | '/family-commitment'
     | '/family-dashboard'
     | '/instructor-dashboard'
     | '/invite'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/alignment-meeting'
     | '/dashboard'
+    | '/family-commitment'
     | '/family-dashboard'
     | '/instructor-dashboard'
     | '/invite'
@@ -385,6 +397,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/_authenticated/alignment-meeting'
     | '/_authenticated/dashboard'
+    | '/_authenticated/family-commitment'
     | '/_authenticated/family-dashboard'
     | '/_authenticated/instructor-dashboard'
     | '/_authenticated/invite'
@@ -611,6 +624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFamilyDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/family-commitment': {
+      id: '/_authenticated/family-commitment'
+      path: '/family-commitment'
+      fullPath: '/family-commitment'
+      preLoaderRoute: typeof AuthenticatedFamilyCommitmentRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -652,6 +672,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlignmentMeetingRoute: typeof AuthenticatedAlignmentMeetingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFamilyCommitmentRoute: typeof AuthenticatedFamilyCommitmentRoute
   AuthenticatedFamilyDashboardRoute: typeof AuthenticatedFamilyDashboardRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
   AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
@@ -666,6 +687,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAlignmentMeetingRoute: AuthenticatedAlignmentMeetingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFamilyCommitmentRoute: AuthenticatedFamilyCommitmentRoute,
   AuthenticatedFamilyDashboardRoute: AuthenticatedFamilyDashboardRoute,
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
   AuthenticatedInviteRoute: AuthenticatedInviteRoute,
