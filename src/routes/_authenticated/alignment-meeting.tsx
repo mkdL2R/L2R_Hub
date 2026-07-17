@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthUser } from "@/lib/hub-auth";
@@ -78,6 +78,7 @@ function generateSlots(date: Date, avails: Omit<Availability, "instructor_id">[]
 
 function AlignmentMeetingPage() {
   const { user } = useAuthUser();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [availability, setAvailability] = useState<Availability[]>([]);
