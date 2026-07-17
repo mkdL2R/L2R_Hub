@@ -17,6 +17,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CheckCircle2 } from "lucide-react";
+import { useAdmissionsProgress } from "@/lib/admissions";
+import { AlreadyCompleted } from "@/components/admissions/AlreadyCompleted";
 
 export const Route = createFileRoute("/student")({
   head: () => ({
@@ -80,6 +82,30 @@ function StudentJourney() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const progress = useAdmissionsProgress();
+
+  // If this family has already submitted the Student Journey, don't reopen
+  // the wizard — surface the next admissions steps instead.
+  if (
+    !progress.loading &&
+    progress.hasFamily &&
+    progress.completed.student &&
+    !done
+  ) {
+    const actions = [
+      { to: "/compass", label: "Continue to Family Compass" },
+      ...(progress.completed.compass
+        ? [{ to: "/alignment-meeting", label: "Continue to Alignment Meeting" }]
+        : [{ to: "/family-dashboard", label: "Back to Dashboard" }]),
+    ];
+    return (
+      <AlreadyCompleted
+        title="You've already completed the Student Journey."
+        description="Your learner's profile is saved. Here's what's next."
+        actions={actions}
+      />
+    );
+  }
 
   useEffect(() => { saveDraft("studentDraft", data); }, [data]);
 
