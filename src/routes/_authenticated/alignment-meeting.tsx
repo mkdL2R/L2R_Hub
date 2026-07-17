@@ -20,8 +20,17 @@ import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/alignment-meeting")({
   head: () => ({ meta: [{ title: "Alignment Meeting — L2R" }] }),
-  component: AlignmentMeetingPage,
+  component: GatedAlignmentMeetingPage,
 });
+
+import { AdmissionsGate } from "@/components/admissions/AdmissionsGate";
+function GatedAlignmentMeetingPage() {
+  return (
+    <AdmissionsGate require="compass">
+      <AlignmentMeetingPage />
+    </AdmissionsGate>
+  );
+}
 
 type Instructor = {
   user_id: string;
