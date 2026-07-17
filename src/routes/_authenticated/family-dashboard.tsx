@@ -69,12 +69,17 @@ function FamilyDashboard() {
     </div>
   );
 
+  // Applicants (not yet enrolled) still get access to Compass, Living Tree,
+  // Growth Hub, add-a-child, and profile. Only truly enrollment-gated
+  // features would be filtered out here — none of the current items require it.
+  const items = hasFamily ? ONGOING_ITEMS : [];
+
   return (
     <DashboardShell
       roleLabel="Family Dashboard"
       title="Welcome back"
       subtitle="Continue your family's journey, at your pace."
-      items={enrolled ? ONGOING_ITEMS : []}
+      items={items}
       marginNote="tend the shelf, not the score"
       footer={footer}
     />
