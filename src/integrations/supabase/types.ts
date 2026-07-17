@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      alignment_meetings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          duration_minutes: number
+          family_id: string
+          id: string
+          instructor_id: string
+          meeting_notes: string | null
+          scheduled_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          family_id: string
+          id?: string
+          instructor_id: string
+          meeting_notes?: string | null
+          scheduled_at: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          duration_minutes?: number
+          family_id?: string
+          id?: string
+          instructor_id?: string
+          meeting_notes?: string | null
+          scheduled_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alignment_meetings_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alignment_meetings_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructor_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       ecosystem_profiles: {
         Row: {
           challenges: string[] | null
@@ -557,6 +611,50 @@ export type Database = {
         }
         Relationships: []
       }
+      instructor_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          instructor_id: string
+          slot_minutes: number
+          start_time: string
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          instructor_id: string
+          slot_minutes?: number
+          start_time: string
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          instructor_id?: string
+          slot_minutes?: number
+          start_time?: string
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "instructor_availability_instructor_id_fkey"
+            columns: ["instructor_id"]
+            isOneToOne: false
+            referencedRelation: "instructor_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       instructor_invitations: {
         Row: {
           accepted_at: string | null
@@ -1010,6 +1108,15 @@ export type Database = {
       assign_primary_role: {
         Args: { _role: Database["public"]["Enums"]["app_role"] }
         Returns: undefined
+      }
+      book_alignment_meeting: {
+        Args: {
+          _duration_minutes?: number
+          _instructor_id: string
+          _notes?: string
+          _scheduled_at: string
+        }
+        Returns: string
       }
       claim_instructor_invitation: { Args: never; Returns: boolean }
       ensure_user_family: { Args: never; Returns: string }
