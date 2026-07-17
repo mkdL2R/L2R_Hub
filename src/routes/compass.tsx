@@ -385,23 +385,14 @@ function CompassPage() {
           return;
         }
 
-        // 2/3. Profile + family (family_members first, then profiles.family_id fallback)
-        const [memberRes, profileRes] = await Promise.all([
-          supabase
-            .from("family_members")
-            .select("family_id")
-            .eq("user_id", user.id)
-            .maybeSingle(),
-          supabase
-            .from("profiles")
-            .select("family_id")
-            .eq("user_id", user.id)
-            .maybeSingle(),
-        ]);
-        const fid: string | null =
-          memberRes.data?.family_id ??
-          (profileRes.data as { family_id?: string | null } | null)?.family_id ??
-          null;
+        // 2/3. Family membership (source of truth is family_members;
+        // profiles carries no family_id column in this schema).
+        const { data: member } = await supabase
+          .from("family_members")
+          .select("family_id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        const fid: string | null = member?.family_id ?? null;
 
         if (!fid) {
           if (cancelled) return;
