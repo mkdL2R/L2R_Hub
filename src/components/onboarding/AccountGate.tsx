@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,27 @@ export function AccountGate({ onAuthenticated, title, description }: Props) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
+  const firedRef = useRef(false);
+  const cbRef = useRef(onAuthenticated);
+  cbRef.current = onAuthenticated;
+
+  function fireOnce() {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    void cbRef.current();
+  }
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) void onAuthenticated();
+      if (data.user) fireOnce();
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
-        void onAuthenticated();
+        fireOnce();
       }
     });
     return () => sub.subscription.unsubscribe();
-  }, [onAuthenticated]);
+  }, []);
 
   async function handleGoogle() {
     setBusy(true);

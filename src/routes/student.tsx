@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { clearDraft, loadDraft, saveDraft } from "@/lib/onboarding-storage";
@@ -83,6 +83,7 @@ function StudentJourney() {
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const progress = useAdmissionsProgress();
+  const submitAttemptedRef = useRef(false);
 
   // If this family has already submitted the Student Journey, don't reopen
   // the wizard — surface the next admissions steps instead.
@@ -123,6 +124,8 @@ function StudentJourney() {
     }));
 
   const submitAll = useCallback(async () => {
+    if (submitAttemptedRef.current) return;
+    submitAttemptedRef.current = true;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -155,12 +158,20 @@ function StudentJourney() {
         "submit_student_journey" as never,
         { _payload: payload } as never,
       );
-      if (error) throw error;
+      if (error) {
+        // eslint-disable-next-line no-console
+        console.error("[submit_student_journey] postgres error", error);
+        throw new Error(
+          `${error.message}${error.code ? ` (code ${error.code})` : ""}${error.details ? ` — ${error.details}` : ""}${error.hint ? ` — hint: ${error.hint}` : ""}`,
+        );
+      }
       clearDraft("studentDraft");
       toast.success("Your answers are saved");
       setDone(true);
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : "Could not save. Please try again.");
+      const msg = e instanceof Error ? e.message : "Could not save. Please try again.";
+      setSubmitError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -168,10 +179,12 @@ function StudentJourney() {
 
   useEffect(() => {
     if (step !== TOTAL_STEPS) return;
+    if (submitAttemptedRef.current) return;
     supabase.auth.getUser().then(({ data: u }) => {
-      if (u.user && !submitting && !done) void submitAll();
+      if (u.user && !submitAttemptedRef.current) void submitAll();
     });
-  }, [step, submitAll, submitting, done]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   // Auto-continue to Compass once saved.
   useEffect(() => {
@@ -223,10 +236,26 @@ function StudentJourney() {
           </p>
           {submitting ? (
             <p className="mt-8 text-sm text-muted-foreground">Saving your answers…</p>
+          ) : submitError ? (
+            <div className="mt-8 space-y-4">
+              <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-left text-sm text-destructive">
+                <p className="font-medium">We couldn't save your answers.</p>
+                <p className="mt-1 whitespace-pre-wrap break-words font-mono text-xs">{submitError}</p>
+              </div>
+              <button
+                onClick={() => {
+                  submitAttemptedRef.current = false;
+                  setSubmitError(null);
+                  void submitAll();
+                }}
+                className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Try again
+              </button>
+            </div>
           ) : (
             <div className="mt-8">
               <AccountGate onAuthenticated={submitAll} />
-              {submitError ? <p className="mt-4 text-sm text-destructive">{submitError}</p> : null}
               <button
                 onClick={() => setStep(TOTAL_STEPS - 1)}
                 className="mt-4 text-sm text-muted-foreground underline underline-offset-2"
