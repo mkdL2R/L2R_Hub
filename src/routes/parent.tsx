@@ -226,32 +226,7 @@ function ParentJourney() {
   }
 
   if (done) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-6">
-        <div className="max-w-md text-center">
-          <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
-          <h1 className="mt-6 text-3xl font-semibold tracking-tight">All set, thank you</h1>
-          <p className="mt-3 text-muted-foreground">
-            Your family ecosystem profile is saved. You can now invite the student to complete their
-            learning profile.
-          </p>
-          <div className="mt-8 flex justify-center gap-3">
-            <button
-              onClick={() => navigate({ to: "/student" })}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Start student journey
-            </button>
-            <button
-              onClick={() => navigate({ to: "/" })}
-              className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent"
-            >
-              Home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <ParentDone />;
   }
 
   if (step === TOTAL_STEPS) {
