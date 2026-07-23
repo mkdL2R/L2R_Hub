@@ -28,6 +28,7 @@ import { Route as HubCategoriesRouteImport } from './routes/hub.categories'
 import { Route as HubBookmarksRouteImport } from './routes/hub.bookmarks'
 import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
+import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student-dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -136,6 +137,12 @@ const HubAdminRoute = HubAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => HubRoute,
 } as any)
+const AuthenticatedStudentDashboardRoute =
+  AuthenticatedStudentDashboardRouteImport.update({
+    id: '/student-dashboard',
+    path: '/student-dashboard',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -225,6 +232,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -292,6 +301,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/people'
     | '/profile'
+    | '/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/bookmarks'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/people'
     | '/profile'
+    | '/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/bookmarks'
@@ -393,6 +405,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/_authenticated/people'
     | '/_authenticated/profile'
+    | '/_authenticated/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/bookmarks'
@@ -555,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubAdminRouteImport
       parentRoute: typeof HubRoute
     }
+    '/_authenticated/student-dashboard': {
+      id: '/_authenticated/student-dashboard'
+      path: '/student-dashboard'
+      fullPath: '/student-dashboard'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -660,6 +680,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
   AuthenticatedAdminProfilesRoute: typeof AuthenticatedAdminProfilesRoute
 }
 
@@ -674,6 +695,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
   AuthenticatedAdminProfilesRoute: AuthenticatedAdminProfilesRoute,
 }
 
