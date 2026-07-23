@@ -13,6 +13,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ParentRouteImport } from './routes/parent'
 import { Route as InviteFamilyRouteImport } from './routes/invite-family'
+import { Route as InviteRouteImport } from './routes/invite'
 import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -34,7 +35,6 @@ import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedPeopleRouteImport } from './routes/_authenticated/people'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedLivingTreeRouteImport } from './routes/_authenticated/living-tree'
-import { Route as AuthenticatedInviteRouteImport } from './routes/_authenticated/invite'
 import { Route as AuthenticatedInstructorDashboardRouteImport } from './routes/_authenticated/instructor-dashboard'
 import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_authenticated/family-dashboard'
 import { Route as AuthenticatedFamilyCommitmentRouteImport } from './routes/_authenticated/family-commitment'
@@ -67,6 +67,11 @@ const ParentRoute = ParentRouteImport.update({
 const InviteFamilyRoute = InviteFamilyRouteImport.update({
   id: '/invite-family',
   path: '/invite-family',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteRoute = InviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HubRoute = HubRouteImport.update({
@@ -174,11 +179,6 @@ const AuthenticatedLivingTreeRoute = AuthenticatedLivingTreeRouteImport.update({
   path: '/living-tree',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedInviteRoute = AuthenticatedInviteRouteImport.update({
-  id: '/invite',
-  path: '/invite',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedInstructorDashboardRoute =
   AuthenticatedInstructorDashboardRouteImport.update({
     id: '/instructor-dashboard',
@@ -260,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
+  '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -269,7 +270,6 @@ export interface FileRoutesByFullPath {
   '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
-  '/invite': typeof AuthenticatedInviteRoute
   '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
@@ -299,6 +299,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
+  '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -308,7 +309,6 @@ export interface FileRoutesByTo {
   '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
-  '/invite': typeof AuthenticatedInviteRoute
   '/living-tree': typeof AuthenticatedLivingTreeRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
@@ -340,6 +340,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
+  '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -349,7 +350,6 @@ export interface FileRoutesById {
   '/_authenticated/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
   '/_authenticated/family-dashboard': typeof AuthenticatedFamilyDashboardRoute
   '/_authenticated/instructor-dashboard': typeof AuthenticatedInstructorDashboardRoute
-  '/_authenticated/invite': typeof AuthenticatedInviteRoute
   '/_authenticated/living-tree': typeof AuthenticatedLivingTreeRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRoute
@@ -382,6 +382,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compass'
     | '/hub'
+    | '/invite'
     | '/invite-family'
     | '/parent'
     | '/reset-password'
@@ -391,7 +392,6 @@ export interface FileRouteTypes {
     | '/family-commitment'
     | '/family-dashboard'
     | '/instructor-dashboard'
-    | '/invite'
     | '/living-tree'
     | '/onboarding'
     | '/people'
@@ -421,6 +421,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compass'
+    | '/invite'
     | '/invite-family'
     | '/parent'
     | '/reset-password'
@@ -430,7 +431,6 @@ export interface FileRouteTypes {
     | '/family-commitment'
     | '/family-dashboard'
     | '/instructor-dashboard'
-    | '/invite'
     | '/living-tree'
     | '/onboarding'
     | '/people'
@@ -461,6 +461,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compass'
     | '/hub'
+    | '/invite'
     | '/invite-family'
     | '/parent'
     | '/reset-password'
@@ -470,7 +471,6 @@ export interface FileRouteTypes {
     | '/_authenticated/family-commitment'
     | '/_authenticated/family-dashboard'
     | '/_authenticated/instructor-dashboard'
-    | '/_authenticated/invite'
     | '/_authenticated/living-tree'
     | '/_authenticated/onboarding'
     | '/_authenticated/people'
@@ -503,6 +503,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompassRoute: typeof CompassRoute
   HubRoute: typeof HubRouteWithChildren
+  InviteRoute: typeof InviteRoute
   InviteFamilyRoute: typeof InviteFamilyRoute
   ParentRoute: typeof ParentRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -537,6 +538,13 @@ declare module '@tanstack/react-router' {
       path: '/invite-family'
       fullPath: '/invite-family'
       preLoaderRoute: typeof InviteFamilyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite': {
+      id: '/invite'
+      path: '/invite'
+      fullPath: '/invite'
+      preLoaderRoute: typeof InviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hub': {
@@ -686,13 +694,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLivingTreeRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/invite': {
-      id: '/_authenticated/invite'
-      path: '/invite'
-      fullPath: '/invite'
-      preLoaderRoute: typeof AuthenticatedInviteRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/instructor-dashboard': {
       id: '/_authenticated/instructor-dashboard'
       path: '/instructor-dashboard'
@@ -817,7 +818,6 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFamilyCommitmentRoute: typeof AuthenticatedFamilyCommitmentRoute
   AuthenticatedFamilyDashboardRoute: typeof AuthenticatedFamilyDashboardRoute
   AuthenticatedInstructorDashboardRoute: typeof AuthenticatedInstructorDashboardRoute
-  AuthenticatedInviteRoute: typeof AuthenticatedInviteRoute
   AuthenticatedLivingTreeRoute: typeof AuthenticatedLivingTreeRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
@@ -833,7 +833,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFamilyCommitmentRoute: AuthenticatedFamilyCommitmentRoute,
   AuthenticatedFamilyDashboardRoute: AuthenticatedFamilyDashboardRoute,
   AuthenticatedInstructorDashboardRoute: AuthenticatedInstructorDashboardRoute,
-  AuthenticatedInviteRoute: AuthenticatedInviteRoute,
   AuthenticatedLivingTreeRoute: AuthenticatedLivingTreeRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
@@ -908,6 +907,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompassRoute: CompassRoute,
   HubRoute: HubRouteWithChildren,
+  InviteRoute: InviteRoute,
   InviteFamilyRoute: InviteFamilyRoute,
   ParentRoute: ParentRoute,
   ResetPasswordRoute: ResetPasswordRoute,

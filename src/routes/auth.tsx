@@ -30,17 +30,25 @@ function AuthPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  function postAuthTarget(): string {
+    try {
+      const t = sessionStorage.getItem("l2r:pending_instructor_token");
+      if (t) return `/invite?token=${t}`;
+    } catch { /* noop */ }
+    return "/onboarding";
+  }
+
   // If already signed in, jump to onboarding/dashboard
   useEffect(() => {
     alog("auth-page:mount", { href: window.location.href });
     supabase.auth.getUser().then(({ data, error }) => {
       alog("auth-page:getUser", { hasUser: !!data.user, error: error?.message });
-      if (data.user) navigate({ to: "/onboarding" as never });
+      if (data.user) navigate({ to: postAuthTarget() as never });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       alog("auth-page:onAuthStateChange", { event, hasSession: !!session });
       if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
-        navigate({ to: "/onboarding" as never });
+        navigate({ to: postAuthTarget() as never });
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -60,7 +68,7 @@ function AuthPage() {
       const { data: userData, error: userErr } = await supabase.auth.getUser();
       alog("google:post-getUser", { hasUser: !!userData.user, error: userErr?.message });
       if (userErr || !userData.user) throw new Error(userErr?.message || "Google returned but no session was created");
-      navigate({ to: "/onboarding" as never });
+      navigate({ to: postAuthTarget() as never });
     } catch (err) {
       aerr("google", err);
       setError(describeError(err) || "Google sign-in failed");
@@ -103,7 +111,7 @@ function AuthPage() {
         } else {
           alog("signup:session-created", { userId: data.user?.id });
           // onAuthStateChange handler will navigate; keep this as a safety net.
-          navigate({ to: "/onboarding" as never });
+          navigate({ to: postAuthTarget() as never });
         }
       } else {
         alog("signin:start", { email });
@@ -118,7 +126,7 @@ function AuthPage() {
         if (!data.session || !data.user) {
           throw new Error("Signed in but no session was returned. Please try again.");
         }
-        navigate({ to: "/onboarding" as never });
+        navigate({ to: postAuthTarget() as never });
       }
     } catch (err) {
       aerr(view === "reset" ? "reset" : mode, err);

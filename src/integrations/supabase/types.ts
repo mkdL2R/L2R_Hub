@@ -778,10 +778,12 @@ export type Database = {
           accepted_by: string | null
           created_at: string
           email: string
+          expires_at: string
           full_name: string | null
           id: string
           invited_by: string | null
           status: string
+          token: string
           updated_at: string
         }
         Insert: {
@@ -789,10 +791,12 @@ export type Database = {
           accepted_by?: string | null
           created_at?: string
           email: string
+          expires_at?: string
           full_name?: string | null
           id?: string
           invited_by?: string | null
           status?: string
+          token?: string
           updated_at?: string
         }
         Update: {
@@ -800,10 +804,12 @@ export type Database = {
           accepted_by?: string | null
           created_at?: string
           email?: string
+          expires_at?: string
           full_name?: string | null
           id?: string
           invited_by?: string | null
           status?: string
+          token?: string
           updated_at?: string
         }
         Relationships: []
@@ -1246,6 +1252,10 @@ export type Database = {
       }
       claim_family_invitation: { Args: { _token: string }; Returns: Json }
       claim_instructor_invitation: { Args: never; Returns: boolean }
+      claim_instructor_invitation_by_token: {
+        Args: { _token: string }
+        Returns: boolean
+      }
       create_family_invitation: {
         Args: { _email: string; _kind: string; _student_id?: string }
         Returns: string

@@ -23,6 +23,7 @@ type Invite = {
   status: string;
   created_at: string;
   accepted_at: string | null;
+  token: string;
 };
 
 function PeoplePage() {
@@ -50,7 +51,7 @@ function PeoplePage() {
     setFetching(true);
     const { data, error } = await supabase
       .from("instructor_invitations")
-      .select("id,email,full_name,status,created_at,accepted_at")
+      .select("id,email,full_name,status,created_at,accepted_at,token")
       .order("created_at", { ascending: false });
     if (!error) setInvites((data ?? []) as Invite[]);
     setFetching(false);
@@ -70,7 +71,8 @@ function PeoplePage() {
     if (!clean) { setBusy(false); return; }
     try {
       const inv = await createInstructorInvite(user.id, clean, name);
-      setInfo(`Invitation ready for ${inv.email}. Share the sign-in link — they will be auto-promoted on first Google sign-in.`);
+      void navigator.clipboard.writeText(inv.url).catch(() => {});
+      setInfo(`Invitation link for ${inv.email} copied to clipboard. Share it with them to accept.`);
       setName(""); setEmail("");
       refresh();
     } catch (e) {
@@ -87,18 +89,19 @@ function PeoplePage() {
   async function resend(inv: Invite) {
     if (!user) return;
     try {
-      await createInstructorInvite(user.id, inv.email, inv.full_name ?? undefined);
-      toast.success(`Invitation refreshed for ${inv.email}.`);
+      const fresh = await createInstructorInvite(user.id, inv.email, inv.full_name ?? undefined);
+      await navigator.clipboard.writeText(fresh.url).catch(() => {});
+      toast.success(`New invitation link for ${inv.email} copied.`);
       refresh();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : String(e));
     }
   }
 
-  function copySignInLink() {
-    const url = `${window.location.origin}/auth`;
+  function copyInviteLink(inv: Invite) {
+    const url = `${window.location.origin}/invite?token=${inv.token}`;
     void navigator.clipboard.writeText(url);
-    toast.success("Sign-in link copied");
+    toast.success(`Invitation link for ${inv.email} copied`);
   }
 
   if (loading || rolesLoading || !isInstructor) {
@@ -143,9 +146,6 @@ function PeoplePage() {
               <Button type="submit" disabled={busy} className="rounded-full">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Mail className="h-4 w-4 mr-1.5" /> Send invitation</>}
               </Button>
-              <Button type="button" variant="outline" size="sm" onClick={copySignInLink} className="rounded-full">
-                <Copy className="h-4 w-4 mr-1.5" /> Copy sign-in link
-              </Button>
               {error && <p className="text-sm text-destructive">{error}</p>}
               {info && <p className="text-sm text-emerald-700">{info}</p>}
             </div>
@@ -173,6 +173,9 @@ function PeoplePage() {
                     </Badge>
                     {i.status === "pending" && (
                       <>
+                        <Button size="sm" variant="outline" onClick={() => copyInviteLink(i)} title="Copy invitation link">
+                          <Copy className="h-4 w-4 mr-1.5" /> Copy link
+                        </Button>
                         <Button size="sm" variant="ghost" onClick={() => resend(i)} title="Refresh invitation">
                           <RotateCw className="h-4 w-4" />
                         </Button>

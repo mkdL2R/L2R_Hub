@@ -50,9 +50,10 @@ export type InstructorInvite = {
   email: string;
   fullName: string | null;
   status: string;
-  /** Where the invited person should sign in. They are auto-promoted on first
-   *  Google sign-in when their email matches an active invitation. */
-  signInUrl: string;
+  token: string;
+  /** Tokenized invitation URL. Opening it (signed-in or not) claims the
+   *  invitation and promotes the account to instructor. */
+  url: string;
 };
 
 export async function createInstructorInvite(
@@ -72,7 +73,7 @@ export async function createInstructorInvite(
   const { data, error } = await supabase
     .from("instructor_invitations")
     .insert({ email: clean, full_name: fullName?.trim() || null, invited_by: invitedBy })
-    .select("id,email,full_name,status")
+    .select("id,email,full_name,status,token")
     .single();
   if (error) throw error;
 
@@ -81,7 +82,8 @@ export async function createInstructorInvite(
     email: data.email,
     fullName: data.full_name,
     status: data.status,
-    signInUrl: `${origin()}/auth`,
+    token: (data as { token: string }).token,
+    url: `${origin()}/invite?token=${(data as { token: string }).token}`,
   };
 }
 
