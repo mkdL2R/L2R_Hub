@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuthUser, PRIMARY_ROLES, dashboardPathForRole, type Role } from "@/lib/hub-auth";
+import { useAuthUser, PRIMARY_ROLES, type Role } from "@/lib/hub-auth";
+import { loadIdentity, routeForIdentity } from "@/lib/identity";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -26,23 +27,10 @@ function Onboarding() {
     alog("onboarding:mount", { userId: user.id, email: user.email });
     (async () => {
       try {
-        // NOTE: instructor-invitation claiming is intentionally NOT performed
-        // here. Standard Parent/Student Google & Email logins land on this
-        // route and must never call claim_instructor_invitation. Invited
-        // instructors are handled by the dedicated /invite route, which only
-        // runs when a verified invitation token is present in the URL.
-
-        let { data: profile, error: profErr } = await supabase
-          .from("profiles")
-          .select("primary_role, membership_status")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        alog("onboarding:profile-lookup", { profile, error: profErr?.message });
-        if (profErr) throw new Error(`profiles select: ${profErr.message}`);
-
-        // If the trigger hasn't created a profile row yet, create it now so we
-        // never redirect to a dashboard while profile creation is still pending.
-        if (!profile) {
+        // Ensure a profile row exists (Google OAuth may hit here before the
+        // handle_new_user_profile trigger has fired for this session).
+        let identity = await loadIdentity();
+        if (!identity || !identity.profile) {
           const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
           const fullName =
             (meta.full_name as string) || (meta.name as string) || (meta.preferred_name as string) || null;
@@ -51,31 +39,18 @@ function Onboarding() {
             { user_id: user.id, email: user.email ?? null, preferred_name: fullName, avatar_url: avatar },
             { onConflict: "user_id" },
           );
-          alog("onboarding:profile-bootstrap", { error: upErr?.message });
           if (upErr) throw new Error(`profile bootstrap: ${upErr.message}`);
-          const reread = await supabase
-            .from("profiles")
-            .select("primary_role, membership_status")
-            .eq("user_id", user.id)
-            .maybeSingle();
-          profile = reread.data;
-          alog("onboarding:profile-reread", { profile, error: reread.error?.message });
+          identity = await loadIdentity();
         }
-
-        const existing = profile?.primary_role as Role | null | undefined;
-        const membership =
-          (profile as { membership_status?: string } | null)?.membership_status ?? "visitor";
-        alog("onboarding:decision", { existing, membership });
-
-        if (existing && ["parent", "student", "instructor", "administrator"].includes(existing)) {
-        // Visitors (signed up directly, no discovery journey yet) go to the Growth Hub.
-        // Applicants and above get their role dashboard.
-        if (existing === "instructor" || existing === "administrator" || membership !== "visitor") {
-          navigate({ to: dashboardPathForRole(existing) as never });
-        } else {
-          navigate({ to: "/hub" as never });
-        }
-        return;
+        alog("onboarding:identity", {
+          role: identity?.profile?.primary_role,
+          membership: identity?.profile?.membership_status,
+          familyId: identity?.family_id,
+        });
+        const target = routeForIdentity(identity);
+        if (target !== "/onboarding") {
+          navigate({ to: target as never });
+          return;
         }
         setNeedsRole(true);
         setChecking(false);
@@ -109,22 +84,12 @@ function Onboarding() {
         },
         { onConflict: "user_id" },
       );
-      alog("pickRole:profile-upsert", { error: upErr?.message });
       if (upErr) throw upErr;
-      // Verify persistence before navigating.
-      const verify = await supabase
-        .from("profiles")
-        .select("primary_role")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      alog("pickRole:verify", { primary_role: verify.data?.primary_role, error: verify.error?.message });
-      if (verify.error) throw verify.error;
-      if (verify.data?.primary_role !== role) {
-        throw new Error("Role did not persist. Please try again.");
-      }
-      // Newly picked role → Visitor status. Send them into the Growth Hub;
-      // completing the Discovery Journey promotes them to Applicant and unlocks the dashboard.
-      navigate({ to: "/hub" as never });
+      // Route based on the freshly resolved identity — this correctly handles
+      // the case where a returning user already has a completed journey.
+      const identity = await loadIdentity();
+      const target = routeForIdentity(identity);
+      navigate({ to: (target === "/onboarding" ? "/hub" : target) as never });
     } catch (err) {
       aerr("pickRole", err);
       setError(describeError(err) || "Could not save role");
