@@ -42,6 +42,7 @@ import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudentDashboardIndexRouteImport } from './routes/_authenticated/student-dashboard.index'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
+import { Route as AuthenticatedStudentDashboardLearningPlanRouteImport } from './routes/_authenticated/student-dashboard.learning-plan'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
 
 const StudentRoute = StudentRouteImport.update({
@@ -214,6 +215,12 @@ const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => HubArticlesRoute,
 } as any)
+const AuthenticatedStudentDashboardLearningPlanRoute =
+  AuthenticatedStudentDashboardLearningPlanRouteImport.update({
+    id: '/learning-plan',
+    path: '/learning-plan',
+    getParentRoute: () => AuthenticatedStudentDashboardRoute,
+  } as any)
 const AuthenticatedAdminProfilesRoute =
   AuthenticatedAdminProfilesRouteImport.update({
     id: '/admin/profiles',
@@ -252,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/hub/videos': typeof HubVideosRoute
   '/hub': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardIndexRoute
@@ -322,6 +331,7 @@ export interface FileRoutesById {
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/_authenticated/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/_authenticated/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub/'
     | '/admin/profiles'
+    | '/student-dashboard/learning-plan'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/student-dashboard/'
@@ -392,6 +403,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub'
     | '/admin/profiles'
+    | '/student-dashboard/learning-plan'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/student-dashboard'
@@ -428,6 +440,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub/'
     | '/_authenticated/admin/profiles'
+    | '/_authenticated/student-dashboard/learning-plan'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/_authenticated/student-dashboard/'
@@ -677,6 +690,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubArticlesSlugRouteImport
       parentRoute: typeof HubArticlesRoute
     }
+    '/_authenticated/student-dashboard/learning-plan': {
+      id: '/_authenticated/student-dashboard/learning-plan'
+      path: '/learning-plan'
+      fullPath: '/student-dashboard/learning-plan'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardLearningPlanRouteImport
+      parentRoute: typeof AuthenticatedStudentDashboardRoute
+    }
     '/_authenticated/admin/profiles': {
       id: '/_authenticated/admin/profiles'
       path: '/admin/profiles'
@@ -688,11 +708,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedStudentDashboardRouteChildren {
+  AuthenticatedStudentDashboardLearningPlanRoute: typeof AuthenticatedStudentDashboardLearningPlanRoute
   AuthenticatedStudentDashboardIndexRoute: typeof AuthenticatedStudentDashboardIndexRoute
 }
 
 const AuthenticatedStudentDashboardRouteChildren: AuthenticatedStudentDashboardRouteChildren =
   {
+    AuthenticatedStudentDashboardLearningPlanRoute:
+      AuthenticatedStudentDashboardLearningPlanRoute,
     AuthenticatedStudentDashboardIndexRoute:
       AuthenticatedStudentDashboardIndexRoute,
   }
