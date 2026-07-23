@@ -39,6 +39,7 @@ const TOTAL_STEPS = STEP_KEYS.length;
 type FormState = {
   full_name: string;
   date_of_birth: string;
+  email: string;
   grade_level: string;
   school_name: string;
   preferred_subjects: string[];
@@ -52,6 +53,7 @@ type FormState = {
 const INITIAL: FormState = {
   full_name: "",
   date_of_birth: "",
+  email: "",
   grade_level: "",
   school_name: "",
   preferred_subjects: [],
@@ -82,6 +84,7 @@ function StudentJourney() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [inviteUrl, setInviteUrl] = useState<string | null>(null);
   const progress = useAdmissionsProgress();
   const submitAttemptedRef = useRef(false);
 
@@ -141,6 +144,7 @@ function StudentJourney() {
         student: {
           full_name: data.full_name,
           date_of_birth: data.date_of_birth || null,
+          email: data.email || null,
           grade_level: data.grade_level || null,
           school_name: data.school_name || null,
           preferred_subjects: data.preferred_subjects,
@@ -154,7 +158,7 @@ function StudentJourney() {
         },
         responses,
       };
-      const { error } = await supabase.rpc(
+      const { data: studentId, error } = await supabase.rpc(
         "submit_student_journey" as never,
         { _payload: payload } as never,
       );
@@ -166,6 +170,30 @@ function StudentJourney() {
         );
       }
       clearDraft("studentDraft");
+      // If a parent completed the Student Journey and provided a student email,
+      // generate an invitation link so the student can claim their own account.
+      if (data.email) {
+        try {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("primary_role, email")
+            .eq("user_id", (await supabase.auth.getUser()).data.user!.id)
+            .maybeSingle();
+          const callerEmail = (profile?.email ?? "").toLowerCase();
+          const isParent = profile?.primary_role === "parent";
+          if (isParent && callerEmail !== data.email.toLowerCase()) {
+            const { data: token, error: invErr } = await supabase.rpc(
+              "create_family_invitation" as never,
+              { _kind: "student", _email: data.email, _student_id: studentId } as never,
+            );
+            if (!invErr && token) {
+              setInviteUrl(`${window.location.origin}/invite-family?token=${token}`);
+            }
+          }
+        } catch {
+          // non-blocking
+        }
+      }
       toast.success("Your answers are saved");
       setDone(true);
     } catch (e) {
@@ -188,10 +216,10 @@ function StudentJourney() {
 
   // Auto-continue to Compass once saved.
   useEffect(() => {
-    if (!done) return;
+    if (!done || inviteUrl) return; // hold if we're showing the invite link
     const t = setTimeout(() => navigate({ to: "/compass" }), 1500);
     return () => clearTimeout(t);
-  }, [done, navigate]);
+  }, [done, navigate, inviteUrl]);
 
   function handleNext() {
     if (!canProceed) return;
@@ -204,9 +232,25 @@ function StudentJourney() {
         <div className="max-w-md text-center">
           <CheckCircle2 className="mx-auto h-14 w-14 text-primary" />
           <h1 className="mt-6 text-3xl font-semibold tracking-tight">Thanks for sharing</h1>
-          <p className="mt-3 text-muted-foreground">
-            Your learning profile is saved. Taking you to your Family Compass…
-          </p>
+          {inviteUrl ? (
+            <div className="mt-4 space-y-3 text-left">
+              <p className="text-sm text-muted-foreground">
+                Send this link to <span className="font-medium">{data.email}</span> so your student can sign in with their own account:
+              </p>
+              <div className="flex gap-2">
+                <input readOnly value={inviteUrl} className="flex-1 rounded-md border px-3 py-2 text-xs font-mono" />
+                <button
+                  onClick={() => { void navigator.clipboard.writeText(inviteUrl); toast.success("Copied"); }}
+                  className="rounded-md bg-primary px-3 py-2 text-xs font-medium text-primary-foreground"
+                >Copy</button>
+              </div>
+              <p className="text-xs text-muted-foreground">The invite is valid for 30 days.</p>
+            </div>
+          ) : (
+            <p className="mt-3 text-muted-foreground">
+              Your learning profile is saved. Taking you to your Family Compass…
+            </p>
+          )}
           <div className="mt-8 flex justify-center gap-3">
             <button
               onClick={() => navigate({ to: "/compass" })}
@@ -297,6 +341,17 @@ function StudentJourney() {
               value={data.date_of_birth}
               onChange={(e) => update("date_of_birth", e.target.value)}
             />
+          </Field>
+          <Field label="Student's primary email">
+            <Input
+              type="email"
+              value={data.email}
+              onChange={(e) => update("email", e.target.value)}
+              placeholder="student@example.com"
+            />
+            <p className="text-xs text-muted-foreground">
+              If a parent is filling this in, we'll create an invitation link so the student can sign in with their own account.
+            </p>
           </Field>
         </div>
       )}
