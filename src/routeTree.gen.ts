@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ParentRouteImport } from './routes/parent'
+import { Route as InviteFamilyRouteImport } from './routes/invite-family'
 import { Route as HubRouteImport } from './routes/hub'
 import { Route as CompassRouteImport } from './routes/compass'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -60,6 +61,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ParentRoute = ParentRouteImport.update({
   id: '/parent',
   path: '/parent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteFamilyRoute = InviteFamilyRouteImport.update({
+  id: '/invite-family',
+  path: '/invite-family',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HubRoute = HubRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
+  '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
+  '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/compass': typeof CompassRoute
   '/hub': typeof HubRouteWithChildren
+  '/invite-family': typeof InviteFamilyRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compass'
     | '/hub'
+    | '/invite-family'
     | '/parent'
     | '/reset-password'
     | '/student'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/compass'
+    | '/invite-family'
     | '/parent'
     | '/reset-password'
     | '/student'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/compass'
     | '/hub'
+    | '/invite-family'
     | '/parent'
     | '/reset-password'
     | '/student'
@@ -478,6 +490,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompassRoute: typeof CompassRoute
   HubRoute: typeof HubRouteWithChildren
+  InviteFamilyRoute: typeof InviteFamilyRoute
   ParentRoute: typeof ParentRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   StudentRoute: typeof StudentRoute
@@ -504,6 +517,13 @@ declare module '@tanstack/react-router' {
       path: '/parent'
       fullPath: '/parent'
       preLoaderRoute: typeof ParentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite-family': {
+      id: '/invite-family'
+      path: '/invite-family'
+      fullPath: '/invite-family'
+      preLoaderRoute: typeof InviteFamilyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hub': {
@@ -865,6 +885,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompassRoute: CompassRoute,
   HubRoute: HubRouteWithChildren,
+  InviteFamilyRoute: InviteFamilyRoute,
   ParentRoute: ParentRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   StudentRoute: StudentRoute,
