@@ -46,6 +46,7 @@ import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug
 import { Route as AuthenticatedStudentDashboardReflectionRouteImport } from './routes/_authenticated/student-dashboard.reflection'
 import { Route as AuthenticatedStudentDashboardProgressRouteImport } from './routes/_authenticated/student-dashboard.progress'
 import { Route as AuthenticatedStudentDashboardLearningPlanRouteImport } from './routes/_authenticated/student-dashboard.learning-plan'
+import { Route as AuthenticatedInstructorAvailabilityRouteImport } from './routes/_authenticated/instructor.availability'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
 
 const StudentRoute = StudentRouteImport.update({
@@ -241,6 +242,12 @@ const AuthenticatedStudentDashboardLearningPlanRoute =
     path: '/learning-plan',
     getParentRoute: () => AuthenticatedStudentDashboardRoute,
   } as any)
+const AuthenticatedInstructorAvailabilityRoute =
+  AuthenticatedInstructorAvailabilityRouteImport.update({
+    id: '/instructor/availability',
+    path: '/instructor/availability',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminProfilesRoute =
   AuthenticatedAdminProfilesRouteImport.update({
     id: '/admin/profiles',
@@ -280,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
   '/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
@@ -317,6 +325,7 @@ export interface FileRoutesByTo {
   '/hub/videos': typeof HubVideosRoute
   '/hub': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
   '/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
@@ -358,6 +367,7 @@ export interface FileRoutesById {
   '/hub/videos': typeof HubVideosRoute
   '/hub/': typeof HubIndexRoute
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
+  '/_authenticated/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/_authenticated/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/_authenticated/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
   '/_authenticated/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub/'
     | '/admin/profiles'
+    | '/instructor/availability'
     | '/student-dashboard/learning-plan'
     | '/student-dashboard/progress'
     | '/student-dashboard/reflection'
@@ -436,6 +447,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub'
     | '/admin/profiles'
+    | '/instructor/availability'
     | '/student-dashboard/learning-plan'
     | '/student-dashboard/progress'
     | '/student-dashboard/reflection'
@@ -476,6 +488,7 @@ export interface FileRouteTypes {
     | '/hub/videos'
     | '/hub/'
     | '/_authenticated/admin/profiles'
+    | '/_authenticated/instructor/availability'
     | '/_authenticated/student-dashboard/learning-plan'
     | '/_authenticated/student-dashboard/progress'
     | '/_authenticated/student-dashboard/reflection'
@@ -757,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentDashboardLearningPlanRouteImport
       parentRoute: typeof AuthenticatedStudentDashboardRoute
     }
+    '/_authenticated/instructor/availability': {
+      id: '/_authenticated/instructor/availability'
+      path: '/instructor/availability'
+      fullPath: '/instructor/availability'
+      preLoaderRoute: typeof AuthenticatedInstructorAvailabilityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/profiles': {
       id: '/_authenticated/admin/profiles'
       path: '/admin/profiles'
@@ -804,6 +824,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRouteWithChildren
   AuthenticatedAdminProfilesRoute: typeof AuthenticatedAdminProfilesRoute
+  AuthenticatedInstructorAvailabilityRoute: typeof AuthenticatedInstructorAvailabilityRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -820,6 +841,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedStudentDashboardRoute:
     AuthenticatedStudentDashboardRouteWithChildren,
   AuthenticatedAdminProfilesRoute: AuthenticatedAdminProfilesRoute,
+  AuthenticatedInstructorAvailabilityRoute:
+    AuthenticatedInstructorAvailabilityRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -893,13 +916,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
