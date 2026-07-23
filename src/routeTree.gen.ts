@@ -39,6 +39,7 @@ import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_auth
 import { Route as AuthenticatedFamilyCommitmentRouteImport } from './routes/_authenticated/family-commitment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_authenticated/alignment-meeting'
+import { Route as AuthenticatedStudentDashboardIndexRouteImport } from './routes/_authenticated/student-dashboard.index'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
@@ -197,6 +198,12 @@ const AuthenticatedAlignmentMeetingRoute =
     path: '/alignment-meeting',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedStudentDashboardIndexRoute =
+  AuthenticatedStudentDashboardIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedStudentDashboardRoute,
+  } as any)
 const HubPodcastsSlugRoute = HubPodcastsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -232,7 +239,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardRouteWithChildren
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -247,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
+  '/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -265,7 +273,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/student-dashboard': typeof AuthenticatedStudentDashboardRoute
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -280,6 +287,7 @@ export interface FileRoutesByTo {
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
+  '/student-dashboard': typeof AuthenticatedStudentDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -301,7 +309,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/people': typeof AuthenticatedPeopleRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRoute
+  '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRouteWithChildren
   '/hub/admin': typeof HubAdminRoute
   '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
@@ -316,6 +324,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
+  '/_authenticated/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -352,6 +361,7 @@ export interface FileRouteTypes {
     | '/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
+    | '/student-dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -370,7 +380,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/people'
     | '/profile'
-    | '/student-dashboard'
     | '/hub/admin'
     | '/hub/articles'
     | '/hub/bookmarks'
@@ -385,6 +394,7 @@ export interface FileRouteTypes {
     | '/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
+    | '/student-dashboard'
   id:
     | '__root__'
     | '/'
@@ -420,6 +430,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/profiles'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
+    | '/_authenticated/student-dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -645,6 +656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlignmentMeetingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/student-dashboard/': {
+      id: '/_authenticated/student-dashboard/'
+      path: '/'
+      fullPath: '/student-dashboard/'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedStudentDashboardRoute
+    }
     '/hub/podcasts/$slug': {
       id: '/hub/podcasts/$slug'
       path: '/$slug'
@@ -669,6 +687,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedStudentDashboardRouteChildren {
+  AuthenticatedStudentDashboardIndexRoute: typeof AuthenticatedStudentDashboardIndexRoute
+}
+
+const AuthenticatedStudentDashboardRouteChildren: AuthenticatedStudentDashboardRouteChildren =
+  {
+    AuthenticatedStudentDashboardIndexRoute:
+      AuthenticatedStudentDashboardIndexRoute,
+  }
+
+const AuthenticatedStudentDashboardRouteWithChildren =
+  AuthenticatedStudentDashboardRoute._addFileChildren(
+    AuthenticatedStudentDashboardRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAlignmentMeetingRoute: typeof AuthenticatedAlignmentMeetingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -680,7 +713,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedPeopleRoute: typeof AuthenticatedPeopleRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRoute
+  AuthenticatedStudentDashboardRoute: typeof AuthenticatedStudentDashboardRouteWithChildren
   AuthenticatedAdminProfilesRoute: typeof AuthenticatedAdminProfilesRoute
 }
 
@@ -695,7 +728,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedPeopleRoute: AuthenticatedPeopleRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedStudentDashboardRoute: AuthenticatedStudentDashboardRoute,
+  AuthenticatedStudentDashboardRoute:
+    AuthenticatedStudentDashboardRouteWithChildren,
   AuthenticatedAdminProfilesRoute: AuthenticatedAdminProfilesRoute,
 }
 
