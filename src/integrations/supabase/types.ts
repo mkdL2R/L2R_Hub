@@ -285,6 +285,66 @@ export type Database = {
           },
         ]
       }
+      family_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          created_by: string
+          email: string
+          expires_at: string
+          family_id: string
+          id: string
+          kind: string
+          status: string
+          student_id: string | null
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by: string
+          email: string
+          expires_at?: string
+          family_id: string
+          id?: string
+          kind: string
+          status?: string
+          student_id?: string | null
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string
+          email?: string
+          expires_at?: string
+          family_id?: string
+          id?: string
+          kind?: string
+          status?: string
+          student_id?: string | null
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_invitations_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_invitations_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_members: {
         Row: {
           created_at: string
@@ -1071,6 +1131,7 @@ export type Database = {
         Row: {
           created_at: string
           date_of_birth: string | null
+          email: string | null
           family_id: string | null
           full_name: string
           grade_level: string | null
@@ -1084,6 +1145,7 @@ export type Database = {
         Insert: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           family_id?: string | null
           full_name: string
           grade_level?: string | null
@@ -1097,6 +1159,7 @@ export type Database = {
         Update: {
           created_at?: string
           date_of_birth?: string | null
+          email?: string | null
           family_id?: string | null
           full_name?: string
           grade_level?: string | null
@@ -1181,7 +1244,12 @@ export type Database = {
         }
         Returns: string
       }
+      claim_family_invitation: { Args: { _token: string }; Returns: Json }
       claim_instructor_invitation: { Args: never; Returns: boolean }
+      create_family_invitation: {
+        Args: { _email: string; _kind: string; _student_id?: string }
+        Returns: string
+      }
       ensure_user_family: { Args: never; Returns: string }
       has_role: {
         Args: {
