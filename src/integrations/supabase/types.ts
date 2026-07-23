@@ -1079,6 +1079,7 @@ export type Database = {
           preferred_subjects: string[] | null
           school_name: string | null
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -1091,6 +1092,7 @@ export type Database = {
           preferred_subjects?: string[] | null
           school_name?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -1103,6 +1105,7 @@ export type Database = {
           preferred_subjects?: string[] | null
           school_name?: string | null
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1197,6 +1200,7 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      resolve_identity: { Args: never; Returns: Json }
       sign_family_commitment: {
         Args: {
           _agreement_text: string
