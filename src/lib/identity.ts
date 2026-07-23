@@ -35,6 +35,17 @@ export type Identity = {
 };
 
 export async function loadIdentity(): Promise<Identity | null> {
+  // Idempotent: if the signed-in user has a pending instructor invitation
+  // matching their email, claim it before resolving. This guarantees that an
+  // invited instructor who signs in via the normal /auth flow (not the
+  // /invite deep link) still resolves to a complete instructor identity
+  // (user_roles + profiles + instructor_profiles) on their first session.
+  // The RPC returns false quickly when there is nothing to claim.
+  try {
+    await supabase.rpc("claim_instructor_invitation" as never);
+  } catch {
+    // Non-fatal: identity resolution proceeds regardless.
+  }
   const { data, error } = await supabase.rpc("resolve_identity" as never);
   if (error) throw error;
   return (data as Identity | null) ?? null;
