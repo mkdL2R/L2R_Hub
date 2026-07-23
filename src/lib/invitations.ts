@@ -31,11 +31,10 @@ export async function createFamilyInvite(
   studentId?: string,
 ): Promise<FamilyInvite> {
   const clean = email.trim().toLowerCase();
-  const { data, error } = await supabase.rpc("create_family_invitation" as never, {
-    _kind: kind,
-    _email: clean,
-    _student_id: studentId ?? null,
-  });
+  const { data, error } = await supabase.rpc(
+    "create_family_invitation" as never,
+    { _kind: kind, _email: clean, _student_id: studentId ?? null } as never,
+  );
   if (error) throw error;
   const token = data as unknown as string;
   return {
