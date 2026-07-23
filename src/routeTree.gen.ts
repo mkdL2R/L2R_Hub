@@ -42,6 +42,7 @@ import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_aut
 import { Route as AuthenticatedStudentDashboardIndexRouteImport } from './routes/_authenticated/student-dashboard.index'
 import { Route as HubPodcastsSlugRouteImport } from './routes/hub.podcasts.$slug'
 import { Route as HubArticlesSlugRouteImport } from './routes/hub.articles.$slug'
+import { Route as AuthenticatedStudentDashboardReflectionRouteImport } from './routes/_authenticated/student-dashboard.reflection'
 import { Route as AuthenticatedStudentDashboardProgressRouteImport } from './routes/_authenticated/student-dashboard.progress'
 import { Route as AuthenticatedStudentDashboardLearningPlanRouteImport } from './routes/_authenticated/student-dashboard.learning-plan'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
@@ -216,6 +217,12 @@ const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => HubArticlesRoute,
 } as any)
+const AuthenticatedStudentDashboardReflectionRoute =
+  AuthenticatedStudentDashboardReflectionRouteImport.update({
+    id: '/reflection',
+    path: '/reflection',
+    getParentRoute: () => AuthenticatedStudentDashboardRoute,
+  } as any)
 const AuthenticatedStudentDashboardProgressRoute =
   AuthenticatedStudentDashboardProgressRouteImport.update({
     id: '/progress',
@@ -268,6 +275,7 @@ export interface FileRoutesByFullPath {
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
+  '/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
@@ -303,6 +311,7 @@ export interface FileRoutesByTo {
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
+  '/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardIndexRoute
@@ -342,6 +351,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/_authenticated/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
   '/_authenticated/student-dashboard/progress': typeof AuthenticatedStudentDashboardProgressRoute
+  '/_authenticated/student-dashboard/reflection': typeof AuthenticatedStudentDashboardReflectionRoute
   '/hub/articles/$slug': typeof HubArticlesSlugRoute
   '/hub/podcasts/$slug': typeof HubPodcastsSlugRoute
   '/_authenticated/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
@@ -381,6 +391,7 @@ export interface FileRouteTypes {
     | '/admin/profiles'
     | '/student-dashboard/learning-plan'
     | '/student-dashboard/progress'
+    | '/student-dashboard/reflection'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/student-dashboard/'
@@ -416,6 +427,7 @@ export interface FileRouteTypes {
     | '/admin/profiles'
     | '/student-dashboard/learning-plan'
     | '/student-dashboard/progress'
+    | '/student-dashboard/reflection'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/student-dashboard'
@@ -454,6 +466,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/profiles'
     | '/_authenticated/student-dashboard/learning-plan'
     | '/_authenticated/student-dashboard/progress'
+    | '/_authenticated/student-dashboard/reflection'
     | '/hub/articles/$slug'
     | '/hub/podcasts/$slug'
     | '/_authenticated/student-dashboard/'
@@ -703,6 +716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubArticlesSlugRouteImport
       parentRoute: typeof HubArticlesRoute
     }
+    '/_authenticated/student-dashboard/reflection': {
+      id: '/_authenticated/student-dashboard/reflection'
+      path: '/reflection'
+      fullPath: '/student-dashboard/reflection'
+      preLoaderRoute: typeof AuthenticatedStudentDashboardReflectionRouteImport
+      parentRoute: typeof AuthenticatedStudentDashboardRoute
+    }
     '/_authenticated/student-dashboard/progress': {
       id: '/_authenticated/student-dashboard/progress'
       path: '/progress'
@@ -730,6 +750,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedStudentDashboardRouteChildren {
   AuthenticatedStudentDashboardLearningPlanRoute: typeof AuthenticatedStudentDashboardLearningPlanRoute
   AuthenticatedStudentDashboardProgressRoute: typeof AuthenticatedStudentDashboardProgressRoute
+  AuthenticatedStudentDashboardReflectionRoute: typeof AuthenticatedStudentDashboardReflectionRoute
   AuthenticatedStudentDashboardIndexRoute: typeof AuthenticatedStudentDashboardIndexRoute
 }
 
@@ -739,6 +760,8 @@ const AuthenticatedStudentDashboardRouteChildren: AuthenticatedStudentDashboardR
       AuthenticatedStudentDashboardLearningPlanRoute,
     AuthenticatedStudentDashboardProgressRoute:
       AuthenticatedStudentDashboardProgressRoute,
+    AuthenticatedStudentDashboardReflectionRoute:
+      AuthenticatedStudentDashboardReflectionRoute,
     AuthenticatedStudentDashboardIndexRoute:
       AuthenticatedStudentDashboardIndexRoute,
   }
