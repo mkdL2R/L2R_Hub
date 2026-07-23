@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Loader2, Mail, UserPlus, ShieldCheck, ShieldOff } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, UserPlus, ShieldCheck, ShieldOff, Copy, RotateCw } from "lucide-react";
+import { toast } from "sonner";
+import { createInstructorInvite, revokeInstructorInvite } from "@/lib/invitations";
 
 export const Route = createFileRoute("/_authenticated/people")({
   head: () => ({ meta: [{ title: "People Management — L2R" }] }),
@@ -66,24 +68,37 @@ function PeoplePage() {
     setInfo(null);
     const clean = email.trim().toLowerCase();
     if (!clean) { setBusy(false); return; }
-    const { error } = await supabase.from("instructor_invitations").insert({
-      email: clean,
-      full_name: name.trim() || null,
-      invited_by: user.id,
-    });
-    if (error) {
-      setError(error.message.includes("duplicate") ? "An active invitation for that email already exists." : error.message);
-    } else {
-      setInfo(`Invitation created for ${clean}. They will become an Instructor on next Google sign-in.`);
+    try {
+      const inv = await createInstructorInvite(user.id, clean, name);
+      setInfo(`Invitation ready for ${inv.email}. Share the sign-in link — they will be auto-promoted on first Google sign-in.`);
       setName(""); setEmail("");
       refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
     }
     setBusy(false);
   }
 
   async function revoke(id: string) {
-    await supabase.from("instructor_invitations").update({ status: "revoked" }).eq("id", id);
+    await revokeInstructorInvite(id);
     refresh();
+  }
+
+  async function resend(inv: Invite) {
+    if (!user) return;
+    try {
+      await createInstructorInvite(user.id, inv.email, inv.full_name ?? undefined);
+      toast.success(`Invitation refreshed for ${inv.email}.`);
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  function copySignInLink() {
+    const url = `${window.location.origin}/auth`;
+    void navigator.clipboard.writeText(url);
+    toast.success("Sign-in link copied");
   }
 
   if (loading || rolesLoading || !isInstructor) {
@@ -103,7 +118,10 @@ function PeoplePage() {
         <div className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight">People Management</h1>
           <p className="mt-2 text-muted-foreground text-sm max-w-xl">
-            Invite trusted colleagues. Instructor accounts are invitation-only — invited users are auto-promoted the first time they sign in with Google.
+            Invite trusted colleagues. Instructor accounts are invitation-only — invited users are auto-promoted the first time they sign in with Google using the invited email address.
+          </p>
+          <p className="mt-2 text-xs text-muted-foreground max-w-xl">
+            Automatic email delivery is coming soon. For now, share the sign-in link with each invitee directly.
           </p>
         </div>
 
@@ -124,6 +142,9 @@ function PeoplePage() {
             <div className="sm:col-span-2 flex items-center gap-3">
               <Button type="submit" disabled={busy} className="rounded-full">
                 {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Mail className="h-4 w-4 mr-1.5" /> Send invitation</>}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={copySignInLink} className="rounded-full">
+                <Copy className="h-4 w-4 mr-1.5" /> Copy sign-in link
               </Button>
               {error && <p className="text-sm text-destructive">{error}</p>}
               {info && <p className="text-sm text-emerald-700">{info}</p>}
@@ -151,7 +172,15 @@ function PeoplePage() {
                       {i.status}
                     </Badge>
                     {i.status === "pending" && (
-                      <Button size="sm" variant="ghost" onClick={() => revoke(i.id)}>Revoke</Button>
+                      <>
+                        <Button size="sm" variant="ghost" onClick={() => resend(i)} title="Refresh invitation">
+                          <RotateCw className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => revoke(i.id)}>Revoke</Button>
+                      </>
+                    )}
+                    {i.status === "revoked" && (
+                      <Button size="sm" variant="ghost" onClick={() => resend(i)}>Reinvite</Button>
                     )}
                   </div>
                 </li>
