@@ -77,7 +77,7 @@ function AdminPage() {
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
       <header>
         <h1 className="text-3xl font-serif font-medium tracking-tight">Manage content</h1>
-        <p className="text-muted-foreground text-sm mt-1">Publish, schedule, edit and archive Growth Hub content.</p>
+        <p className="text-muted-foreground text-sm mt-1">Create drafts and publish immediately to the Growth Hub.</p>
       </header>
       <Tabs defaultValue="articles">
         <TabsList className="rounded-full">
@@ -100,12 +100,11 @@ function Center({ children }: { children: React.ReactNode }) {
 }
 
 function StatusBadge({ status, when }: { status: string; when: string }) {
-  const scheduled = status === "published" && new Date(when) > new Date();
-  const label = scheduled ? "scheduled" : status;
+  void when;
+  const label = status;
   const color: Record<string, string> = {
     published: "bg-emerald-100 text-emerald-800",
     draft: "bg-amber-100 text-amber-800",
-    scheduled: "bg-sky-100 text-sky-800",
     archived: "bg-muted text-muted-foreground",
   };
   return <Badge className={`rounded-full ${color[label] ?? ""}`}>{label}</Badge>;
@@ -195,8 +194,9 @@ function ArticleForm({
     if (!title) return toast.error("Title is required");
     const slug = (form.slug || slugify(title)).trim();
     if (!slug) return toast.error("Slug could not be generated — set it manually");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       slug,
       title,
@@ -207,7 +207,7 @@ function ArticleForm({
       category: form.category ?? ARTICLE_CATEGORIES[0],
       reading_minutes: Number(form.reading_minutes ?? 5),
       status,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       seo_title: form.seo_title ?? null,
       seo_description: form.seo_description ?? null,
       og_image_url: form.og_image_url ?? form.hero_image_url ?? null,
@@ -223,7 +223,7 @@ function ArticleForm({
         return; // keep the dialog open with all fields preserved
       }
       toast.success(mode === "publish" ? "Article published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -277,25 +277,9 @@ function ArticleForm({
             <input type="checkbox" checked={!!form.is_featured} onChange={(e) => set("is_featured", e.target.checked)} />
             Feature this article on the Hub homepage
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {["draft", "published", "archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Publish at">
-              <Input
-                type="datetime-local"
-                value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-                onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())}
-              />
-            </Field>
-          </div>
           <p className="text-xs text-muted-foreground">
-            Tip: set status to <b>published</b> with a future publish date to schedule.
+            <b>Save draft</b> keeps this hidden from the Growth Hub. <b>Publish</b> makes it visible immediately.
+            Current status: <b>{form.status ?? "draft"}</b>.
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -303,7 +287,7 @@ function ArticleForm({
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>
@@ -390,8 +374,9 @@ function EpisodeForm({
     if (!title) return toast.error("Title is required");
     const slug = (form.slug || slugify(title)).trim();
     if (!slug) return toast.error("Slug could not be generated — set it manually");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       slug,
       title,
@@ -402,7 +387,7 @@ function EpisodeForm({
       category: form.category ?? PODCAST_CATEGORIES[0],
       status,
       is_featured: !!form.is_featured,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       episode_number: form.episode_number ? Number(form.episode_number) : null,
       spotify_url: form.spotify_url ?? null,
       apple_url: form.apple_url ?? null,
@@ -419,7 +404,7 @@ function EpisodeForm({
         return;
       }
       toast.success(mode === "publish" ? "Episode published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -472,30 +457,21 @@ function EpisodeForm({
                 <SelectContent>{PODCAST_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
               </Select>
             </Field>
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{["draft","published","archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Publish at">
-              <Input type="datetime-local" value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-                onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())} />
-            </Field>
             <label className="flex items-end gap-2 text-sm">
               <input type="checkbox" checked={!!form.is_featured} onChange={(e) => set("is_featured", e.target.checked)} />
               Feature this episode
             </label>
           </div>
+          <p className="text-xs text-muted-foreground">
+            <b>Save draft</b> keeps this hidden. <b>Publish</b> makes it live immediately. Current status: <b>{form.status ?? "draft"}</b>.
+          </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>
@@ -574,8 +550,9 @@ function ResourceForm({
   async function save(mode: SaveMode) {
     const title = (form.title ?? "").trim();
     if (!title) return toast.error("Title is required");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       title,
       description: form.description ?? null,
@@ -584,7 +561,7 @@ function ResourceForm({
       category: form.category ?? RESOURCE_CATEGORIES[0],
       age_group: form.age_group ?? null,
       status,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       resource_type: form.resource_type ?? null,
     };
     setSaving(mode);
@@ -597,7 +574,7 @@ function ResourceForm({
         return;
       }
       toast.success(mode === "publish" ? "Resource published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -639,24 +616,18 @@ function ResourceForm({
               </Select>
             </Field>
             <Field label="Age group"><Input placeholder="6–10, Teens…" value={form.age_group ?? ""} onChange={(e) => set("age_group", e.target.value)} /></Field>
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{["draft","published","archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
+            <div />
           </div>
-          <Field label="Publish at">
-            <Input type="datetime-local" value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-              onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())} />
-          </Field>
+          <p className="text-xs text-muted-foreground">
+            <b>Save draft</b> keeps this hidden. <b>Publish</b> makes it downloadable immediately. Current status: <b>{form.status ?? "draft"}</b>.
+          </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>

@@ -19,6 +19,9 @@ import {
   Bold,
   Italic,
   Underline as UnderlineIcon,
+  Strikethrough,
+  Pilcrow,
+  RemoveFormatting,
   Heading1,
   Heading2,
   Heading3,
@@ -50,11 +53,18 @@ export function TiptapEditor({ value, onChange, placeholder }: Props) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      // StarterKit v3 bundles Underline and Link — disable them here so our
+      // custom-configured versions below are the single source of truth.
+      StarterKit.configure({ link: false, underline: false }),
       Underline,
       Highlight,
       Placeholder.configure({ placeholder: placeholder ?? "Start writing…" }),
-      LinkExt.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),
+      LinkExt.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: { class: "text-primary underline", rel: "noopener noreferrer", target: "_blank" },
+      }),
       ImageExt.configure({ HTMLAttributes: { class: "rounded-xl" } }),
       Youtube.configure({ width: 640, height: 360, controls: true, HTMLAttributes: { class: "rounded-xl" } }),
       TaskList,
@@ -69,6 +79,27 @@ export function TiptapEditor({ value, onChange, placeholder }: Props) {
       attributes: {
         class:
           "prose prose-neutral max-w-none min-h-[400px] focus:outline-none font-serif px-6 py-5 [&_h1]:font-serif [&_h2]:font-serif [&_h3]:font-serif",
+      },
+      handleDrop: (view, event) => {
+        const files = Array.from(event.dataTransfer?.files ?? []).filter((f) => f.type.startsWith("image/"));
+        if (files.length === 0) return false;
+        event.preventDefault();
+        (async () => {
+          for (const file of files) {
+            const ext = file.name.split(".").pop() ?? "png";
+            const path = `editor/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+            const { error } = await supabase.storage.from("hub-media").upload(path, file, { contentType: file.type });
+            if (error) continue;
+            const { data: signed } = await supabase.storage
+              .from("hub-media")
+              .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+            if (signed?.signedUrl) {
+              const editorInstance = (view as unknown as { editor?: Editor }).editor;
+              editorInstance?.chain().focus().setImage({ src: signed.signedUrl }).run();
+            }
+          }
+        })();
+        return true;
       },
     },
     onUpdate: ({ editor: ed }) => {
@@ -175,6 +206,9 @@ function Toolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-1 border-b border-border/60 bg-sand/40 px-2 py-1.5">
+      <B on={() => editor.chain().focus().setParagraph().run()} active={editor.isActive("paragraph")} title="Paragraph">
+        <Pilcrow className="h-4 w-4" />
+      </B>
       <B on={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })} title="H1">
         <Heading1 className="h-4 w-4" />
       </B>
@@ -188,7 +222,9 @@ function Toolbar({
       <B on={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")} title="Bold"><Bold className="h-4 w-4" /></B>
       <B on={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")} title="Italic"><Italic className="h-4 w-4" /></B>
       <B on={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")} title="Underline"><UnderlineIcon className="h-4 w-4" /></B>
+      <B on={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")} title="Strikethrough"><Strikethrough className="h-4 w-4" /></B>
       <B on={() => editor.chain().focus().toggleHighlight().run()} active={editor.isActive("highlight")} title="Highlight"><Highlighter className="h-4 w-4" /></B>
+      <B on={() => editor.chain().focus().unsetAllMarks().clearNodes().run()} title="Clear formatting"><RemoveFormatting className="h-4 w-4" /></B>
       <div className="mx-1 h-5 w-px bg-border/60" />
       <B on={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")} title="Bulleted"><List className="h-4 w-4" /></B>
       <B on={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")} title="Numbered"><ListOrdered className="h-4 w-4" /></B>
