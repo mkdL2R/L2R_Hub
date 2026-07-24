@@ -77,7 +77,7 @@ function AdminPage() {
     <div className="mx-auto max-w-6xl px-6 py-10 space-y-6">
       <header>
         <h1 className="text-3xl font-serif font-medium tracking-tight">Manage content</h1>
-        <p className="text-muted-foreground text-sm mt-1">Publish, schedule, edit and archive Growth Hub content.</p>
+        <p className="text-muted-foreground text-sm mt-1">Create drafts and publish immediately to the Growth Hub.</p>
       </header>
       <Tabs defaultValue="articles">
         <TabsList className="rounded-full">
@@ -100,12 +100,11 @@ function Center({ children }: { children: React.ReactNode }) {
 }
 
 function StatusBadge({ status, when }: { status: string; when: string }) {
-  const scheduled = status === "published" && new Date(when) > new Date();
-  const label = scheduled ? "scheduled" : status;
+  void when;
+  const label = status;
   const color: Record<string, string> = {
     published: "bg-emerald-100 text-emerald-800",
     draft: "bg-amber-100 text-amber-800",
-    scheduled: "bg-sky-100 text-sky-800",
     archived: "bg-muted text-muted-foreground",
   };
   return <Badge className={`rounded-full ${color[label] ?? ""}`}>{label}</Badge>;
