@@ -194,8 +194,9 @@ function ArticleForm({
     if (!title) return toast.error("Title is required");
     const slug = (form.slug || slugify(title)).trim();
     if (!slug) return toast.error("Slug could not be generated — set it manually");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       slug,
       title,
@@ -206,7 +207,7 @@ function ArticleForm({
       category: form.category ?? ARTICLE_CATEGORIES[0],
       reading_minutes: Number(form.reading_minutes ?? 5),
       status,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       seo_title: form.seo_title ?? null,
       seo_description: form.seo_description ?? null,
       og_image_url: form.og_image_url ?? form.hero_image_url ?? null,
@@ -222,7 +223,7 @@ function ArticleForm({
         return; // keep the dialog open with all fields preserved
       }
       toast.success(mode === "publish" ? "Article published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -276,25 +277,9 @@ function ArticleForm({
             <input type="checkbox" checked={!!form.is_featured} onChange={(e) => set("is_featured", e.target.checked)} />
             Feature this article on the Hub homepage
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {["draft", "published", "archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </Field>
-            <Field label="Publish at">
-              <Input
-                type="datetime-local"
-                value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-                onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())}
-              />
-            </Field>
-          </div>
           <p className="text-xs text-muted-foreground">
-            Tip: set status to <b>published</b> with a future publish date to schedule.
+            <b>Save draft</b> keeps this hidden from the Growth Hub. <b>Publish</b> makes it visible immediately.
+            Current status: <b>{form.status ?? "draft"}</b>.
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -302,7 +287,7 @@ function ArticleForm({
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>
