@@ -40,8 +40,8 @@ export const Route = createFileRoute("/hub/admin")({
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id);
-    // Must match app_security.is_staff() — instructor is NOT staff for CMS writes.
-    const staffRoles = new Set(["admin", "editor", "administrator"]);
+    // Must match app_security.is_staff() — admins, editors, administrators, instructors.
+    const staffRoles = new Set(["admin", "editor", "administrator", "instructor"]);
     const isStaff = (roles ?? []).some((r) => staffRoles.has(r.role as string));
     if (!isStaff) {
       throw redirect({ to: "/hub/featured" });
