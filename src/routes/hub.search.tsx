@@ -104,13 +104,13 @@ function SearchTab() {
           <Section title="Downloads" icon={Download} count={filtered.resources.length}>
             <div className="grid gap-4 md:grid-cols-3">
               {filtered.resources.map((r) => (
-                <Card key={r.id} className="rounded-2xl border-border/60 p-4">
-                  <Badge variant="outline" className={`rounded-full text-[10px] mb-2 ${categoryTone(r.category)}`}>{r.category}</Badge>
-                  <h3 className="font-serif leading-snug line-clamp-2">{r.title}</h3>
-                  {r.file_url && (
-                    <a className="text-xs text-primary underline mt-2 inline-block" href={r.file_url} target="_blank" rel="noreferrer">Download</a>
-                  )}
-                </Card>
+                <Link key={r.id} to="/hub/resources/$id" params={{ id: r.id }}>
+                  <Card className="rounded-2xl border-border/60 p-4 h-full hover:shadow-md transition-shadow">
+                    <Badge variant="outline" className={`rounded-full text-[10px] mb-2 ${categoryTone(r.category)}`}>{r.category}</Badge>
+                    <h3 className="font-serif leading-snug line-clamp-2">{r.title}</h3>
+                    <p className="text-xs text-muted-foreground mt-2">{fmtDate(r.publish_at)}</p>
+                  </Card>
+                </Link>
               ))}
             </div>
           </Section>

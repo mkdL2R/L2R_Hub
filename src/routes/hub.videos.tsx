@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Video, Youtube } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useEffect, useState } from "react";
@@ -62,22 +62,24 @@ function VideosTab() {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {rows.map((v) => (
             <Card key={v.id} className="rounded-2xl border-border/60 overflow-hidden">
-              <div className="aspect-video bg-muted">
-                {v.cover_url && <img src={v.cover_url} alt="" className="h-full w-full object-cover" />}
-              </div>
+              <Link to="/hub/videos/$slug" params={{ slug: v.slug }} className="block">
+                <div className="aspect-video bg-muted">
+                  {v.cover_url && <img src={v.cover_url} alt="" className="h-full w-full object-cover" />}
+                </div>
+              </Link>
               <div className="p-5 space-y-2">
                 <Badge variant="outline" className="rounded-full text-[10px]">{v.category}</Badge>
-                <h3 className="font-serif text-lg leading-snug">{v.title}</h3>
+                <Link to="/hub/videos/$slug" params={{ slug: v.slug }}>
+                  <h3 className="font-serif text-lg leading-snug hover:text-primary transition-colors">{v.title}</h3>
+                </Link>
                 {v.description && <p className="text-sm text-muted-foreground line-clamp-2">{v.description}</p>}
                 <div className="flex items-center justify-between pt-2">
                   <span className="text-xs text-muted-foreground">{fmtDate(v.publish_at)}</span>
-                  {v.youtube_url && (
-                    <Button asChild size="sm" variant="outline" className="rounded-full gap-1">
-                      <a href={v.youtube_url} target="_blank" rel="noreferrer">
-                        <Youtube className="h-3.5 w-3.5" /> Watch
-                      </a>
-                    </Button>
-                  )}
+                  <Button asChild size="sm" variant="outline" className="rounded-full gap-1">
+                    <Link to="/hub/videos/$slug" params={{ slug: v.slug }}>
+                      <Youtube className="h-3.5 w-3.5" /> Watch
+                    </Link>
+                  </Button>
                 </div>
               </div>
             </Card>

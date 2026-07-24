@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -73,32 +73,35 @@ function ResourcesTab() {
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((r) => (
             <Card key={r.id} className="rounded-2xl border-border/60 p-6 flex flex-col gap-3">
-              <div className="flex items-start justify-between gap-3">
+              <Link to="/hub/resources/$id" params={{ id: r.id }} className="flex items-start justify-between gap-3">
                 <div className="h-10 w-10 rounded-xl bg-sage/25 text-forest flex items-center justify-center">
                   <FileText className="h-5 w-5" />
                 </div>
                 {r.file_type && (
                   <Badge variant="outline" className="rounded-full text-[10px] uppercase border-crayon/30 text-crayon">{r.file_type}</Badge>
                 )}
-              </div>
+              </Link>
               <Badge variant="outline" className={`rounded-full text-[10px] w-fit ${categoryTone(r.category)}`}>{r.category}</Badge>
-              <h3 className="font-serif text-lg leading-snug">{r.title}</h3>
+              <Link to="/hub/resources/$id" params={{ id: r.id }}>
+                <h3 className="font-serif text-lg leading-snug hover:text-primary transition-colors">{r.title}</h3>
+              </Link>
               {r.description && <p className="text-sm text-muted-foreground line-clamp-3">{r.description}</p>}
               <div className="text-xs text-muted-foreground">
                 {r.age_group && <>For: {r.age_group} · </>}
                 {fmtDate(r.publish_at)}
               </div>
-              {r.file_url ? (
-                <Button asChild variant="outline" size="sm" className="rounded-full mt-auto gap-2">
-                  <a href={r.file_url} target="_blank" rel="noreferrer" download>
-                    <Download className="h-3.5 w-3.5" /> Download
-                  </a>
+              <div className="mt-auto flex gap-2">
+                <Button asChild variant="outline" size="sm" className="rounded-full gap-2">
+                  <Link to="/hub/resources/$id" params={{ id: r.id }}>Open</Link>
                 </Button>
-              ) : (
-                <Button variant="outline" size="sm" disabled className="rounded-full mt-auto">
-                  Coming soon
-                </Button>
-              )}
+                {r.file_url && (
+                  <Button asChild variant="ghost" size="sm" className="rounded-full gap-2">
+                    <a href={r.file_url} target="_blank" rel="noreferrer" download>
+                      <Download className="h-3.5 w-3.5" /> Download
+                    </a>
+                  </Button>
+                )}
+              </div>
             </Card>
           ))}
         </div>
