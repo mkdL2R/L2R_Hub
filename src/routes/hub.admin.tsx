@@ -550,8 +550,9 @@ function ResourceForm({
   async function save(mode: SaveMode) {
     const title = (form.title ?? "").trim();
     if (!title) return toast.error("Title is required");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       title,
       description: form.description ?? null,
@@ -560,7 +561,7 @@ function ResourceForm({
       category: form.category ?? RESOURCE_CATEGORIES[0],
       age_group: form.age_group ?? null,
       status,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       resource_type: form.resource_type ?? null,
     };
     setSaving(mode);
@@ -573,7 +574,7 @@ function ResourceForm({
         return;
       }
       toast.success(mode === "publish" ? "Resource published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -615,24 +616,18 @@ function ResourceForm({
               </Select>
             </Field>
             <Field label="Age group"><Input placeholder="6–10, Teens…" value={form.age_group ?? ""} onChange={(e) => set("age_group", e.target.value)} /></Field>
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{["draft","published","archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
+            <div />
           </div>
-          <Field label="Publish at">
-            <Input type="datetime-local" value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-              onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())} />
-          </Field>
+          <p className="text-xs text-muted-foreground">
+            <b>Save draft</b> keeps this hidden. <b>Publish</b> makes it downloadable immediately. Current status: <b>{form.status ?? "draft"}</b>.
+          </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>
