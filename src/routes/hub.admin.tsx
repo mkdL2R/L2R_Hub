@@ -21,6 +21,13 @@ import { useAuthUser, useUserRoles, ARTICLE_CATEGORIES, PODCAST_CATEGORIES, RESO
 import { fmtDate } from "@/lib/hub-content";
 import { FileDropzone } from "@/components/admin/FileDropzone";
 import { TiptapEditor } from "@/components/editor/TiptapEditor";
+import { toast } from "sonner";
+
+function slugify(s: string) {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+type SaveMode = "draft" | "publish";
 
 export const Route = createFileRoute("/hub/admin")({
   ssr: false,
@@ -33,7 +40,8 @@ export const Route = createFileRoute("/hub/admin")({
       .from("user_roles")
       .select("role")
       .eq("user_id", userData.user.id);
-    const staffRoles = new Set(["admin", "editor", "administrator", "instructor"]);
+    // Must match app_security.is_staff() — instructor is NOT staff for CMS writes.
+    const staffRoles = new Set(["admin", "editor", "administrator"]);
     const isStaff = (roles ?? []).some((r) => staffRoles.has(r.role as string));
     if (!isStaff) {
       throw redirect({ to: "/hub/featured" });
@@ -125,11 +133,15 @@ function ArticlesAdmin() {
 
   async function remove(id: string) {
     if (!confirm("Delete this article?")) return;
-    await supabase.from("hub_articles").delete().eq("id", id);
+    const { error } = await supabase.from("hub_articles").delete().eq("id", id);
+    if (error) return toast.error("Delete failed", { description: error.message });
+    toast.success("Article deleted");
     load();
   }
   async function archive(id: string) {
-    await supabase.from("hub_articles").update({ status: "archived" }).eq("id", id);
+    const { error } = await supabase.from("hub_articles").update({ status: "archived" }).eq("id", id);
+    if (error) return toast.error("Archive failed", { description: error.message });
+    toast.success("Article archived");
     load();
   }
 
@@ -176,29 +188,46 @@ function ArticleForm({
   }, [initial, open]);
   function set<K extends keyof ArticleRow>(k: K, v: ArticleRow[K]) { setForm((f) => ({ ...f, [k]: v })); }
 
-  async function save() {
+  const [saving, setSaving] = useState<SaveMode | null>(null);
+
+  async function save(mode: SaveMode) {
+    const title = (form.title ?? "").trim();
+    if (!title) return toast.error("Title is required");
+    const slug = (form.slug || slugify(title)).trim();
+    if (!slug) return toast.error("Slug could not be generated — set it manually");
+    const status =
+      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
     const payload = {
-      slug: form.slug || (form.title ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-      title: form.title ?? "",
+      slug,
+      title,
       excerpt: form.excerpt ?? null,
       content: form.content ?? "",
       hero_image_url: form.hero_image_url ?? null,
       author: form.author ?? null,
       category: form.category ?? ARTICLE_CATEGORIES[0],
       reading_minutes: Number(form.reading_minutes ?? 5),
-      status: form.status ?? "draft",
+      status,
       publish_at: form.publish_at ?? new Date().toISOString(),
       seo_title: form.seo_title ?? null,
       seo_description: form.seo_description ?? null,
       og_image_url: form.og_image_url ?? form.hero_image_url ?? null,
       is_featured: !!form.is_featured,
     };
-    if (initial) {
-      await supabase.from("hub_articles").update(payload).eq("id", initial.id);
-    } else {
-      await supabase.from("hub_articles").insert(payload);
+    setSaving(mode);
+    try {
+      const { error } = initial
+        ? await supabase.from("hub_articles").update(payload).eq("id", initial.id)
+        : await supabase.from("hub_articles").insert(payload);
+      if (error) {
+        toast.error("Save failed", { description: error.message });
+        return; // keep the dialog open with all fields preserved
+      }
+      toast.success(mode === "publish" ? "Article published" : "Draft saved");
+      setForm((f) => ({ ...f, status }));
+      onSaved();
+    } finally {
+      setSaving(null);
     }
-    onSaved();
   }
 
   return (
@@ -270,7 +299,12 @@ function ArticleForm({
           </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button onClick={save}>Save</Button>
+            <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
+              {saving === "draft" ? "Saving…" : "Save draft"}
+            </Button>
+            <Button disabled={!!saving} onClick={() => save("publish")}>
+              {saving === "publish" ? "Publishing…" : "Publish"}
+            </Button>
           </div>
         </div>
       </DialogContent>
@@ -301,8 +335,19 @@ function PodcastsAdmin() {
     setRows((data ?? []) as EpisodeRow[]);
   }
   useEffect(() => { load(); }, []);
-  async function archive(id: string) { await supabase.from("hub_podcast_episodes").update({ status: "archived" }).eq("id", id); load(); }
-  async function remove(id: string) { if (!confirm("Delete?")) return; await supabase.from("hub_podcast_episodes").delete().eq("id", id); load(); }
+  async function archive(id: string) {
+    const { error } = await supabase.from("hub_podcast_episodes").update({ status: "archived" }).eq("id", id);
+    if (error) return toast.error("Archive failed", { description: error.message });
+    toast.success("Episode archived");
+    load();
+  }
+  async function remove(id: string) {
+    if (!confirm("Delete this episode?")) return;
+    const { error } = await supabase.from("hub_podcast_episodes").delete().eq("id", id);
+    if (error) return toast.error("Delete failed", { description: error.message });
+    toast.success("Episode deleted");
+    load();
+  }
   return (
     <Card className="rounded-2xl border-border/60 p-6">
       <div className="flex justify-between items-center mb-4">
@@ -339,16 +384,23 @@ function EpisodeForm({
     setForm(initial ?? { category: PODCAST_CATEGORIES[0], status: "draft", is_featured: false, publish_at: new Date().toISOString() });
   }, [initial, open]);
   function set<K extends keyof EpisodeRow>(k: K, v: EpisodeRow[K]) { setForm((f) => ({ ...f, [k]: v })); }
-  async function save() {
+  const [saving, setSaving] = useState<SaveMode | null>(null);
+  async function save(mode: SaveMode) {
+    const title = (form.title ?? "").trim();
+    if (!title) return toast.error("Title is required");
+    const slug = (form.slug || slugify(title)).trim();
+    if (!slug) return toast.error("Slug could not be generated — set it manually");
+    const status =
+      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
     const payload = {
-      slug: form.slug || (form.title ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
-      title: form.title ?? "",
+      slug,
+      title,
       description: form.description ?? null,
       cover_url: form.cover_url ?? null,
       audio_url: form.audio_url ?? null,
       duration_seconds: form.duration_seconds ? Number(form.duration_seconds) : null,
       category: form.category ?? PODCAST_CATEGORIES[0],
-      status: form.status ?? "draft",
+      status,
       is_featured: !!form.is_featured,
       publish_at: form.publish_at ?? new Date().toISOString(),
       episode_number: form.episode_number ? Number(form.episode_number) : null,
@@ -357,9 +409,21 @@ function EpisodeForm({
       youtube_url: form.youtube_url ?? null,
       transcript: form.transcript ?? null,
     };
-    if (initial) await supabase.from("hub_podcast_episodes").update(payload).eq("id", initial.id);
-    else await supabase.from("hub_podcast_episodes").insert(payload);
-    onSaved();
+    setSaving(mode);
+    try {
+      const { error } = initial
+        ? await supabase.from("hub_podcast_episodes").update(payload).eq("id", initial.id)
+        : await supabase.from("hub_podcast_episodes").insert(payload);
+      if (error) {
+        toast.error("Save failed", { description: error.message });
+        return;
+      }
+      toast.success(mode === "publish" ? "Episode published" : "Draft saved");
+      setForm((f) => ({ ...f, status }));
+      onSaved();
+    } finally {
+      setSaving(null);
+    }
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -427,7 +491,12 @@ function EpisodeForm({
           </div>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button onClick={save}>Save</Button>
+            <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
+              {saving === "draft" ? "Saving…" : "Save draft"}
+            </Button>
+            <Button disabled={!!saving} onClick={() => save("publish")}>
+              {saving === "publish" ? "Publishing…" : "Publish"}
+            </Button>
           </div>
         </div>
       </DialogContent>
@@ -452,8 +521,19 @@ function ResourcesAdmin() {
     setRows((data ?? []) as ResourceRow[]);
   }
   useEffect(() => { load(); }, []);
-  async function archive(id: string) { await supabase.from("hub_resources").update({ status: "archived" }).eq("id", id); load(); }
-  async function remove(id: string) { if (!confirm("Delete?")) return; await supabase.from("hub_resources").delete().eq("id", id); load(); }
+  async function archive(id: string) {
+    const { error } = await supabase.from("hub_resources").update({ status: "archived" }).eq("id", id);
+    if (error) return toast.error("Archive failed", { description: error.message });
+    toast.success("Resource archived");
+    load();
+  }
+  async function remove(id: string) {
+    if (!confirm("Delete this resource?")) return;
+    const { error } = await supabase.from("hub_resources").delete().eq("id", id);
+    if (error) return toast.error("Delete failed", { description: error.message });
+    toast.success("Resource deleted");
+    load();
+  }
   return (
     <Card className="rounded-2xl border-border/60 p-6">
       <div className="flex justify-between items-center mb-4">
@@ -490,21 +570,38 @@ function ResourceForm({
     setForm(initial ?? { category: RESOURCE_CATEGORIES[0], status: "draft", publish_at: new Date().toISOString() });
   }, [initial, open]);
   function set<K extends keyof ResourceRow>(k: K, v: ResourceRow[K]) { setForm((f) => ({ ...f, [k]: v })); }
-  async function save() {
+  const [saving, setSaving] = useState<SaveMode | null>(null);
+  async function save(mode: SaveMode) {
+    const title = (form.title ?? "").trim();
+    if (!title) return toast.error("Title is required");
+    const status =
+      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
     const payload = {
-      title: form.title ?? "",
+      title,
       description: form.description ?? null,
       file_url: form.file_url ?? null,
       file_type: form.file_type ?? null,
       category: form.category ?? RESOURCE_CATEGORIES[0],
       age_group: form.age_group ?? null,
-      status: form.status ?? "draft",
+      status,
       publish_at: form.publish_at ?? new Date().toISOString(),
       resource_type: form.resource_type ?? null,
     };
-    if (initial) await supabase.from("hub_resources").update(payload).eq("id", initial.id);
-    else await supabase.from("hub_resources").insert(payload);
-    onSaved();
+    setSaving(mode);
+    try {
+      const { error } = initial
+        ? await supabase.from("hub_resources").update(payload).eq("id", initial.id)
+        : await supabase.from("hub_resources").insert(payload);
+      if (error) {
+        toast.error("Save failed", { description: error.message });
+        return;
+      }
+      toast.success(mode === "publish" ? "Resource published" : "Draft saved");
+      setForm((f) => ({ ...f, status }));
+      onSaved();
+    } finally {
+      setSaving(null);
+    }
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -555,7 +652,12 @@ function ResourceForm({
           </Field>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button onClick={save}>Save</Button>
+            <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
+              {saving === "draft" ? "Saving…" : "Save draft"}
+            </Button>
+            <Button disabled={!!saving} onClick={() => save("publish")}>
+              {saving === "publish" ? "Publishing…" : "Publish"}
+            </Button>
           </div>
         </div>
       </DialogContent>
