@@ -11,11 +11,12 @@ interface Props {
   onAuthenticated: () => void | Promise<void>;
   title?: string;
   description?: string;
+  defaultEmail?: string;
 }
 
-export function AccountGate({ onAuthenticated, title, description }: Props) {
+export function AccountGate({ onAuthenticated, title, description, defaultEmail }: Props) {
   const [mode, setMode] = useState<"signup" | "signin">("signup");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail ?? "");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState<string | null>(null);

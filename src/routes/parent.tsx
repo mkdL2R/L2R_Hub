@@ -301,7 +301,7 @@ function ParentJourney() {
             </div>
           ) : (
             <div className="mt-8">
-              <AccountGate onAuthenticated={submitAll} />
+              <AccountGate onAuthenticated={submitAll} defaultEmail={data.primary_email} />
               <button
                 onClick={() => setStep(TOTAL_STEPS - 1)}
                 className="mt-4 text-sm text-muted-foreground underline underline-offset-2"
