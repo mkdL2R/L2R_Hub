@@ -45,6 +45,7 @@ type EcosystemProfile = {
   goals: string[] | null;
   challenges: string[] | null;
   notes: string | null;
+  daily_routine: Record<string, unknown> | null;
 };
 
 type LivingTreeEntry = {
@@ -93,7 +94,7 @@ function FamilyDashboard() {
           .select("id,scheduled_at,duration_minutes,status,instructor_id,meeting_notes")
           .eq("family_id", familyId).order("scheduled_at", { ascending: true }),
         supabase.from("ecosystem_profiles")
-          .select("parenting_style,values_summary,support_network,goals,challenges,notes")
+          .select("parenting_style,values_summary,support_network,goals,challenges,notes,daily_routine")
           .eq("family_id", familyId).maybeSingle(),
         supabase.from("living_tree_entries")
           .select("id,entry_type,title,description,occurred_on")
@@ -273,7 +274,7 @@ function FamilyOverviewCard({
       <SectionHeader icon={Users} title="Family Overview" />
       <dl className="mt-4 space-y-3 text-sm">
         <Row label="Family"><span className="font-medium">{familyName}</span></Row>
-        <Row label="Children">{students.length ? `${students.length} enrolled` : "None added yet"}</Row>
+        <Row label="Children">{students.length ? `${students.length} on file` : "None added yet"}</Row>
         <Row label="Status">
           <Badge variant="outline" className="capitalize">{enrolled ? "Enrolled" : membership}</Badge>
         </Row>
@@ -334,18 +335,31 @@ function NotificationsCard({
 }
 
 function CompassCard({ ecosystem }: { ecosystem: EcosystemProfile | null }) {
-  const strengths = ecosystem?.goals ?? [];
-  const growth = ecosystem?.challenges ?? [];
+  const compass = (ecosystem?.daily_routine as { compass?: Record<string, unknown> } | null)?.compass ?? null;
+  const compassStrengths = Array.isArray((compass as { strengths?: unknown })?.strengths)
+    ? ((compass as { strengths: string[] }).strengths)
+    : [];
+  const compassGrowth = Array.isArray((compass as { growth?: unknown })?.growth)
+    ? ((compass as { growth: string[] }).growth)
+    : [];
+  const pathway = (compass as { pathway?: { summary?: string; recommendations?: string[] } } | null)?.pathway ?? null;
+  const strengths = compassStrengths.length ? compassStrengths : (ecosystem?.goals ?? []);
+  const growth = compassGrowth.length ? compassGrowth : (ecosystem?.challenges ?? []);
+  const summary = pathway?.summary ?? ecosystem?.values_summary ?? null;
+  const recommendations = Array.isArray(pathway?.recommendations) && pathway!.recommendations!.length
+    ? pathway!.recommendations!
+    : (ecosystem?.notes ? [ecosystem.notes] : []);
+  const hasCompass = !!(compass || ecosystem?.values_summary || strengths.length || growth.length);
   return (
     <Card className="card-paper p-6 rounded-3xl">
       <div className="flex items-center justify-between">
         <SectionHeader icon={Compass} title="Family Compass" />
         <Button asChild variant="ghost" size="sm"><Link to="/compass">Open <ChevronRight className="h-4 w-4 ml-1" /></Link></Button>
       </div>
-      {ecosystem ? (
+      {hasCompass ? (
         <div className="mt-4 space-y-4 text-sm">
-          {ecosystem.values_summary ? (
-            <p className="text-muted-foreground italic">"{ecosystem.values_summary}"</p>
+          {summary ? (
+            <p className="text-muted-foreground italic">"{summary}"</p>
           ) : null}
           {strengths.length ? (
             <div>
@@ -359,15 +373,20 @@ function CompassCard({ ecosystem }: { ecosystem: EcosystemProfile | null }) {
               <div className="flex flex-wrap gap-1.5">{growth.map((g) => <Badge key={g} variant="outline">{g}</Badge>)}</div>
             </div>
           ) : null}
-          {ecosystem.notes ? (
+          {recommendations.length ? (
             <div>
               <div className="text-xs uppercase tracking-widest text-muted-foreground mb-1.5">Recommendations</div>
-              <p className="text-muted-foreground">{ecosystem.notes}</p>
+              <ul className="space-y-1 text-muted-foreground list-disc pl-4">
+                {recommendations.map((r, i) => <li key={i}>{r}</li>)}
+              </ul>
             </div>
           ) : null}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-muted-foreground">Complete the Parent Journey to generate your Family Compass.</p>
+        <div className="mt-4 space-y-3">
+          <p className="text-sm text-muted-foreground">Your Family Compass hasn't been generated yet.</p>
+          <Button asChild size="sm" variant="outline"><Link to="/compass">Generate Compass</Link></Button>
+        </div>
       )}
     </Card>
   );
