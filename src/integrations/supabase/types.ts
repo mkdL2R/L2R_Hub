@@ -410,6 +410,8 @@ export type Database = {
       hub_articles: {
         Row: {
           author: string | null
+          author_id: string | null
+          author_role: Database["public"]["Enums"]["app_role"] | null
           canonical_url: string | null
           category: string
           content: string
@@ -434,6 +436,8 @@ export type Database = {
         }
         Insert: {
           author?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           canonical_url?: string | null
           category: string
           content?: string
@@ -458,6 +462,8 @@ export type Database = {
         }
         Update: {
           author?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           canonical_url?: string | null
           category?: string
           content?: string
@@ -546,6 +552,8 @@ export type Database = {
         Row: {
           apple_url: string | null
           audio_url: string | null
+          author_id: string | null
+          author_role: Database["public"]["Enums"]["app_role"] | null
           category: string
           cover_url: string | null
           created_at: string
@@ -566,6 +574,8 @@ export type Database = {
         Insert: {
           apple_url?: string | null
           audio_url?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           category: string
           cover_url?: string | null
           created_at?: string
@@ -586,6 +596,8 @@ export type Database = {
         Update: {
           apple_url?: string | null
           audio_url?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           category?: string
           cover_url?: string | null
           created_at?: string
@@ -638,6 +650,8 @@ export type Database = {
       hub_resources: {
         Row: {
           age_group: string | null
+          author_id: string | null
+          author_role: Database["public"]["Enums"]["app_role"] | null
           category: string
           created_at: string
           description: string | null
@@ -653,6 +667,8 @@ export type Database = {
         }
         Insert: {
           age_group?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           category: string
           created_at?: string
           description?: string | null
@@ -668,6 +684,8 @@ export type Database = {
         }
         Update: {
           age_group?: string | null
+          author_id?: string | null
+          author_role?: Database["public"]["Enums"]["app_role"] | null
           category?: string
           created_at?: string
           description?: string | null
@@ -1273,6 +1291,7 @@ export type Database = {
         Returns: undefined
       }
       increment_download: { Args: { _resource_id: string }; Returns: undefined }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_family_member: {
         Args: { _family_id: string; _user_id: string }
         Returns: boolean
