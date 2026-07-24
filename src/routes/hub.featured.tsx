@@ -185,23 +185,18 @@ function ArticleMini({ article }: { article: Article }) {
 
 function ResourceMini({ resource }: { resource: Resource }) {
   return (
-    <Card className="h-full rounded-2xl border-border/60 p-5 space-y-2">
-      <Badge variant="outline" className={`rounded-full text-[10px] ${categoryTone(resource.category)}`}>
-        <Download className="h-3 w-3 mr-1" /> {resource.category}
-      </Badge>
-      <h3 className="font-medium leading-snug">{resource.title}</h3>
-      {resource.description && <p className="text-xs text-muted-foreground line-clamp-2">{resource.description}</p>}
-      {resource.file_url && (
-        <a
-          href={resource.file_url}
-          target="_blank"
-          rel="noreferrer"
-          className="text-xs text-primary inline-flex items-center gap-1 hover:underline"
-        >
-          Download {resource.file_type ?? "file"}
-        </a>
-      )}
-    </Card>
+    <Link to="/hub/resources/$id" params={{ id: resource.id }}>
+      <Card className="h-full rounded-2xl border-border/60 p-5 space-y-2 hover:shadow-md transition-shadow">
+        <Badge variant="outline" className={`rounded-full text-[10px] ${categoryTone(resource.category)}`}>
+          <Download className="h-3 w-3 mr-1" /> {resource.category}
+        </Badge>
+        <h3 className="font-medium leading-snug">{resource.title}</h3>
+        {resource.description && <p className="text-xs text-muted-foreground line-clamp-2">{resource.description}</p>}
+        <span className="text-xs text-primary inline-flex items-center gap-1">
+          Open resource →
+        </span>
+      </Card>
+    </Link>
   );
 }
 
