@@ -374,8 +374,9 @@ function EpisodeForm({
     if (!title) return toast.error("Title is required");
     const slug = (form.slug || slugify(title)).trim();
     if (!slug) return toast.error("Slug could not be generated — set it manually");
-    const status =
-      mode === "publish" ? "published" : form.status === "archived" ? "archived" : "draft";
+    const status = mode === "publish" ? "published" : "draft";
+    const publish_at =
+      mode === "publish" ? new Date().toISOString() : form.publish_at ?? new Date().toISOString();
     const payload = {
       slug,
       title,
@@ -386,7 +387,7 @@ function EpisodeForm({
       category: form.category ?? PODCAST_CATEGORIES[0],
       status,
       is_featured: !!form.is_featured,
-      publish_at: form.publish_at ?? new Date().toISOString(),
+      publish_at,
       episode_number: form.episode_number ? Number(form.episode_number) : null,
       spotify_url: form.spotify_url ?? null,
       apple_url: form.apple_url ?? null,
@@ -403,7 +404,7 @@ function EpisodeForm({
         return;
       }
       toast.success(mode === "publish" ? "Episode published" : "Draft saved");
-      setForm((f) => ({ ...f, status }));
+      setForm((f) => ({ ...f, status, publish_at }));
       onSaved();
     } finally {
       setSaving(null);
@@ -456,30 +457,21 @@ function EpisodeForm({
                 <SelectContent>{PODCAST_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
               </Select>
             </Field>
-            <Field label="Status">
-              <Select value={form.status} onValueChange={(v) => set("status", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{["draft","published","archived"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Field label="Publish at">
-              <Input type="datetime-local" value={form.publish_at ? new Date(form.publish_at).toISOString().slice(0, 16) : ""}
-                onChange={(e) => set("publish_at", new Date(e.target.value).toISOString())} />
-            </Field>
             <label className="flex items-end gap-2 text-sm">
               <input type="checkbox" checked={!!form.is_featured} onChange={(e) => set("is_featured", e.target.checked)} />
               Feature this episode
             </label>
           </div>
+          <p className="text-xs text-muted-foreground">
+            <b>Save draft</b> keeps this hidden. <b>Publish</b> makes it live immediately. Current status: <b>{form.status ?? "draft"}</b>.
+          </p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button variant="outline" disabled={!!saving} onClick={() => save("draft")}>
               {saving === "draft" ? "Saving…" : "Save draft"}
             </Button>
             <Button disabled={!!saving} onClick={() => save("publish")}>
-              {saving === "publish" ? "Publishing…" : "Publish"}
+              {saving === "publish" ? "Publishing…" : "Publish now"}
             </Button>
           </div>
         </div>
