@@ -1234,6 +1234,24 @@ export type Database = {
         Args: { _user_id: string }
         Returns: undefined
       }
+      admin_list_families: {
+        Args: never
+        Returns: {
+          alignment_at: string
+          alignment_status: string
+          commitment_signed: boolean
+          compass_generated: boolean
+          created_at: string
+          family_id: string
+          family_name: string
+          final_enrolled: boolean
+          parent_completed: boolean
+          parent_name: string
+          primary_email: string
+          student_completed: boolean
+          student_count: number
+        }[]
+      }
       admin_list_profiles: {
         Args: never
         Returns: {
@@ -1297,6 +1315,21 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      list_bookable_instructors: {
+        Args: never
+        Returns: {
+          bio: string
+          preferred_name: string
+          specialties: string[]
+          user_id: string
+        }[]
+      }
+      list_taken_slots: {
+        Args: { _from: string; _instructor_id: string; _to: string }
+        Returns: {
+          scheduled_at: string
+        }[]
+      }
       resolve_identity: { Args: never; Returns: Json }
       sign_family_commitment: {
         Args: {
