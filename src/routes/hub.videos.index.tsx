@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fmtDate } from "@/lib/hub-content";
 
-export const Route = createFileRoute("/hub/videos")({ component: VideosTab });
+export const Route = createFileRoute("/hub/videos/")({ component: VideosTab });
 
 type Ep = {
   id: string;
