@@ -8,7 +8,7 @@ import { Download, FileText, Search } from "lucide-react";
 import { RESOURCE_CATEGORIES } from "@/lib/hub-auth";
 import { fmtDate, listPublishedResources, categoryTone, type Resource } from "@/lib/hub-content";
 
-export const Route = createFileRoute("/hub/resources")({ component: ResourcesTab });
+export const Route = createFileRoute("/hub/resources/")({ component: ResourcesTab });
 
 function ResourcesTab() {
   const [items, setItems] = useState<Resource[]>([]);

@@ -9,7 +9,7 @@ import { PODCAST_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
 import { fmtDate, fmtDuration, listPublishedEpisodes, categoryTone, type Episode } from "@/lib/hub-content";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/hub/podcasts")({ component: PodcastsTab });
+export const Route = createFileRoute("/hub/podcasts/")({ component: PodcastsTab });
 
 function PodcastsTab() {
   const [eps, setEps] = useState<Episode[]>([]);

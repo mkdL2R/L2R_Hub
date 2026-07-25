@@ -20,15 +20,11 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HubIndexRouteImport } from './routes/hub.index'
-import { Route as HubVideosRouteImport } from './routes/hub.videos'
 import { Route as HubSearchRouteImport } from './routes/hub.search'
-import { Route as HubResourcesRouteImport } from './routes/hub.resources'
-import { Route as HubPodcastsRouteImport } from './routes/hub.podcasts'
 import { Route as HubFeaturedRouteImport } from './routes/hub.featured'
 import { Route as HubDownloadsRouteImport } from './routes/hub.downloads'
 import { Route as HubCategoriesRouteImport } from './routes/hub.categories'
 import { Route as HubBookmarksRouteImport } from './routes/hub.bookmarks'
-import { Route as HubArticlesRouteImport } from './routes/hub.articles'
 import { Route as HubAdminRouteImport } from './routes/hub.admin'
 import { Route as AuthenticatedStudentDashboardRouteImport } from './routes/_authenticated/student-dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -40,6 +36,10 @@ import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_auth
 import { Route as AuthenticatedFamilyCommitmentRouteImport } from './routes/_authenticated/family-commitment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_authenticated/alignment-meeting'
+import { Route as HubVideosIndexRouteImport } from './routes/hub.videos.index'
+import { Route as HubResourcesIndexRouteImport } from './routes/hub.resources.index'
+import { Route as HubPodcastsIndexRouteImport } from './routes/hub.podcasts.index'
+import { Route as HubArticlesIndexRouteImport } from './routes/hub.articles.index'
 import { Route as AuthenticatedStudentDashboardIndexRouteImport } from './routes/_authenticated/student-dashboard.index'
 import { Route as HubVideosSlugRouteImport } from './routes/hub.videos.$slug'
 import { Route as HubResourcesIdRouteImport } from './routes/hub.resources.$id'
@@ -105,24 +105,9 @@ const HubIndexRoute = HubIndexRouteImport.update({
   path: '/',
   getParentRoute: () => HubRoute,
 } as any)
-const HubVideosRoute = HubVideosRouteImport.update({
-  id: '/videos',
-  path: '/videos',
-  getParentRoute: () => HubRoute,
-} as any)
 const HubSearchRoute = HubSearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => HubRoute,
-} as any)
-const HubResourcesRoute = HubResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => HubRoute,
-} as any)
-const HubPodcastsRoute = HubPodcastsRouteImport.update({
-  id: '/podcasts',
-  path: '/podcasts',
   getParentRoute: () => HubRoute,
 } as any)
 const HubFeaturedRoute = HubFeaturedRouteImport.update({
@@ -143,11 +128,6 @@ const HubCategoriesRoute = HubCategoriesRouteImport.update({
 const HubBookmarksRoute = HubBookmarksRouteImport.update({
   id: '/bookmarks',
   path: '/bookmarks',
-  getParentRoute: () => HubRoute,
-} as any)
-const HubArticlesRoute = HubArticlesRouteImport.update({
-  id: '/articles',
-  path: '/articles',
   getParentRoute: () => HubRoute,
 } as any)
 const HubAdminRoute = HubAdminRouteImport.update({
@@ -210,6 +190,26 @@ const AuthenticatedAlignmentMeetingRoute =
     path: '/alignment-meeting',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const HubVideosIndexRoute = HubVideosIndexRouteImport.update({
+  id: '/videos/',
+  path: '/videos/',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubResourcesIndexRoute = HubResourcesIndexRouteImport.update({
+  id: '/resources/',
+  path: '/resources/',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubPodcastsIndexRoute = HubPodcastsIndexRouteImport.update({
+  id: '/podcasts/',
+  path: '/podcasts/',
+  getParentRoute: () => HubRoute,
+} as any)
+const HubArticlesIndexRoute = HubArticlesIndexRouteImport.update({
+  id: '/articles/',
+  path: '/articles/',
+  getParentRoute: () => HubRoute,
+} as any)
 const AuthenticatedStudentDashboardIndexRoute =
   AuthenticatedStudentDashboardIndexRouteImport.update({
     id: '/',
@@ -217,24 +217,24 @@ const AuthenticatedStudentDashboardIndexRoute =
     getParentRoute: () => AuthenticatedStudentDashboardRoute,
   } as any)
 const HubVideosSlugRoute = HubVideosSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => HubVideosRoute,
+  id: '/videos/$slug',
+  path: '/videos/$slug',
+  getParentRoute: () => HubRoute,
 } as any)
 const HubResourcesIdRoute = HubResourcesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => HubResourcesRoute,
+  id: '/resources/$id',
+  path: '/resources/$id',
+  getParentRoute: () => HubRoute,
 } as any)
 const HubPodcastsSlugRoute = HubPodcastsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => HubPodcastsRoute,
+  id: '/podcasts/$slug',
+  path: '/podcasts/$slug',
+  getParentRoute: () => HubRoute,
 } as any)
 const HubArticlesSlugRoute = HubArticlesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => HubArticlesRoute,
+  id: '/articles/$slug',
+  path: '/articles/$slug',
+  getParentRoute: () => HubRoute,
 } as any)
 const AuthenticatedStudentDashboardReflectionRoute =
   AuthenticatedStudentDashboardReflectionRouteImport.update({
@@ -288,15 +288,11 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardRouteWithChildren
   '/hub/admin': typeof HubAdminRoute
-  '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
   '/hub/categories': typeof HubCategoriesRoute
   '/hub/downloads': typeof HubDownloadsRoute
   '/hub/featured': typeof HubFeaturedRoute
-  '/hub/podcasts': typeof HubPodcastsRouteWithChildren
-  '/hub/resources': typeof HubResourcesRouteWithChildren
   '/hub/search': typeof HubSearchRoute
-  '/hub/videos': typeof HubVideosRouteWithChildren
   '/hub/': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
@@ -308,6 +304,10 @@ export interface FileRoutesByFullPath {
   '/hub/resources/$id': typeof HubResourcesIdRoute
   '/hub/videos/$slug': typeof HubVideosSlugRoute
   '/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
+  '/hub/articles/': typeof HubArticlesIndexRoute
+  '/hub/podcasts/': typeof HubPodcastsIndexRoute
+  '/hub/resources/': typeof HubResourcesIndexRoute
+  '/hub/videos/': typeof HubVideosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -328,15 +328,11 @@ export interface FileRoutesByTo {
   '/people': typeof AuthenticatedPeopleRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/hub/admin': typeof HubAdminRoute
-  '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
   '/hub/categories': typeof HubCategoriesRoute
   '/hub/downloads': typeof HubDownloadsRoute
   '/hub/featured': typeof HubFeaturedRoute
-  '/hub/podcasts': typeof HubPodcastsRouteWithChildren
-  '/hub/resources': typeof HubResourcesRouteWithChildren
   '/hub/search': typeof HubSearchRoute
-  '/hub/videos': typeof HubVideosRouteWithChildren
   '/hub': typeof HubIndexRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
@@ -348,6 +344,10 @@ export interface FileRoutesByTo {
   '/hub/resources/$id': typeof HubResourcesIdRoute
   '/hub/videos/$slug': typeof HubVideosSlugRoute
   '/student-dashboard': typeof AuthenticatedStudentDashboardIndexRoute
+  '/hub/articles': typeof HubArticlesIndexRoute
+  '/hub/podcasts': typeof HubPodcastsIndexRoute
+  '/hub/resources': typeof HubResourcesIndexRoute
+  '/hub/videos': typeof HubVideosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -372,15 +372,11 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/student-dashboard': typeof AuthenticatedStudentDashboardRouteWithChildren
   '/hub/admin': typeof HubAdminRoute
-  '/hub/articles': typeof HubArticlesRouteWithChildren
   '/hub/bookmarks': typeof HubBookmarksRoute
   '/hub/categories': typeof HubCategoriesRoute
   '/hub/downloads': typeof HubDownloadsRoute
   '/hub/featured': typeof HubFeaturedRoute
-  '/hub/podcasts': typeof HubPodcastsRouteWithChildren
-  '/hub/resources': typeof HubResourcesRouteWithChildren
   '/hub/search': typeof HubSearchRoute
-  '/hub/videos': typeof HubVideosRouteWithChildren
   '/hub/': typeof HubIndexRoute
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/_authenticated/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
@@ -392,6 +388,10 @@ export interface FileRoutesById {
   '/hub/resources/$id': typeof HubResourcesIdRoute
   '/hub/videos/$slug': typeof HubVideosSlugRoute
   '/_authenticated/student-dashboard/': typeof AuthenticatedStudentDashboardIndexRoute
+  '/hub/articles/': typeof HubArticlesIndexRoute
+  '/hub/podcasts/': typeof HubPodcastsIndexRoute
+  '/hub/resources/': typeof HubResourcesIndexRoute
+  '/hub/videos/': typeof HubVideosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -416,15 +416,11 @@ export interface FileRouteTypes {
     | '/profile'
     | '/student-dashboard'
     | '/hub/admin'
-    | '/hub/articles'
     | '/hub/bookmarks'
     | '/hub/categories'
     | '/hub/downloads'
     | '/hub/featured'
-    | '/hub/podcasts'
-    | '/hub/resources'
     | '/hub/search'
-    | '/hub/videos'
     | '/hub/'
     | '/admin/profiles'
     | '/instructor/availability'
@@ -436,6 +432,10 @@ export interface FileRouteTypes {
     | '/hub/resources/$id'
     | '/hub/videos/$slug'
     | '/student-dashboard/'
+    | '/hub/articles/'
+    | '/hub/podcasts/'
+    | '/hub/resources/'
+    | '/hub/videos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -456,15 +456,11 @@ export interface FileRouteTypes {
     | '/people'
     | '/profile'
     | '/hub/admin'
-    | '/hub/articles'
     | '/hub/bookmarks'
     | '/hub/categories'
     | '/hub/downloads'
     | '/hub/featured'
-    | '/hub/podcasts'
-    | '/hub/resources'
     | '/hub/search'
-    | '/hub/videos'
     | '/hub'
     | '/admin/profiles'
     | '/instructor/availability'
@@ -476,6 +472,10 @@ export interface FileRouteTypes {
     | '/hub/resources/$id'
     | '/hub/videos/$slug'
     | '/student-dashboard'
+    | '/hub/articles'
+    | '/hub/podcasts'
+    | '/hub/resources'
+    | '/hub/videos'
   id:
     | '__root__'
     | '/'
@@ -499,15 +499,11 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/_authenticated/student-dashboard'
     | '/hub/admin'
-    | '/hub/articles'
     | '/hub/bookmarks'
     | '/hub/categories'
     | '/hub/downloads'
     | '/hub/featured'
-    | '/hub/podcasts'
-    | '/hub/resources'
     | '/hub/search'
-    | '/hub/videos'
     | '/hub/'
     | '/_authenticated/admin/profiles'
     | '/_authenticated/instructor/availability'
@@ -519,6 +515,10 @@ export interface FileRouteTypes {
     | '/hub/resources/$id'
     | '/hub/videos/$slug'
     | '/_authenticated/student-dashboard/'
+    | '/hub/articles/'
+    | '/hub/podcasts/'
+    | '/hub/resources/'
+    | '/hub/videos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -613,32 +613,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HubIndexRouteImport
       parentRoute: typeof HubRoute
     }
-    '/hub/videos': {
-      id: '/hub/videos'
-      path: '/videos'
-      fullPath: '/hub/videos'
-      preLoaderRoute: typeof HubVideosRouteImport
-      parentRoute: typeof HubRoute
-    }
     '/hub/search': {
       id: '/hub/search'
       path: '/search'
       fullPath: '/hub/search'
       preLoaderRoute: typeof HubSearchRouteImport
-      parentRoute: typeof HubRoute
-    }
-    '/hub/resources': {
-      id: '/hub/resources'
-      path: '/resources'
-      fullPath: '/hub/resources'
-      preLoaderRoute: typeof HubResourcesRouteImport
-      parentRoute: typeof HubRoute
-    }
-    '/hub/podcasts': {
-      id: '/hub/podcasts'
-      path: '/podcasts'
-      fullPath: '/hub/podcasts'
-      preLoaderRoute: typeof HubPodcastsRouteImport
       parentRoute: typeof HubRoute
     }
     '/hub/featured': {
@@ -667,13 +646,6 @@ declare module '@tanstack/react-router' {
       path: '/bookmarks'
       fullPath: '/hub/bookmarks'
       preLoaderRoute: typeof HubBookmarksRouteImport
-      parentRoute: typeof HubRoute
-    }
-    '/hub/articles': {
-      id: '/hub/articles'
-      path: '/articles'
-      fullPath: '/hub/articles'
-      preLoaderRoute: typeof HubArticlesRouteImport
       parentRoute: typeof HubRoute
     }
     '/hub/admin': {
@@ -753,6 +725,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlignmentMeetingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/hub/videos/': {
+      id: '/hub/videos/'
+      path: '/videos'
+      fullPath: '/hub/videos/'
+      preLoaderRoute: typeof HubVideosIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/resources/': {
+      id: '/hub/resources/'
+      path: '/resources'
+      fullPath: '/hub/resources/'
+      preLoaderRoute: typeof HubResourcesIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/podcasts/': {
+      id: '/hub/podcasts/'
+      path: '/podcasts'
+      fullPath: '/hub/podcasts/'
+      preLoaderRoute: typeof HubPodcastsIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
+    '/hub/articles/': {
+      id: '/hub/articles/'
+      path: '/articles'
+      fullPath: '/hub/articles/'
+      preLoaderRoute: typeof HubArticlesIndexRouteImport
+      parentRoute: typeof HubRoute
+    }
     '/_authenticated/student-dashboard/': {
       id: '/_authenticated/student-dashboard/'
       path: '/'
@@ -762,31 +762,31 @@ declare module '@tanstack/react-router' {
     }
     '/hub/videos/$slug': {
       id: '/hub/videos/$slug'
-      path: '/$slug'
+      path: '/videos/$slug'
       fullPath: '/hub/videos/$slug'
       preLoaderRoute: typeof HubVideosSlugRouteImport
-      parentRoute: typeof HubVideosRoute
+      parentRoute: typeof HubRoute
     }
     '/hub/resources/$id': {
       id: '/hub/resources/$id'
-      path: '/$id'
+      path: '/resources/$id'
       fullPath: '/hub/resources/$id'
       preLoaderRoute: typeof HubResourcesIdRouteImport
-      parentRoute: typeof HubResourcesRoute
+      parentRoute: typeof HubRoute
     }
     '/hub/podcasts/$slug': {
       id: '/hub/podcasts/$slug'
-      path: '/$slug'
+      path: '/podcasts/$slug'
       fullPath: '/hub/podcasts/$slug'
       preLoaderRoute: typeof HubPodcastsSlugRouteImport
-      parentRoute: typeof HubPodcastsRoute
+      parentRoute: typeof HubRoute
     }
     '/hub/articles/$slug': {
       id: '/hub/articles/$slug'
-      path: '/$slug'
+      path: '/articles/$slug'
       fullPath: '/hub/articles/$slug'
       preLoaderRoute: typeof HubArticlesSlugRouteImport
-      parentRoute: typeof HubArticlesRoute
+      parentRoute: typeof HubRoute
     }
     '/_authenticated/student-dashboard/reflection': {
       id: '/_authenticated/student-dashboard/reflection'
@@ -885,80 +885,40 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface HubArticlesRouteChildren {
-  HubArticlesSlugRoute: typeof HubArticlesSlugRoute
-}
-
-const HubArticlesRouteChildren: HubArticlesRouteChildren = {
-  HubArticlesSlugRoute: HubArticlesSlugRoute,
-}
-
-const HubArticlesRouteWithChildren = HubArticlesRoute._addFileChildren(
-  HubArticlesRouteChildren,
-)
-
-interface HubPodcastsRouteChildren {
-  HubPodcastsSlugRoute: typeof HubPodcastsSlugRoute
-}
-
-const HubPodcastsRouteChildren: HubPodcastsRouteChildren = {
-  HubPodcastsSlugRoute: HubPodcastsSlugRoute,
-}
-
-const HubPodcastsRouteWithChildren = HubPodcastsRoute._addFileChildren(
-  HubPodcastsRouteChildren,
-)
-
-interface HubResourcesRouteChildren {
-  HubResourcesIdRoute: typeof HubResourcesIdRoute
-}
-
-const HubResourcesRouteChildren: HubResourcesRouteChildren = {
-  HubResourcesIdRoute: HubResourcesIdRoute,
-}
-
-const HubResourcesRouteWithChildren = HubResourcesRoute._addFileChildren(
-  HubResourcesRouteChildren,
-)
-
-interface HubVideosRouteChildren {
-  HubVideosSlugRoute: typeof HubVideosSlugRoute
-}
-
-const HubVideosRouteChildren: HubVideosRouteChildren = {
-  HubVideosSlugRoute: HubVideosSlugRoute,
-}
-
-const HubVideosRouteWithChildren = HubVideosRoute._addFileChildren(
-  HubVideosRouteChildren,
-)
-
 interface HubRouteChildren {
   HubAdminRoute: typeof HubAdminRoute
-  HubArticlesRoute: typeof HubArticlesRouteWithChildren
   HubBookmarksRoute: typeof HubBookmarksRoute
   HubCategoriesRoute: typeof HubCategoriesRoute
   HubDownloadsRoute: typeof HubDownloadsRoute
   HubFeaturedRoute: typeof HubFeaturedRoute
-  HubPodcastsRoute: typeof HubPodcastsRouteWithChildren
-  HubResourcesRoute: typeof HubResourcesRouteWithChildren
   HubSearchRoute: typeof HubSearchRoute
-  HubVideosRoute: typeof HubVideosRouteWithChildren
   HubIndexRoute: typeof HubIndexRoute
+  HubArticlesSlugRoute: typeof HubArticlesSlugRoute
+  HubPodcastsSlugRoute: typeof HubPodcastsSlugRoute
+  HubResourcesIdRoute: typeof HubResourcesIdRoute
+  HubVideosSlugRoute: typeof HubVideosSlugRoute
+  HubArticlesIndexRoute: typeof HubArticlesIndexRoute
+  HubPodcastsIndexRoute: typeof HubPodcastsIndexRoute
+  HubResourcesIndexRoute: typeof HubResourcesIndexRoute
+  HubVideosIndexRoute: typeof HubVideosIndexRoute
 }
 
 const HubRouteChildren: HubRouteChildren = {
   HubAdminRoute: HubAdminRoute,
-  HubArticlesRoute: HubArticlesRouteWithChildren,
   HubBookmarksRoute: HubBookmarksRoute,
   HubCategoriesRoute: HubCategoriesRoute,
   HubDownloadsRoute: HubDownloadsRoute,
   HubFeaturedRoute: HubFeaturedRoute,
-  HubPodcastsRoute: HubPodcastsRouteWithChildren,
-  HubResourcesRoute: HubResourcesRouteWithChildren,
   HubSearchRoute: HubSearchRoute,
-  HubVideosRoute: HubVideosRouteWithChildren,
   HubIndexRoute: HubIndexRoute,
+  HubArticlesSlugRoute: HubArticlesSlugRoute,
+  HubPodcastsSlugRoute: HubPodcastsSlugRoute,
+  HubResourcesIdRoute: HubResourcesIdRoute,
+  HubVideosSlugRoute: HubVideosSlugRoute,
+  HubArticlesIndexRoute: HubArticlesIndexRoute,
+  HubPodcastsIndexRoute: HubPodcastsIndexRoute,
+  HubResourcesIndexRoute: HubResourcesIndexRoute,
+  HubVideosIndexRoute: HubVideosIndexRoute,
 }
 
 const HubRouteWithChildren = HubRoute._addFileChildren(HubRouteChildren)

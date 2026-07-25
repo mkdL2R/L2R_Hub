@@ -9,7 +9,7 @@ import { ARTICLE_CATEGORIES, useAuthUser } from "@/lib/hub-auth";
 import { fmtDate, listPublishedArticles, categoryTone, type Article } from "@/lib/hub-content";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/hub/articles")({ component: ArticlesTab });
+export const Route = createFileRoute("/hub/articles/")({ component: ArticlesTab });
 
 function ArticlesTab() {
   const [articles, setArticles] = useState<Article[]>([]);
