@@ -105,29 +105,15 @@ function AlignmentMeetingPage() {
     if (!user) return;
     (async () => {
       setLoading(true);
-      // Instructors
-      const { data: instr } = await supabase
-        .from("instructor_profiles")
-        .select("user_id, bio, specialties");
-      const ids = (instr ?? []).map((i) => i.user_id);
-      let profs: { user_id: string; preferred_name: string | null; email: string | null }[] = [];
-      if (ids.length) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("user_id, preferred_name, email")
-          .in("user_id", ids);
-        profs = data ?? [];
-      }
-      const merged: Instructor[] = (instr ?? []).map((i) => {
-        const p = profs.find((x) => x.user_id === i.user_id);
-        return {
-          user_id: i.user_id,
-          bio: i.bio,
-          specialties: i.specialties,
-          preferred_name: p?.preferred_name ?? null,
-          email: p?.email ?? null,
-        };
-      });
+      // Instructors (via SECURITY DEFINER helper — parents can't SELECT instructor_profiles directly)
+      const { data: instr } = await supabase.rpc("list_bookable_instructors");
+      const merged: Instructor[] = ((instr ?? []) as Array<{ user_id: string; preferred_name: string | null; bio: string | null; specialties: string[] | null }>).map((i) => ({
+        user_id: i.user_id,
+        bio: i.bio,
+        specialties: i.specialties,
+        preferred_name: i.preferred_name,
+        email: null,
+      }));
       setInstructors(merged);
 
       const { data: avail } = await supabase
@@ -135,21 +121,34 @@ function AlignmentMeetingPage() {
         .select("instructor_id, day_of_week, start_time, end_time, slot_minutes");
       setAvailability(avail ?? []);
 
-      // Existing bookings visible to this user (own family + any assigned)
+      // Existing meetings for THIS family (RLS)
       const { data: mine } = await supabase
         .from("alignment_meetings")
         .select("id, scheduled_at, instructor_id, status")
         .in("status", ["pending", "confirmed"])
         .order("scheduled_at", { ascending: true });
-      const list = mine ?? [];
-      setBookings(list.map((b) => ({ scheduled_at: b.scheduled_at, instructor_id: b.instructor_id })));
-      const own = list[0];
+      const own = (mine ?? [])[0];
       if (own) setExistingMeeting(own);
+      setBookings([]); // taken-slot list is fetched per instructor+date below
 
       if (merged.length === 1) setInstructorId(merged[0].user_id);
       setLoading(false);
     })();
   }, [user]);
+
+  // Fetch taken slots for the chosen instructor + day (public helper, no leakage)
+  useEffect(() => {
+    if (!instructorId || !date) return;
+    const from = new Date(date); from.setHours(0,0,0,0);
+    const to = new Date(from); to.setDate(to.getDate() + 1);
+    supabase.rpc("list_taken_slots", {
+      _instructor_id: instructorId,
+      _from: from.toISOString(),
+      _to: to.toISOString(),
+    }).then(({ data }) => {
+      setBookings(((data ?? []) as { scheduled_at: string }[]).map(r => ({ scheduled_at: r.scheduled_at, instructor_id: instructorId })));
+    });
+  }, [instructorId, date]);
 
   const slotsForDay = useMemo(() => {
     if (!date || !instructorId) return [];
