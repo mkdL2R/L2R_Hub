@@ -50,7 +50,20 @@ function UpcomingMeetings() {
     setLoading(false);
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    const ch = supabase
+      .channel("alignment_meetings_dashboard")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "alignment_meetings" },
+        () => refresh(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
 
   async function setStatus(id: string, status: "confirmed" | "completed" | "cancelled") {
     const { error } = await supabase.from("alignment_meetings").update({ status }).eq("id", id);
@@ -66,9 +79,14 @@ function UpcomingMeetings() {
       {loading ? (
         <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No upcoming meetings across the team. Set your <Link to="/instructor/availability" className="underline">weekly availability</Link> so families can book.
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            No Alignment Meetings have been booked yet.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Make sure your <Link to="/instructor/availability" className="underline">weekly availability</Link> is set so families can book time with you.
+          </p>
+        </div>
       ) : (
         <ul className="divide-y divide-border/60">
           {rows.map((m) => (
