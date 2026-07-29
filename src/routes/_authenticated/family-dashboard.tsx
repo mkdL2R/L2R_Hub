@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Compass, Sprout, BookOpen, TreeDeciduous, ArrowRight, PartyPopper,
   LayoutDashboard, Users, GraduationCap, CalendarClock, MessageSquare,
   Library, Settings, UserCircle, LogOut, Loader2, Bell, Sparkles,
-  Target, ChevronRight, PlusCircle,
+  Target, ChevronRight, PlusCircle, Pencil, Check, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIdentity } from "@/lib/identity";
@@ -66,7 +70,6 @@ const SIDEBAR: { to: string; label: string; icon: typeof LayoutDashboard }[] = [
   { to: "/alignment-meeting", label: "Alignment Meetings", icon: CalendarClock },
   { to: "/hub", label: "Growth Hub", icon: Sprout },
   { to: "/hub/bookmarks", label: "Saved Resources", icon: Library },
-  { to: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 function FamilyDashboard() {
@@ -148,6 +151,8 @@ function FamilyDashboard() {
                   enrolled={enrolled}
                   nextStep={nextStep}
                 />
+
+                <ParentProfileCard identity={identity} />
 
                 <div className="grid gap-6 lg:grid-cols-3">
                   <FamilyOverviewCard
@@ -232,7 +237,6 @@ function TopBar({ name }: { name: string | null }) {
           {name ? <>Signed in as <span className="text-foreground font-medium">{name}</span></> : "Signed in"}
         </div>
         <div className="flex items-center gap-2">
-          <Button asChild variant="ghost" size="sm"><Link to="/profile"><UserCircle className="h-4 w-4 mr-1.5" />Profile</Link></Button>
           <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="h-4 w-4 mr-1.5" />Sign out</Button>
         </div>
       </div>
@@ -568,5 +572,92 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
       <dt className="text-xs uppercase tracking-widest text-muted-foreground">{label}</dt>
       <dd className="text-sm text-right">{children}</dd>
     </div>
+  );
+}
+
+function ParentProfileCard({ identity }: { identity: ReturnType<typeof useIdentity>["identity"] }) {
+  const profile = identity?.profile;
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [name, setName] = useState(profile?.preferred_name ?? "");
+  const [avatar, setAvatar] = useState(profile?.avatar_url ?? "");
+  const [phone, setPhone] = useState<string>("");
+
+  useEffect(() => {
+    setName(profile?.preferred_name ?? "");
+    setAvatar(profile?.avatar_url ?? "");
+  }, [profile?.preferred_name, profile?.avatar_url]);
+
+  useEffect(() => {
+    if (!profile?.user_id) return;
+    supabase.from("profiles").select("phone").eq("user_id", profile.user_id).maybeSingle()
+      .then(({ data }) => setPhone((data?.phone as string | null) ?? ""));
+  }, [profile?.user_id]);
+
+  if (!profile) return null;
+  const roleLabel = profile.primary_role === "parent" ? "Parent · Family Owner" : (profile.primary_role ?? "Member");
+  const initials = (name || profile.email || "?").slice(0, 2).toUpperCase();
+
+  async function save() {
+    if (!profile?.user_id) return;
+    setSaving(true);
+    const { error } = await supabase.from("profiles").upsert({
+      user_id: profile.user_id,
+      preferred_name: name || null,
+      avatar_url: avatar || null,
+      phone: phone || null,
+    });
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Profile updated");
+    setEditing(false);
+  }
+
+  return (
+    <Card className="card-paper p-6 rounded-3xl">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <Avatar className="h-14 w-14">
+            <AvatarImage src={avatar || undefined} />
+            <AvatarFallback>{initials}</AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">{roleLabel}</div>
+            <div className="font-serif text-xl truncate">{name || "Add your name"}</div>
+            <div className="text-sm text-muted-foreground truncate">{profile.email}</div>
+          </div>
+        </div>
+        {!editing ? (
+          <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
+            <Pencil className="h-4 w-4 mr-1.5" />Edit
+          </Button>
+        ) : (
+          <div className="flex gap-1.5">
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+            <Button size="sm" onClick={save} disabled={saving}>
+              <Check className="h-4 w-4 mr-1.5" />{saving ? "Saving…" : "Save"}
+            </Button>
+          </div>
+        )}
+      </div>
+      {editing ? (
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="pp-name">Preferred name</Label>
+            <Input id="pp-name" value={name} onChange={(e) => setName(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="pp-phone">Phone</Label>
+            <Input id="pp-phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </div>
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label htmlFor="pp-avatar">Avatar URL</Label>
+            <Input id="pp-avatar" placeholder="https://…" value={avatar} onChange={(e) => setAvatar(e.target.value)} />
+          </div>
+        </div>
+      ) : null}
+    </Card>
   );
 }
