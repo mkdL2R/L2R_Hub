@@ -1,10 +1,14 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Compass, Sprout, BookOpen, TreeDeciduous, ArrowRight, PartyPopper,
   LayoutDashboard, Users, GraduationCap, CalendarClock, MessageSquare,
   Library, Settings, UserCircle, LogOut, Loader2, Bell, Sparkles,
-  Target, ChevronRight, PlusCircle,
+  Target, ChevronRight, PlusCircle, Pencil, Check, X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIdentity } from "@/lib/identity";
@@ -66,7 +70,6 @@ const SIDEBAR: { to: string; label: string; icon: typeof LayoutDashboard }[] = [
   { to: "/alignment-meeting", label: "Alignment Meetings", icon: CalendarClock },
   { to: "/hub", label: "Growth Hub", icon: Sprout },
   { to: "/hub/bookmarks", label: "Saved Resources", icon: Library },
-  { to: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 function FamilyDashboard() {
