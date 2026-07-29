@@ -92,6 +92,21 @@ function StudentJourney() {
   // Parents may return to /student to add additional children at any time.
   void progress;
 
+  // If a previous Student Journey was already submitted for this family,
+  // start the wizard fresh so the parent can add a NEW child (rather than
+  // seeing the previous child's stale draft prefilled).
+  const freshResetRef = useRef(false);
+  useEffect(() => {
+    if (freshResetRef.current) return;
+    if (progress.loading) return;
+    if (progress.hasFamily && progress.completed.student && !done) {
+      freshResetRef.current = true;
+      clearDraft("studentDraft");
+      setData(INITIAL);
+      setStep(0);
+    }
+  }, [progress.loading, progress.hasFamily, progress.completed.student, done]);
+
   useEffect(() => { saveDraft("studentDraft", data); }, [data]);
 
   const canProceed = useMemo(() => stepValid(step, data), [step, data]);
