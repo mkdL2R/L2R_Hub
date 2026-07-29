@@ -88,28 +88,9 @@ function StudentJourney() {
   const progress = useAdmissionsProgress();
   const submitAttemptedRef = useRef(false);
 
-  // If this family has already submitted the Student Journey, don't reopen
-  // the wizard — surface the next admissions steps instead.
-  if (
-    !progress.loading &&
-    progress.hasFamily &&
-    progress.completed.student &&
-    !done
-  ) {
-    const actions = [
-      { to: "/compass", label: "Continue to Family Compass" },
-      ...(progress.completed.compass
-        ? [{ to: "/alignment-meeting", label: "Continue to Alignment Meeting" }]
-        : [{ to: "/family-dashboard", label: "Back to Dashboard" }]),
-    ];
-    return (
-      <AlreadyCompleted
-        title="You've already completed the Student Journey."
-        description="Your learner's profile is saved. Here's what's next."
-        actions={actions}
-      />
-    );
-  }
+  // Note: We intentionally do NOT gate this route on prior completion.
+  // Parents may return to /student to add additional children at any time.
+  void progress;
 
   useEffect(() => { saveDraft("studentDraft", data); }, [data]);
 
