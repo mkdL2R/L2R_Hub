@@ -50,7 +50,20 @@ function UpcomingMeetings() {
     setLoading(false);
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+    const ch = supabase
+      .channel("alignment_meetings_dashboard")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "alignment_meetings" },
+        () => refresh(),
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(ch);
+    };
+  }, []);
 
   async function setStatus(id: string, status: "confirmed" | "completed" | "cancelled") {
     const { error } = await supabase.from("alignment_meetings").update({ status }).eq("id", id);
