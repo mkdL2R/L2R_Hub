@@ -66,9 +66,14 @@ function UpcomingMeetings() {
       {loading ? (
         <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No upcoming meetings across the team. Set your <Link to="/instructor/availability" className="underline">weekly availability</Link> so families can book.
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            No Alignment Meetings have been booked yet.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Make sure your <Link to="/instructor/availability" className="underline">weekly availability</Link> is set so families can book time with you.
+          </p>
+        </div>
       ) : (
         <ul className="divide-y divide-border/60">
           {rows.map((m) => (
