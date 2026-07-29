@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/select";
 import { CheckCircle2 } from "lucide-react";
 import { useAdmissionsProgress } from "@/lib/admissions";
-import { AlreadyCompleted } from "@/components/admissions/AlreadyCompleted";
 
 export const Route = createFileRoute("/student")({
   head: () => ({
