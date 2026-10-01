@@ -32,6 +32,11 @@ function AuthPage() {
 
   function postAuthTarget(): string {
     try {
+      const next = sessionStorage.getItem("l2r:post_auth_next");
+      if (next && next.startsWith("/") && !next.startsWith("//")) {
+        sessionStorage.removeItem("l2r:post_auth_next");
+        return next;
+      }
       const t = sessionStorage.getItem("l2r:pending_instructor_token");
       if (t) return `/invite?token=${t}`;
     } catch { /* noop */ }
