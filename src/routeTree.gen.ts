@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ParentRouteImport } from './routes/parent'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InviteFamilyRouteImport } from './routes/invite-family'
 import { Route as InviteRouteImport } from './routes/invite'
 import { Route as HubRouteImport } from './routes/hub'
@@ -36,6 +37,7 @@ import { Route as AuthenticatedFamilyDashboardRouteImport } from './routes/_auth
 import { Route as AuthenticatedFamilyCommitmentRouteImport } from './routes/_authenticated/family-commitment'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAlignmentMeetingRouteImport } from './routes/_authenticated/alignment-meeting'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as HubVideosIndexRouteImport } from './routes/hub.videos.index'
 import { Route as HubResourcesIndexRouteImport } from './routes/hub.resources.index'
 import { Route as HubPodcastsIndexRouteImport } from './routes/hub.podcasts.index'
@@ -50,6 +52,7 @@ import { Route as AuthenticatedStudentDashboardProgressRouteImport } from './rou
 import { Route as AuthenticatedStudentDashboardLearningPlanRouteImport } from './routes/_authenticated/student-dashboard.learning-plan'
 import { Route as AuthenticatedInstructorAvailabilityRouteImport } from './routes/_authenticated/instructor.availability'
 import { Route as AuthenticatedAdminProfilesRouteImport } from './routes/_authenticated/admin.profiles'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
@@ -64,6 +67,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const ParentRoute = ParentRouteImport.update({
   id: '/parent',
   path: '/parent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteFamilyRoute = InviteFamilyRouteImport.update({
@@ -190,6 +198,12 @@ const AuthenticatedAlignmentMeetingRoute =
     path: '/alignment-meeting',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const HubVideosIndexRoute = HubVideosIndexRouteImport.update({
   id: '/videos/',
   path: '/videos/',
@@ -266,6 +280,11 @@ const AuthenticatedAdminProfilesRoute =
     path: '/admin/profiles',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -274,9 +293,11 @@ export interface FileRoutesByFullPath {
   '/hub': typeof HubRouteWithChildren
   '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
+  '/mcp': typeof McpRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
@@ -294,6 +315,7 @@ export interface FileRoutesByFullPath {
   '/hub/featured': typeof HubFeaturedRoute
   '/hub/search': typeof HubSearchRoute
   '/hub/': typeof HubIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
@@ -315,9 +337,11 @@ export interface FileRoutesByTo {
   '/compass': typeof CompassRoute
   '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
+  '/mcp': typeof McpRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
@@ -334,6 +358,7 @@ export interface FileRoutesByTo {
   '/hub/featured': typeof HubFeaturedRoute
   '/hub/search': typeof HubSearchRoute
   '/hub': typeof HubIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
@@ -358,9 +383,11 @@ export interface FileRoutesById {
   '/hub': typeof HubRouteWithChildren
   '/invite': typeof InviteRoute
   '/invite-family': typeof InviteFamilyRoute
+  '/mcp': typeof McpRoute
   '/parent': typeof ParentRoute
   '/reset-password': typeof ResetPasswordRoute
   '/student': typeof StudentRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/alignment-meeting': typeof AuthenticatedAlignmentMeetingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/family-commitment': typeof AuthenticatedFamilyCommitmentRoute
@@ -378,6 +405,7 @@ export interface FileRoutesById {
   '/hub/featured': typeof HubFeaturedRoute
   '/hub/search': typeof HubSearchRoute
   '/hub/': typeof HubIndexRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/admin/profiles': typeof AuthenticatedAdminProfilesRoute
   '/_authenticated/instructor/availability': typeof AuthenticatedInstructorAvailabilityRoute
   '/_authenticated/student-dashboard/learning-plan': typeof AuthenticatedStudentDashboardLearningPlanRoute
@@ -402,9 +430,11 @@ export interface FileRouteTypes {
     | '/hub'
     | '/invite'
     | '/invite-family'
+    | '/mcp'
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/.well-known/oauth-protected-resource'
     | '/alignment-meeting'
     | '/dashboard'
     | '/family-commitment'
@@ -422,6 +452,7 @@ export interface FileRouteTypes {
     | '/hub/featured'
     | '/hub/search'
     | '/hub/'
+    | '/.lovable/oauth/consent'
     | '/admin/profiles'
     | '/instructor/availability'
     | '/student-dashboard/learning-plan'
@@ -443,9 +474,11 @@ export interface FileRouteTypes {
     | '/compass'
     | '/invite'
     | '/invite-family'
+    | '/mcp'
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/.well-known/oauth-protected-resource'
     | '/alignment-meeting'
     | '/dashboard'
     | '/family-commitment'
@@ -462,6 +495,7 @@ export interface FileRouteTypes {
     | '/hub/featured'
     | '/hub/search'
     | '/hub'
+    | '/.lovable/oauth/consent'
     | '/admin/profiles'
     | '/instructor/availability'
     | '/student-dashboard/learning-plan'
@@ -485,9 +519,11 @@ export interface FileRouteTypes {
     | '/hub'
     | '/invite'
     | '/invite-family'
+    | '/mcp'
     | '/parent'
     | '/reset-password'
     | '/student'
+    | '/.well-known/oauth-protected-resource'
     | '/_authenticated/alignment-meeting'
     | '/_authenticated/dashboard'
     | '/_authenticated/family-commitment'
@@ -505,6 +541,7 @@ export interface FileRouteTypes {
     | '/hub/featured'
     | '/hub/search'
     | '/hub/'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/admin/profiles'
     | '/_authenticated/instructor/availability'
     | '/_authenticated/student-dashboard/learning-plan'
@@ -529,9 +566,12 @@ export interface RootRouteChildren {
   HubRoute: typeof HubRouteWithChildren
   InviteRoute: typeof InviteRoute
   InviteFamilyRoute: typeof InviteFamilyRoute
+  McpRoute: typeof McpRoute
   ParentRoute: typeof ParentRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   StudentRoute: typeof StudentRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -555,6 +595,13 @@ declare module '@tanstack/react-router' {
       path: '/parent'
       fullPath: '/parent'
       preLoaderRoute: typeof ParentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invite-family': {
@@ -725,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAlignmentMeetingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/hub/videos/': {
       id: '/hub/videos/'
       path: '/videos'
@@ -822,6 +876,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/profiles'
       preLoaderRoute: typeof AuthenticatedAdminProfilesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -931,9 +992,13 @@ const rootRouteChildren: RootRouteChildren = {
   HubRoute: HubRouteWithChildren,
   InviteRoute: InviteRoute,
   InviteFamilyRoute: InviteFamilyRoute,
+  McpRoute: McpRoute,
   ParentRoute: ParentRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   StudentRoute: StudentRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
